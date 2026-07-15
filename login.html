@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter the Clan — AniStock</title>
+<style>
+:root{
+    --blue:#1d3f9e;
+    --blue-dark:#152f78;
+    --ink:#1a1d29;
+    --ink-soft:#5b6072;
+    --bg:#f7f7f9;
+    --border:#e6e6ea;
+    --error:#c0394f;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+}
+
+a{
+    color:var(--blue);
+    text-decoration:none;
+}
+
+.card{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    max-width:1200px;
+    width:100%;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 2px 24px rgba(0,0,0,.04);
+}
+
+.visual{
+    position:relative;
+    background:
+        linear-gradient(180deg, rgba(10,15,25,.1), rgba(10,15,25,.85)),
+        url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop')
+        center/cover;
+    min-height:560px;
+    padding:34px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    color:#fff;
+}
+
+.visual-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.brand{
+    font-family:var(--serif);
+    font-size:24px;
+    font-weight:700;
+}
+
+.brand small{
+    display:block;
+    font-family:var(--sans);
+    font-size:9px;
+    letter-spacing:2px;
+    opacity:.75;
+    margin-top:2px;
+}
+
+.sysver{
+    font-size:10px;
+    opacity:.4;
+    letter-spacing:1px;
+}
+
+.visual-bottom{
+    border-left:3px solid var(--blue);
+    padding-left:16px;
+}
+
+.visual-bottom h2{
+    font-family:var(--serif);
+    font-size:30px;
+    line-height:1.15;
+    margin-bottom:10px;
+}
+
+.visual-bottom p{
+    font-size:14px;
+    opacity:.85;
+    max-width:340px;
+    line-height:1.6;
+}
+
+.form-side{
+    padding:44px 48px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.tabs{
+    display:flex;
+    gap:28px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:24px;
+}
+
+.tab{
+    font-family:var(--serif);
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.5px;
+    padding-bottom:12px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    border-bottom:2px solid transparent;
+    position:relative;
+    top:1px;
+}
+
+.tab.active{
+    color:var(--ink);
+    border-bottom-color:var(--blue);
+}
+
+.demo-hint{
+    background:#eef2fb;
+    border:1px solid #c7d3f0;
+    border-radius:6px;
+    padding:12px 14px;
+    font-size:12px;
+    color:var(--blue-dark);
+    margin-bottom:20px;
+    line-height:1.6;
+}
+
+.demo-hint strong{
+    font-family:monospace;
+    font-size:12px;
+}
+
+.demo-hint button{
+    margin-top:6px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:6px 10px;
+    border-radius:4px;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.field{
+    margin-bottom:18px;
+}
+
+.field-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    letter-spacing:.8px;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+}
+
+.field-label a{
+    font-size:11px;
+}
+
+.input-wrap{
+    position:relative;
+}
+
+.input-wrap input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:5px;
+    font-size:14px;
+    outline:none;
+    transition:border-color .15s;
+}
+
+.input-wrap input:focus{
+    border-color:var(--blue);
+}
+
+.input-wrap input.err{
+    border-color:var(--error);
+}
+
+.toggle-eye{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+}
+
+.err-msg{
+    font-size:11.5px;
+    color:var(--error);
+    margin-top:5px;
+    display:none;
+}
+
+.err-msg.show{
+    display:block;
+}
+
+.btn-main{
+    width:100%;
+    padding:14px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:.5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:6px;
+    transition:background .15s;
+}
+
+.btn-main:hover{
+    background:var(--blue-dark);
+}
+
+.btn-main:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.divider{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:24px 0;
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:.5px;
+}
+
+.divider::before,
+.divider::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--border);
+}
+
+.social-btn{
+    width:100%;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:5px;
+    background:#fff;
+    font-size:13.5px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    cursor:pointer;
+    margin-bottom:10px;
+    transition:.15s;
+}
+
+.social-btn:hover{
+    background:var(--bg);
+}
+
+.terms{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:20px;
+    line-height:1.6;
+}
+
+@media (max-width:860px){
+
+    .card{
+        grid-template-columns:1fr;
+    }
+
+    .visual{
+        display:none;
+    }
+
+    .form-side{
+        padding:32px 24px;
+    }
+
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="visual">
+    <div class="visual-top">
+      <div class="brand">Anistock<small>PREMIUM ANIME GEAR</small></div>
+      <div class="sysver">SYS.VER.9.2.EXPANDED</div>
+    </div>
+    <div class="visual-bottom">
+      <h2>ENTER THE<br>CLAN</h2>
+      <p>Unlock exclusive drops, manage your cosplay arsenal, and join a community of elite collectors.</p>
+    </div>
+  </div>
+
+  <div class="form-side">
+    <div class="tabs">
+      <div class="tab active" id="tabLogin" onclick="switchTab('login')">LOGIN</div>
+      <div class="tab" id="tabCreate" onclick="switchTab('create')">CREATE</div>
+    </div>
+
+    <div class="demo-hint" id="loginHint">
+      A demo account already exists — sign in with<br>
+      <strong>kira.shinobi@neon.net</strong> / <strong>demo1234</strong>
+      <div><button type="button" onclick="fillDemo()">Autofill demo login</button></div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field">
+        <label class="field-label">EMAIL / ID</label>
+        <div class="input-wrap">
+          <input type="text" id="loginEmail" placeholder="collector@anistock.com">
+        </div>
+        <div class="err-msg" id="loginEmailErr">Enter a valid email or ID.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">PASSWORD <a href="#" onclick="alert('Password reset link sent (demo).'); return false;">Forgot?</a></label>
+        <div class="input-wrap">
+          <input type="password" id="loginPassword" placeholder="••••••••">
+          <button type="button" class="toggle-eye" onclick="togglePw('loginPassword', this)">
+            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#666" stroke-width="2" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="err-msg" id="loginPasswordErr">Incorrect email or password.</div>
+      </div>
+      <button type="submit" class="btn-main">AUTHENTICATE →</button>
+    </form>
+
+    <!-- CREATE FORM -->
+    <form id="createForm" style="display:none;" onsubmit="handleCreate(event)">
+      <div class="field">
+        <label class="field-label">DISPLAY NAME</label>
+        <div class="input-wrap"><input type="text" id="createName" placeholder="Kira_99"></div>
+        <div class="err-msg" id="createNameErr">Display name is required.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">EMAIL</label>
+        <div class="input-wrap"><input type="text" id="createEmail" placeholder="collector@anistock.com"></div>
+        <div class="err-msg" id="createEmailErr">Enter a valid email, or that account already exists.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">PASSWORD</label>
+        <div class="input-wrap">
+          <input type="password" id="createPassword" placeholder="Minimum 6 characters">
+          <button type="button" class="toggle-eye" onclick="togglePw('createPassword', this)">
+            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#666" stroke-width="2" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="err-msg" id="createPasswordErr">Password must be at least 6 characters.</div>
+      </div>
+      <button type="submit" class="btn-main">CREATE ACCOUNT →</button>
+    </form>
+
+    <div class="divider">OR CONNECT WITH</div>
+    <button class="social-btn" onclick="socialLogin('Google')">🔵 GOOGLE</button>
+    <button class="social-btn" onclick="socialLogin('Apple ID')"> APPLE ID</button>
+    <button class="social-btn" onclick="socialLogin('Discord')">🎮 DISCORD</button>
+
+    <div class="terms">By connecting, you agree to our <a href="#">Terms</a> & <a href="#">Privacy Policy</a>.</div>
+  </div>
+</div>
+
+<script>
+const ACCOUNTS_KEY = 'anistock_accounts';
+
+/* Seed one demo account so a first-time visitor always has working credentials */
+function seedDemoAccount(){
+  let accounts = [];
+  try{ accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); }catch(e){ accounts = []; }
+  if(!accounts.find(a => a.email.toLowerCase() === 'kira.shinobi@neon.net')){
+    accounts.push({name:'Kira_99', email:'kira.shinobi@neon.net', password:'demo1234'});
+    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+  }
+}
+seedDemoAccount();
+
+function fillDemo(){
+  document.getElementById('loginEmail').value = 'kira.shinobi@neon.net';
+  document.getElementById('loginPassword').value = 'demo1234';
+}
+
+function switchTab(tab){
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabCreate').classList.toggle('active', tab==='create');
+  document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('createForm').style.display = tab==='create' ? 'block' : 'none';
+  document.getElementById('loginHint').style.display = tab==='login' ? 'block' : 'none';
+}
+function togglePw(id, btn){
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.style.opacity = input.type === 'text' ? '0.5' : '1';
+}
+
+function handleLogin(e){
+  e.preventDefault();
+  let ok = true;
+  const email = document.getElementById('loginEmail');
+  const pw = document.getElementById('loginPassword');
+  if(!email.value.trim()){ email.classList.add('err'); ok=false; }
+  else { email.classList.remove('err'); }
+  if(pw.value.length < 6){ pw.classList.add('err'); ok=false; }
+  else { pw.classList.remove('err'); }
+  if(!ok){ document.getElementById('loginPasswordErr').classList.toggle('show', pw.value.length<6); return; }
+
+  const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
+  const match = accounts.find(a => a.email.toLowerCase() === email.value.trim().toLowerCase() && a.password === pw.value);
+  if(!match){
+    email.classList.add('err'); pw.classList.add('err');
+    document.getElementById('loginPasswordErr').textContent = 'Incorrect email or password.';
+    document.getElementById('loginPasswordErr').classList.add('show');
+    return;
+  }
+  document.getElementById('loginPasswordErr').classList.remove('show');
+  localStorage.setItem('anistock_user', JSON.stringify({name: match.name, email: match.email}));
+  window.location.href = 'index.html';
+}
+
+function handleCreate(e){
+  e.preventDefault();
+  let ok = true;
+  const name = document.getElementById('createName');
+  const email = document.getElementById('createEmail');
+  const pw = document.getElementById('createPassword');
+  const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
+  const exists = accounts.find(a => a.email.toLowerCase() === email.value.trim().toLowerCase());
+
+  if(!name.value.trim()){ name.classList.add('err'); document.getElementById('createNameErr').classList.add('show'); ok=false; }
+  else { name.classList.remove('err'); document.getElementById('createNameErr').classList.remove('show'); }
+
+  if(!email.value.trim() || exists){ email.classList.add('err'); document.getElementById('createEmailErr').classList.add('show'); ok=false; }
+  else { email.classList.remove('err'); document.getElementById('createEmailErr').classList.remove('show'); }
+
+  if(pw.value.length < 6){ pw.classList.add('err'); document.getElementById('createPasswordErr').classList.add('show'); ok=false; }
+  else { pw.classList.remove('err'); document.getElementById('createPasswordErr').classList.remove('show'); }
+
+  if(!ok) return;
+
+  accounts.push({name: name.value.trim(), email: email.value.trim(), password: pw.value});
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+  localStorage.setItem('anistock_user', JSON.stringify({name: name.value.trim(), email: email.value.trim()}));
+  window.location.href = 'index.html';
+}
+
+function socialLogin(provider){
+  localStorage.setItem('anistock_user', JSON.stringify({name:'Kira_99', email:'kira.shinobi@neon.net'}));
+  alert(`Connecting with ${provider}... (demo)`);
+  window.location.href = 'index.html';
+}
+
+/* If already logged in, skip straight to the shop */
+(function(){
+  const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+  if(user){ window.location.href = 'index.html'; }
+})();
+</script>
+</body>
+</html>

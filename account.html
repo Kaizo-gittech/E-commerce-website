@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Dojo — AniStock</title>
+<script>
+/* AUTH GUARD: visitors must log in / create an account before browsing */
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<style>
+  :root{
+    --blue:#1d3f9e;
+    --blue-dark:#152f78;
+    --ink:#1a1d29;
+    --ink-soft:#5b6072;
+    --bg:#ffffff;
+    --bg-soft:#f7f7f9;
+    --border:#e6e6ea;
+    --gold:#c9962c;
+    --serif:Georgia, 'Times New Roman', serif;
+    --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.5;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+.app{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    min-height:100vh;
+}
+
+.sidebar{
+    border-right:1px solid var(--border);
+    padding:28px 20px;
+    display:flex;
+    flex-direction:column;
+    position:sticky;
+    top:0;
+    height:100vh;
+    background:#fff;
+}
+
+.logo{
+    font-family:var(--serif);
+    font-size:22px;
+    font-weight:700;
+    color:var(--blue);
+}
+
+.logo small{
+    display:block;
+    font-family:var(--sans);
+    font-size:9px;
+    letter-spacing:2px;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-top:2px;
+}
+
+.nav-main{
+    margin-top:36px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.nav-main a,
+.nav-bottom a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:6px;
+    font-size:14px;
+    color:var(--ink);
+    transition:background .15s;
+}
+
+.nav-main a:hover,
+.nav-bottom a:hover{
+    background:var(--bg-soft);
+}
+
+.nav-bottom a.active{
+    color:var(--blue);
+    background:#eef2fb;
+    font-weight:600;
+}
+
+.icon{
+    width:16px;
+    height:16px;
+    stroke:var(--ink-soft);
+    stroke-width:1.8;
+    fill:none;
+}
+
+.nav-bottom a.active .icon{
+    stroke:var(--blue);
+}
+
+.nav-bottom{
+    margin-top:auto;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.sidebar-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(10,12,20,.45);
+    z-index:999;
+}
+
+.sidebar-overlay.show{
+    display:block;
+}
+
+  .hamburger-btn{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:36px; height:36px;
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:6px;
+    cursor:pointer;
+    flex-direction:column;
+    gap:4px;
+  }
+  .hamburger-btn span{
+    display:block;
+    width:16px;
+    height:2px;
+    background:var(--ink);
+}
+
+.main{
+    padding:32px 40px;
+    max-width:1100px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:24px;
+}
+
+.topbar-right{
+    display:flex;
+    gap:20px;
+}
+
+.page-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:1px solid var(--border);
+    padding-bottom:18px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+    gap:16px;
+}
+
+.page-head h1{
+    font-family:var(--serif);
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.page-head p{
+    font-size:13.5px;
+    color:var(--ink-soft);
+}
+
+.tabs{
+    display:flex;
+    gap:24px;
+    font-size:13.5px;
+    flex-wrap:wrap;
+}
+
+.tabs .tab{
+    padding-bottom:8px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    border-bottom:2px solid transparent;
+}
+
+.tabs .tab.active{
+    color:var(--blue);
+    font-weight:600;
+    border-color:var(--blue);
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1.6fr;
+    gap:24px;
+}
+
+.card{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px;
+    margin-bottom:20px;
+}
+
+.profile-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.avatar{
+    width:56px;
+    height:56px;
+    border-radius:8px;
+    background:linear-gradient(135deg,#1d3f9e,#7c3aed);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:700;
+    font-size:20px;
+}
+
+.uname{
+    font-size:17px;
+    font-weight:700;
+}
+
+.tier{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:11px;
+    color:var(--gold);
+    font-weight:700;
+    margin-top:2px;
+}
+
+.xp-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+}
+
+.xp-val{
+    color:var(--blue);
+    font-weight:700;
+    font-size:14px;
+}
+
+.progress{
+    height:8px;
+    background:var(--bg-soft);
+    border-radius:6px;
+    overflow:hidden;
+    margin-bottom:6px;
+}
+
+.progress-fill{
+    height:100%;
+    background:var(--blue);
+    border-radius:6px;
+    transition:width .6s ease;
+}
+
+.xp-note{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+}
+
+.claim-btn{
+    width:100%;
+    padding:11px;
+    border:1px solid var(--blue);
+    background:#fff;
+    color:var(--blue);
+    font-weight:700;
+    font-size:13px;
+    border-radius:5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.claim-btn:hover{
+    background:var(--blue);
+    color:#fff;
+}
+
+.claim-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    background:#fff;
+    color:var(--blue);
+}
+
+ .list-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
+    font-size:14px;
+    cursor:pointer;
+}
+
+.list-row:last-child{
+    border-bottom:none;
+}
+
+.list-row:hover{
+    color:var(--blue);
+}
+
+.badge-count{
+    background:var(--bg-soft);
+    color:var(--ink-soft);
+    font-size:11.5px;
+    padding:2px 8px;
+    border-radius:10px;
+}
+
+.card-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+}
+
+.card-title h3{
+    font-size:16px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.card-title a{
+    font-size:12.5px;
+    color:var(--blue);
+}
+
+.order-item{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.order-item:last-child{
+    border-bottom:none;
+}
+
+.order-item img{
+    width:56px;
+    height:56px;
+    border-radius:6px;
+    object-fit:cover;
+    background:var(--bg-soft);
+}
+
+.order-mid{
+    flex:1;
+}
+
+.order-id{
+    font-size:11px;
+    color:var(--blue);
+    font-weight:700;
+    letter-spacing:.5px;
+}
+
+.order-title{
+    font-size:14px;
+    font-weight:600;
+    margin:2px 0 6px;
+}
+
+.status-chip{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:3px;
+    margin-right:8px;
+}
+
+.status-chip.transit{
+    background:#eef2fb;
+    color:var(--blue);
+}
+
+.status-chip.delivered{
+    background:#eafbea;
+    color:#1c8a3e;
+}
+
+.order-right{
+    text-align:right;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+    white-space:nowrap;
+}
+
+.order-price{
+    font-weight:700;
+    font-size:14.5px;
+}
+
+.track-btn{
+    padding:6px 12px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-size:12px;
+    background:#fff;
+    cursor:pointer;
+}
+
+.track-btn:hover{
+    background:var(--bg-soft);
+}
+
+.field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:18px;
+}
+
+.field label{
+    display:block;
+    font-size:10.5px;
+    letter-spacing:.8px;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+}
+
+.field input,
+.field textarea{
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--border);
+    padding:6px 0;
+    font-size:14px;
+    outline:none;
+    font-family:inherit;
+}
+
+.field input:focus,
+.field textarea:focus{
+    border-color:var(--blue);
+}
+
+.save-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:10px;
+}
+
+.save-btn{
+    padding:12px 26px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+}
+
+.save-btn:hover{
+    background:var(--blue-dark);
+}
+
+.save-btn.saved{
+    background:#1c8a3e;
+}
+
+footer{
+    border-top:1px solid var(--border);
+    margin-top:20px;
+    padding:32px 0;
+}
+
+footer h2{
+    font-family:var(--serif);
+    font-size:22px;
+    color:var(--ink);
+    margin-bottom:14px;
+}
+
+footer div span{
+    display:block;
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    cursor:pointer;
+}
+
+.toast{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    background:var(--ink);
+    color:#fff;
+    padding:13px 18px;
+    border-radius:6px;
+    font-size:13.5px;
+    transform:translateY(120%);
+    transition:transform .3s ease;
+    z-index:999;
+}
+
+.toast.show{
+    transform:translateY(0);
+}
+
+@media (max-width:900px){
+
+    .app{
+        grid-template-columns:1fr;
+    }
+
+    .hamburger-btn{
+        display:flex;
+    }
+
+    .sidebar{
+        display:flex;
+        position:fixed;
+        left:-260px;
+        top:0;
+        width:240px;
+        height:100vh;
+        z-index:1000;
+        box-shadow:2px 0 24px rgba(0,0,0,.18);
+        transition:left .28s ease;
+    }
+
+    .sidebar.open{
+        left:0;
+    }
+
+    .grid2{
+        grid-template-columns:1fr;
+    }
+
+    .field-row{
+        grid-template-columns:1fr;
+    }
+
+    .main{
+        padding:20px;
+    }
+
+}
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">AniStock<small>PREMIUM ANIME GEAR</small></div>
+    <nav class="nav-main">
+      <a href="index.html"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
+      <a href="shop.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Shop</a>
+      <a href="shop.html?sort=new"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/></svg>New Arrivals</a>
+      <a href="shop.html?sort=best"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Best Sellers</a>
+      <a href="shop.html?cat=cosplay"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12l4-8 4 3 4-3 4 8-4 8H8z"/></svg>Cosplay</a>
+      <a href="shop.html?cat=weapons"><svg class="icon" viewBox="0 0 24 24"><path d="M3 21l7-7M14 3l7 7-9 9-4-4z"/></svg>Weapons</a>
+      <a href="shop.html?cat=figures"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Action Figures</a>
+     </nav>
+    <div class="nav-bottom">
+      <a href="account.html" class="active"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</a>
+      <a href="checkout.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Cart</a>
+      <a href="#"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>Wishlist</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-right">
+        <a href="checkout.html">Cart</a>
+        <a href="login.html" id="loginTopLink">Login</a>
+      </div>
+    </div>
+
+    <div class="page-head">
+      <div>
+        <h1>My Dojo (Profile)</h1>
+        <p>Manage your gear, track bounties, and view your clan status.</p>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="profile" onclick="switchTab('profile')">Profile</div>
+        <div class="tab" data-tab="orders" onclick="switchTab('orders')">Orders</div>
+        <div class="tab" data-tab="wishlist" onclick="switchTab('wishlist')">Wishlist</div>
+        <div class="tab" data-tab="payment" onclick="switchTab('payment')">Payment</div>
+        <div class="tab" data-tab="rewards" onclick="switchTab('rewards')">Rewards</div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div id="tab-profile">
+      <div class="grid2">
+        <div>
+          <div class="card">
+            <div class="profile-head">
+              <div class="avatar" id="avatarInit">K</div>
+              <div>
+                <div class="uname" id="displayUname">Kira_99</div>
+                <div class="tier">⬡ GOLD TIER</div>
+              </div>
+            </div>
+            <div class="xp-row"><span>Power Level</span></div>
+            <div class="xp-val">12,450 XP</div>
+            <div class="progress" style="margin-top:8px;"><div class="progress-fill" style="width:83%"></div></div>
+            <div class="xp-note">2,550 XP to Platinum Tier</div>
+            <button class="claim-btn" onclick="claimRewards(this)">🎁 CLAIM REWARDS</button>
+          </div>
+          <div class="card" style="padding:0;">
+            <div class="list-row" style="padding:16px 22px;" onclick="switchTab('wishlist')">❤ Wishlist <span class="badge-count">14 Items</span></div>
+            <div class="list-row" style="padding:16px 22px;" onclick="switchTab('payment')">💳 Payment Methods <span>›</span></div>
+            <div class="list-row" style="padding:16px 22px; border-bottom:none;" onclick="showToast('Saved addresses opened')">📍 Saved Addresses <span class="badge-count">2</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">
+              <h3>🚚 Recent Orders</h3>
+              <a href="#" onclick="switchTab('orders'); return false;">View All</a>
+            </div>
+            <div class="order-item">
+              <img src="https://images.unsplash.com/photo-1600717535275-0b394da10788?q=80&w=200&auto=format&fit=crop">
+              <div class="order-mid">
+                <div class="order-id">ORDER #AN-88392</div>
+                <div class="order-title">Demon Slayer: Nichirin Blade Replica (Water Breathing Edition)</div>
+                <span class="status-chip transit">IN TRANSIT</span><span style="font-size:12px; color:var(--ink-soft);">Est. Arrival: Oct 24</span>
+              </div>
+              <div class="order-right">
+                <div class="order-price">₹4,299</div>
+                <button class="track-btn" onclick="showToast('Tracking order #AN-88392')">Track Order</button>
+              </div>
+            </div>
+            <div class="order-item">
+              <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=200&auto=format&fit=crop">
+              <div class="order-mid">
+                <div class="order-id">ORDER #AN-87104</div>
+                <div class="order-title">Cyber-Ronin Techwear Hoodie - Obsidian Black</div>
+                <span class="status-chip delivered">DELIVERED</span><span style="font-size:12px; color:var(--ink-soft);">Oct 12</span>
+              </div>
+              <div class="order-right">
+                <div class="order-price">₹2,450</div>
+                <a href="#" style="font-size:12px;" onclick="showToast('Review form opened'); return false;">Write Review</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><h3>👤 Personal Information</h3></div>
+            <form onsubmit="saveProfile(event)">
+              <div class="field-row">
+                <div class="field"><label>DISPLAY NAME</label><input type="text" id="fName" value="Kira_99"></div>
+                <div class="field"><label>EMAIL ADDRESS</label><input type="email" id="fEmail" value="kira.shinobi@neon.net"></div>
+              </div>
+              <div class="field">
+                <label>BIO / QUOTE</label>
+                <textarea id="fBio" rows="1">"I will become the strongest."</textarea>
+              </div>
+              <div class="save-row"><button type="submit" class="save-btn" id="saveBtn">SAVE PROFILE</button></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER TABS (simple placeholders) -->
+    <div id="tab-orders" style="display:none;">
+      <div class="card"><div class="card-title"><h3>Order History</h3></div><p style="color:var(--ink-soft); font-size:13.5px;">All your past orders will appear here, from newest to oldest.</p></div>
+    </div>
+    <div id="tab-wishlist" style="display:none;">
+      <div class="card"><div class="card-title"><h3>Saved for Later</h3></div><p style="color:var(--ink-soft); font-size:13.5px;">14 items in your wishlist. Head to the <a href="shop.html" style="color:var(--blue);">shop</a> to view them.</p></div>
+    </div>
+    <div id="tab-payment" style="display:none;">
+      <div class="card"><div class="card-title"><h3>Saved Payment Methods</h3></div><p style="color:var(--ink-soft); font-size:13.5px;">Manage your saved cards at <a href="checkout.html" style="color:var(--blue);">checkout</a>.</p></div>
+    </div>
+    <div id="tab-rewards" style="display:none;">
+      <div class="card"><div class="card-title"><h3>Clan Rewards</h3></div><p style="color:var(--ink-soft); font-size:13.5px;">You have 12,450 XP. Reach 15,000 XP to unlock Platinum Tier perks.</p></div>
+    </div>
+
+    <footer>
+      <h2>ANISTOCK</h2>
+      <div><span>Newsletter</span><span>Support</span></div>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(tab){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  ['profile','orders','wishlist','payment','rewards'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function claimRewards(btn){
+  btn.disabled = true;
+  btn.textContent = '✓ Rewards Claimed';
+  showToast('✓ 500 bonus XP added to your account');
+}
+function saveProfile(e){
+  e.preventDefault();
+  const name = document.getElementById('fName').value;
+  document.getElementById('displayUname').textContent = name;
+  document.getElementById('avatarInit').textContent = name.charAt(0).toUpperCase();
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '✓ SAVED';
+  btn.classList.add('saved');
+  showToast('✓ Profile updated successfully');
+  setTimeout(()=>{ btn.textContent='SAVE PROFILE'; btn.classList.remove('saved'); }, 1800);
+}
+
+/* Sidebar drawer (mobile) */
+function openSidebar(){
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* Load logged-in user if available */
+(function(){
+  const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+  if(user){
+    document.getElementById('fName').value = user.name || 'Kira_99';
+    document.getElementById('fEmail').value = user.email || 'kira.shinobi@neon.net';
+    document.getElementById('displayUname').textContent = user.name || 'Kira_99';
+    document.getElementById('avatarInit').textContent = (user.name||'K').charAt(0).toUpperCase();
+    document.getElementById('loginTopLink').textContent = 'Logout';
+    document.getElementById('loginTopLink').href = '#';
+    document.getElementById('loginTopLink').onclick = function(e){ e.preventDefault(); localStorage.removeItem('anistock_user'); window.location.href='login.html'; };
+  }
+})();
+</script>
+</body>
+</html>

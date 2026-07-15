@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — AniStock</title>
+<script>
+/* AUTH GUARD: visitors must log in / create an account before browsing */
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<style>
+  :root{
+  --blue:#1d3f9e;
+  --blue-dark:#152f78;
+  --ink:#1a1d29;
+  --ink-soft:#5b6072;
+  --bg:#f7f7f9;
+  --border:#e6e6ea;
+  --green:#1c8a3e;
+  --serif:Georgia, 'Times New Roman', serif;
+  --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.card{
+  max-width:660px;
+  width:100%;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:48px;
+  text-align:center;
+  box-shadow:0 2px 30px rgba(0,0,0,.05);
+}
+
+.check-icon{
+  width:64px;
+  height:64px;
+  background:var(--blue);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 22px;
+  animation:pop .4s ease;
+}
+
+@keyframes pop{
+  0%{
+    transform:scale(0);
+  }
+  70%{
+    transform:scale(1.1);
+  }
+  100%{
+    transform:scale(1);
+  }
+}
+
+h1{
+  font-family:var(--serif);
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  font-size:14.5px;
+  color:var(--ink-soft);
+  max-width:400px;
+  margin:0 auto 34px;
+  line-height:1.6;
+}
+
+.section-title{
+  text-align:left;
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:14px;
+  font-family:var(--serif);
+}
+
+.gear-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:28px;
+}
+
+.gear-item{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  text-align:left;
+}
+
+.gear-item img{
+  width:48px;
+  height:48px;
+  border-radius:6px;
+  object-fit:cover;
+  background:var(--bg);
+}
+
+.gear-name{
+  font-size:13.5px;
+  font-weight:600;
+}
+
+.gear-sub{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  margin-top:2px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:32px;
+}
+
+.info-card{
+  background:var(--bg);
+  border-radius:8px;
+  padding:20px;
+  text-align:left;
+}
+
+.info-card h4{
+  font-family:var(--serif);
+  font-size:16px;
+  margin-bottom:14px;
+}
+
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-bottom:10px;
+  color:var(--ink-soft);
+}
+
+.info-row span:last-child{
+  color:var(--ink);
+  font-weight:600;
+}
+
+.verified-chip{
+  background:#eef2fb;
+  color:var(--blue);
+  font-size:11px;
+  font-weight:700;
+  padding:3px 9px;
+  border-radius:10px;
+}
+
+.eta{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:2px;
+}
+
+.eta-sub{
+  font-size:11px;
+  color:var(--ink-soft);
+  letter-spacing:.5px;
+  margin-left:26px;
+}
+
+.tracking-box{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:10px 12px;
+  margin-top:14px;
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+}
+
+.tracking-box span:last-child{
+  color:var(--blue);
+  font-weight:700;
+}
+
+.continue-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:var(--blue);
+  color:#fff;
+  border:none;
+  padding:15px 32px;
+  font-size:14px;
+  font-weight:700;
+  border-radius:6px;
+  cursor:pointer;
+  text-decoration:none;
+  transition:.15s;
+}
+
+.continue-btn:hover{
+  background:var(--blue-dark);
+}
+
+@media (max-width:600px){
+
+  .gear-grid,
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
+  .card{
+    padding:32px 22px;
+  }
+
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="check-icon">
+    <svg width="30" height="30" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5" fill="none"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <h1>Order Confirmed, Warrior!</h1>
+  <p class="subtitle">Your arsenal has been secured. Our shinobi are preparing your gear for immediate dispatch.</p>
+
+  <div class="section-title">Secured Gear</div>
+  <div class="gear-grid" id="gearGrid"></div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>Mission Intel</h4>
+      <div class="info-row"><span>Order ID:</span><span id="orderId">#ANI-0000-OMEGA</span></div>
+      <div class="info-row"><span>Date:</span><span id="orderDate"></span></div>
+      <div class="info-row"><span>Total Value:</span><span id="orderTotal">₹0</span></div>
+      <div class="info-row"><span>Payment Status:</span><span class="verified-chip">✓ Verified</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Deployment Status</h4>
+      <div style="font-size:11px; color:var(--ink-soft); letter-spacing:.5px; margin-bottom:6px;">ESTIMATED ARRIVAL:</div>
+      <div class="eta">🚚 <span id="etaDate">Oct 28 – Oct 31</span></div>
+      <div class="eta-sub">STANDARD HYPER-DELIVERY</div>
+      <div class="tracking-box"><span>Tracking:</span><span>PENDING_DISPATCH</span></div>
+    </div>
+  </div>
+
+  <a href="shop.html" class="continue-btn"> CONTINUE SHOPPING</a>
+</div>
+
+<script>
+function formatDate(d){
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+(function init(){
+  const order = JSON.parse(localStorage.getItem('anistock_last_order') || 'null');
+  const today = new Date();
+  document.getElementById('orderDate').textContent = formatDate(today);
+
+  const arrival1 = new Date(today); arrival1.setDate(today.getDate()+4);
+  const arrival2 = new Date(today); arrival2.setDate(today.getDate()+7);
+  document.getElementById('etaDate').textContent = `${formatDate(arrival1).split(',')[0]} – ${formatDate(arrival2)}`;
+
+  const grid = document.getElementById('gearGrid');
+  if(order && order.items && order.items.length){
+    document.getElementById('orderId').textContent = '#' + order.id;
+    document.getElementById('orderTotal').textContent = order.total;
+    grid.innerHTML = order.items.map(item=>`
+      <div class="gear-item">
+        <img src="${item.img}" alt="${item.name}">
+        <div>
+          <div class="gear-name">${item.name}</div>
+          <div class="gear-sub">Qty: ${item.qty}</div>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    grid.innerHTML = `
+      <div class="gear-item">
+        <img src="https://images.unsplash.com/photo-1600717535275-0b394da10788?q=80&w=200&auto=format&fit=crop">
+        <div><div class="gear-name">Shinobi Katana Replica</div><div class="gear-sub">Museum Grade</div></div>
+      </div>
+      <div class="gear-item">
+        <img src="https://images.unsplash.com/photo-1548126032-079a0fb0099d?q=80&w=200&auto=format&fit=crop">
+        <div><div class="gear-name">Tactical Techwear Hoodie</div><div class="gear-sub">Dark Charcoal / Purple</div></div>
+      </div>`;
+    document.getElementById('orderTotal').textContent = '₹4,250';
+  }
+})();
+</script>
+</body>
+</html>

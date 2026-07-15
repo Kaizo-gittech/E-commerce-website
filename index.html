@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniStock — Premium Anime Gear</title>
+    <script>
+      (function(){
+        try{
+          const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+          if(!user){ window.location.replace('login.html'); }
+          }catch(e){ window.location.replace('login.html'); }
+        })
+        ();
+    </script>
+<style>
+  :root {
+    --blue: #1d3f9e;
+    --blue-dark: #152f78;
+    --ink: #1a1d29;
+    --ink-soft: #5b6072;
+    --bg: #ffffff;
+    --bg-soft: #f7f7f9;
+    --border: #e6e6ea;
+    --gold: #c9962c;
+    --radius: 4px;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+ul {
+    list-style: none;
+}
+
+/* ===== Layout ===== */
+
+.app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+}
+
+.sidebar {
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: #fff;
+}
+
+.logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: .3px;
+}
+
+.logo small {
+    display: block;
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.nav-main {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nav-main a,
+.nav-bottom a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--ink);
+    transition: background .15s;
+}
+
+.nav-main a:hover,
+.nav-bottom a:hover {
+    background: var(--bg-soft);
+}
+
+.nav-main a.active {
+    color: var(--blue);
+    background: #eef2fb;
+    font-weight: 600;
+}
+
+.nav-main a.active svg {
+    stroke: var(--blue);
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    stroke: var(--ink-soft);
+    stroke-width: 1.8;
+    fill: none;
+}
+
+.nav-main a.active .icon {
+    stroke: var(--blue);
+}
+
+.nav-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+ .main {
+    min-width: 0;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+
+.topbar-left span {
+    cursor: pointer;
+}
+
+.hamburger-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--ink);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-size: 14px;
+}
+
+.cart-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    position: relative;
+}
+
+.cart-count {
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    margin-left: 2px;
+}
+
+.login-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 20, .45);
+    z-index: 999;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+  /* ===== Hero ===== */
+ .hero {
+    position: relative;
+    margin: 0;
+    padding: 64px 40px;
+    min-height: 420px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background-image:
+        linear-gradient(100deg, rgba(20,20,25,.78), rgba(20,20,25,.35)),
+        url('https://tse3.mm.bing.net/th/id/OIP.BWxt2MC3pOqQS7ClDJ4cxAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3');
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.hero-tag {
+    display: inline-block;
+    background: var(--blue);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    width: fit-content;
+}
+
+.hero h1 {
+    font-family: var(--serif);
+    font-size: 48px;
+    font-weight: 700;
+    max-width: 520px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+
+.hero p {
+    max-width: 440px;
+    font-size: 15px;
+    color: #e6e6ea;
+    margin-bottom: 26px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: 13px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .15s;
+    width: fit-content;
+}
+
+.btn:hover {
+    background: var(--blue-dark);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+}
+
+.btn-outline:hover {
+    background: var(--ink);
+    color: #fff;
+}
+
+/* ===== Sections ===== */
+
+section {
+    padding: 48px 40px;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 22px;
+}
+
+.section-head h2 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.section-head p.section-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+}
+
+.view-all {
+    font-size: 13px;
+    color: var(--blue);
+    font-weight: 600;
+}
+
+.cat-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 18px;
+}
+
+.cat-card {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    min-height: 280px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 22px;
+    color: #fff;
+}
+
+.cat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.05));
+}
+
+.cat-card span {
+    position: relative;
+    font-size: 19px;
+    font-weight: 700;
+    font-family: var(--serif);
+}
+
+.cat-right {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cat-right .cat-card {
+    min-height: 131px;
+}
+
+.explore-tag {
+    position: relative;
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.5);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 8px;
+    margin-top: 8px;
+    backdrop-filter: blur(2px);
+}
+
+  .product-scroll {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.product-scroll.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.product-card{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+}
+
+.product-info{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+.add-btn{
+    margin-top:auto;
+}
+.product-img {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    background: #eee;
+}
+
+.product-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.product-card:hover .product-img img {
+    transform: scale(1.05);
+}
+
+.badge-new {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+}
+
+.badge-new.bestseller {
+    background: var(--gold);
+}
+
+.wish-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.wish-btn.active svg {
+    fill: #e0435c;
+    stroke: #e0435c;
+}
+
+.product-info {
+    padding-top: 12px;
+}
+
+.price {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.pname {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.pcat {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+}
+
+.add-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.add-btn:hover {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+}
+
+.add-btn.added {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+}
+
+  .trending {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.trending-copy {
+    padding: 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+
+.trending-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    color: var(--blue);
+}
+
+.trending-copy h3 {
+    font-family: var(--serif);
+    font-size: 32px;
+    line-height: 1.15;
+}
+
+.trending-copy p {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 380px;
+}
+
+.trending-img {
+    background: url('https://images.unsplash.com/photo-1614632537190-23e4146777db?q=80&w=1200&auto=format&fit=crop') center/cover;
+}
+
+footer {
+    background: var(--bg-soft);
+    padding: 44px 40px 24px;
+    border-top: 1px solid var(--border);
+}
+
+.foot-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.4fr;
+    gap: 24px;
+    padding-bottom: 28px;
+}
+
+.foot-logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 10px;
+}
+
+.foot-grid p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    max-width: 220px;
+}
+
+.foot-grid h4 {
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+}
+
+.foot-grid li {
+    font-size: 13.5px;
+    margin-bottom: 9px;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.foot-grid li:hover {
+    color: var(--blue);
+}
+
+.newsletter-row {
+    display: flex;
+    margin-top: 10px;
+    gap: 0;
+}
+
+.newsletter-row input {
+    flex: 1;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    border-radius: 3px 0 0 3px;
+    outline: none;
+}
+
+.newsletter-row button {
+    padding: 9px 14px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    font-size: 12.5px;
+    border-radius: 0 3px 3px 0;
+    cursor: pointer;
+}
+
+.copyright {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
+
+  /* toast */
+ .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: #fff;
+    padding: 13px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(120%);
+    transition: transform .3s ease;
+    z-index: 999;
+}
+
+.toast.show {
+    transform: translateY(0);
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+=========================== */
+
+@media (max-width: 900px) {
+
+    .app{
+        grid-template-columns:1fr;
+    }
+
+    .hamburger-btn{
+        display:flex;
+    }
+
+    .sidebar{
+        display:flex;
+        position:fixed;
+        left:-260px;
+        top:0;
+        width:240px;
+        height:100vh;
+        z-index:1000;
+        box-shadow:2px 0 24px rgba(0,0,0,.18);
+        transition:left .28s ease;
+    }
+
+    .sidebar.open{
+        left:0;
+    }
+
+    .topbar{
+        padding:15px 20px;
+        flex-wrap:wrap;
+        justify-content:space-between;
+        gap:15px;
+    }
+
+    .topbar-right{
+        gap:15px;
+    }
+
+    .hero{
+        min-height:320px;
+        padding:40px 20px;
+        text-align:center;
+        align-items:center;
+        background-position:center;
+        background-size:cover;
+    }
+
+    .hero h1{
+        font-size:34px;
+        max-width:100%;
+    }
+
+    .hero p{
+        max-width:100%;
+    }
+
+    section{
+        padding:35px 20px;
+    }
+
+    .section-head{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    .cat-grid{
+        grid-template-columns:1fr;
+    }
+
+    .cat-right{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:15px;
+    }
+
+    /* TWO PRODUCTS PER ROW */
+
+    .product-scroll,
+    .product-scroll.cols-3{
+        display:grid;
+        grid-template-columns:repeat(2,1fr);
+        gap:15px;
+    }
+
+    .product-card{
+        width:100%;
+    }
+
+    .product-img{
+        aspect-ratio:1/1;
+    }
+
+    .product-img img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+    }
+
+    .product-info{
+        display:flex;
+        flex-direction:column;
+        height:100%;
+    }
+
+    .add-btn{
+        margin-top:auto;
+    }
+
+    .trending{
+        grid-template-columns:1fr;
+    }
+
+    .trending-copy{
+        padding:25px;
+    }
+
+    .trending-copy h3{
+        font-size:28px;
+    }
+
+    .foot-grid{
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+    }
+
+    .newsletter-row{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .newsletter-row input,
+    .newsletter-row button{
+        width:100%;
+        border-radius:4px;
+    }
+}
+
+@media (max-width:600px){
+
+    .topbar{
+        justify-content:space-between;
+        text-align:left;
+    }
+
+    .topbar-right{
+        justify-content:flex-end;
+        flex-wrap:wrap;
+    }
+
+    .hero{
+        min-height:260px;
+        padding:30px 15px;
+    }
+
+    .hero h1{
+        font-size:26px;
+    }
+
+    .hero p{
+        font-size:14px;
+    }
+
+    .btn{
+        width:100%;
+        justify-content:center;
+    }
+
+    section{
+        padding:25px 15px;
+    }
+
+    .cat-right{
+        grid-template-columns:1fr;
+    }
+
+    /* KEEP 2 ITEMS PER ROW */
+
+    .product-scroll,
+    .product-scroll.cols-3{
+        grid-template-columns:repeat(2,1fr);
+        gap:12px;
+    }
+
+    .price{
+        font-size:14px;
+    }
+
+    .pname{
+        font-size:12px;
+    }
+
+    .pcat{
+        font-size:11px;
+    }
+
+    .add-btn{
+        font-size:11px;
+        padding:8px;
+    }
+
+    .foot-grid{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .toast{
+        left:15px;
+        right:15px;
+        bottom:15px;
+    }
+}
+
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">AniStock<small>PREMIUM ANIME GEAR</small></div>
+    <nav class="nav-main">
+      <a href="index.html" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
+      <a href="shop.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Shop</a>
+      <a href="shop.html?sort=new"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/></svg>New Arrivals</a>
+      <a href="shop.html?sort=best"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Best Sellers</a>
+      <a href="shop.html?cat=cosplay"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12l4-8 4 3 4-3 4 8-4 8H8z"/></svg>Cosplay</a>
+      <a href="shop.html?cat=weapons"><svg class="icon" viewBox="0 0 24 24"><path d="M3 21l7-7M14 3l7 7-9 9-4-4z"/></svg>Weapons</a>
+      <a href="shop.html?cat=figures"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Action Figures</a>
+      
+    </nav>
+    <div class="nav-bottom">
+      <a href="account.html"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</a>
+      <a href="checkout.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Cart</a>
+      <a href="shop.html"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>Wishlist</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <a class="cart-link" href="checkout.html">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>
+          Cart<span class="cart-count" id="cartCount">0</span>
+        </a>
+        <a class="login-link" href="#" id="topAuthLink">Login</a>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <span class="hero-tag">NEW DROP</span>
+      <h1>Cyber-Samurai Collection</h1>
+      <p>Equip yourself with the latest tech-infused apparel. Limited stock available.</p>
+      <a href="shop.html" class="btn">Shop the Drop</a>
+    </div>
+
+    <!-- Categories -->
+    <section>
+      <div class="section-head">
+        <h2>Shop By Category</h2>
+        <a href="shop.html" class="view-all">View All →</a>
+      </div>
+      <div class="cat-grid">
+        <a class="cat-card" href="shop.html?cat=weapons" style="background-image:url('https://tse4.mm.bing.net/th/id/OIP.UlQyTg5NvO1EBF61XHCBgwHaEK?r=0&rs=1&pid=ImgDetMain&o=7&rm=3')">
+          <span>Weapons & Replicas<span class="explore-tag" style="display:block">EXPLORE</span></span>
+        </a>
+        <div class="cat-right">
+          <a class="cat-card" href="shop.html?cat=figures" style="background-image:url('https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?q=80&w=800&auto=format&fit=crop')"><span>Action Figures</span></a>
+          <a class="cat-card" href="shop.html?cat=apparel" style="background-image:url('https://tse2.mm.bing.net/th/id/OIP.fZpO8_tcYLWG9ekrVcthfgHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3')"><span>Apparel</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Arrivals -->
+    <section>
+      <div class="section-head">
+        <h2>New Arrivals</h2>
+        <div style="display:flex; gap:8px;">
+          <button class="wish-btn" onclick="scrollProducts('newArrivals',-1)" style="position:static;">‹</button>
+          <button class="wish-btn" onclick="scrollProducts('newArrivals',1)" style="position:static;">›</button>
+        </div>
+      </div>
+      <div class="product-scroll" id="newArrivals"></div>
+    </section>
+
+    <!-- Best Sellers -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Best Sellers</h2>
+          <p class="section-sub">The gear the whole clan keeps coming back for.</p>
+        </div>
+        <a href="shop.html?sort=best" class="view-all">View All →</a>
+      </div>
+      <div class="product-scroll" id="bestSellers"></div>
+    </section>
+
+    <!-- Weapons Arsenal -->
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Weapons Arsenal</h2>
+          <p class="section-sub">Museum-grade replicas for display and cosplay.</p>
+        </div>
+        <a href="shop.html?cat=weapons" class="view-all">View All →</a>
+      </div>
+      <div class="product-scroll cols-3" id="weaponItems"></div>
+    </section>
+
+    <!-- Trending / Cosplay -->
+    <section>
+      <div class="trending" style="margin-bottom:28px;">
+        <div class="trending-copy">
+          <div class="trending-eyebrow">⬡ TRENDING NOW</div>
+          <h3>Elite<br>Cosplay Gear</h3>
+          <p>Crafted for perfection. Premium materials, game-accurate details, and battle-ready durability for your next convention.</p>
+          <a href="shop.html?cat=cosplay" class="btn btn-outline">Shop Cosplay</a>
+        </div>
+        <div class="trending-img"></div>
+      </div>
+      <div class="section-head">
+        <h2>Cosplay Essentials</h2>
+        <a href="shop.html?cat=cosplay" class="view-all">View All →</a>
+      </div>
+      <div class="product-scroll cols-3" id="cosplayItems"></div>
+    </section>
+
+    <footer>
+      <div class="foot-grid">
+        <div>
+          <div class="foot-logo">AniStock</div>
+          <p>Equipping the modern otaku with premium, battle-ready gear.</p>
+        </div>
+        <div>
+          <h4>SUPPORT</h4>
+          <ul><li>Support Center</li><li>Payments</li><li>Shipping</li></ul>
+        </div>
+        <div>
+          <h4>LEGAL</h4>
+          <ul><li>Return Policy</li><li>Terms of Service</li><li>Privacy Policy</li></ul>
+        </div>
+        <div>
+          <h4>JOIN THE NEWSLETTER</h4>
+          <p style="margin-bottom:0;">Get exclusive drop alerts and intel.</p>
+          <div class="newsletter-row">
+            <input type="email" placeholder="you@email.com" id="newsEmail">
+            <button onclick="subscribeNews()">Join</button>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">© 2024 AniStock. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Added to cart</div>
+
+<script>
+
+const NEW_ARRIVALS = [
+    {
+        id: 'p1',
+        name: 'Starlight Sorceress 1/7 Scale',
+        cat: 'Figures & Statues',
+        price: 2500,
+        img: './OIP.webp',
+        badge: 'NEW'
+    },
+    {
+        id: 'p2',
+        name: 'Neo-Tokyo Tech Jacket',
+        cat: 'Apparel',
+        price: 3200,
+        img: 'https://images.unsplash.com/photo-1548126032-079a0fb0099d?q=80&w=600&auto=format&fit=crop'
+    },
+    {
+        id: 'p3',
+        name: 'Crimson Mecha Helmet Replica',
+        cat: 'Cosplay & Props',
+        price: 4500,
+        img: 'https://cdna.artstation.com/p/assets/video_clips/images/070/088/958/large/julian-rincon-thumb.jpg?1701732163'
+    },
+    {
+        id: 'p4',
+        name: 'Ronin Tactical Cloak',
+        cat: 'Apparel',
+        price: 3200,
+        img: 'https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=600&auto=format&fit=crop'
+    }
+];
+
+const BEST_SELLERS = [
+    {
+        id: 'b1',
+        name: 'Exhibition Blade',
+        cat: 'Weapons',
+        price: 1250,
+        img: 'https://th.bing.com/th/id/R.6caf8bbcb15dc00a68ded0bffcf448ad?rik=Zn14mXITuzRE3Q&riu=http%3a%2f%2fsunizumi.com%2fcdn%2fshop%2ffiles%2fA90B4B67-9A61-4D63-B333-F8F27FDC3B8D.jpg%3fv%3d1770702583&ehk=c4mwLeaZyQBvemx3B0VswZSqTx%2fKdDaI2Ytvukn213E%3d&risl=&pid=ImgRaw&r=0',
+        badge: 'BESTSELLER'
+    },
+    {
+        id: 'b2',
+        name: 'Contemporary Haori',
+        cat: 'Apparel',
+        price: 1850,
+        img: 'https://i.pinimg.com/736x/37/35/12/3735123f80bc25418b3ab56d25cad6e3.jpg',
+        badge: 'BESTSELLER'
+    },
+    {
+        id: 'b3',
+        name: 'Vanguard Mecha Helm',
+        cat: 'Cosplay & Props',
+        price: 4800,
+        img: 'https://kidultverse.com/cdn/shop/files/heatboys-teenage-mutant-ninja-turtles-tmnt-leonardo-mecha-robot-action-figure-40th-anniversary-ver-kidultverse-6.webp?v=1753661034&width=800',
+        badge: 'BESTSELLER'
+    },
+    {
+        id: 'b4',
+        name: 'Miniature Vanguard',
+        cat: 'Figures & Statues',
+        price: 750,
+        img: 'https://i.etsystatic.com/32156247/r/il/2c0c02/4880954544/il_1080xN.4880954544_fco6.jpg',
+        badge: 'BESTSELLER'
+    }
+];
+
+const WEAPON_ITEMS = [
+    {
+        id: 'w1',
+        name: 'Exhibition Blade',
+        cat: 'Katana Replica',
+        price: 1250,
+        img: 'images/figure1.jpg'
+    },
+    {
+        id: 'w2',
+        name: 'Twin Dragon Katana Set',
+        cat: 'Dual Blade Set',
+        price: 2100,
+        img: ''
+    },
+    {
+        id: 'w3',
+        name: 'Heirloom Katana Display',
+        cat: 'Display Stand',
+        price: 3400,
+        img: 'https://images.unsplash.com/photo-1601814933824-fd0b574dd592?q=80&w=600&auto=format&fit=crop'
+    }
+];
+
+const COSPLAY_ITEMS = [
+    {
+        id: 'c1',
+        name: 'Crimson Mecha Helmet Replica',
+        cat: 'Prop Replica',
+        price: 4500,
+        img: 'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?q=80&w=600&auto=format&fit=crop'
+    },
+    {
+        id: 'c2',
+        name: 'Warrior Battle Armor',
+        cat: 'Full Armor Set',
+        price: 4600,
+        img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=600&auto=format&fit=crop'
+    },
+    {
+        id: 'c3',
+        name: 'Neon Oni Mask Set',
+        cat: 'Mask & Prop',
+        price: 2200,
+        img: 'https://images.unsplash.com/photo-1614632537190-23e4146777db?q=80&w=600&auto=format&fit=crop'
+    }
+];
+
+const ALL_ITEMS = [
+    ...NEW_ARRIVALS,
+    ...BEST_SELLERS,
+    ...WEAPON_ITEMS,
+    ...COSPLAY_ITEMS
+];
+
+/* ===== Cart (localStorage) ===== */
+
+function getCart() {
+    return JSON.parse(localStorage.getItem('anistock_cart') || '[]');
+}
+
+function saveCart(c) {
+    localStorage.setItem('anistock_cart', JSON.stringify(c));
+    updateCartCount();
+}
+
+function addToCart(id) {
+    const p = ALL_ITEMS.find(x => x.id === id);
+    if (!p) return;
+
+    const cart = getCart();
+    const existing = cart.find(x => x.id === id);
+
+    if (existing) {
+        existing.qty++;
+    } else {
+        cart.push({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            img: p.img,
+            qty: 1
+        });
+    }
+
+    saveCart(cart);
+    showToast(`✓ ${p.name} added to cart`);
+}
+
+function updateCartCount() {
+    const cart = getCart();
+    const count = cart.reduce((a, c) => a + c.qty, 0);
+
+    document
+        .querySelectorAll('#cartCount')
+        .forEach(el => el.textContent = count);
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+
+    t.textContent = msg;
+    t.classList.add('show');
+
+    setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* Wishlist */
+
+function toggleWish(btn, id, e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    btn.classList.toggle('active');
+
+    let wl = JSON.parse(localStorage.getItem('anistock_wishlist') || '[]');
+
+    if (wl.includes(id)) {
+        wl = wl.filter(x => x !== id);
+    } else {
+        wl.push(id);
+    }
+
+    localStorage.setItem('anistock_wishlist', JSON.stringify(wl));
+}
+
+function renderSection(containerId, items) {
+    const wl = JSON.parse(localStorage.getItem('anistock_wishlist') || '[]');
+    const wrap = document.getElementById(containerId);
+
+    wrap.innerHTML = items.map(p => `
+        <div class="product-card">
+            <div class="product-img">
+                ${p.badge ? `<span class="badge-new ${p.badge === 'BESTSELLER' ? 'bestseller' : ''}">${p.badge}</span>` : ''}
+
+                <button class="wish-btn ${wl.includes(p.id) ? 'active' : ''}" onclick="toggleWish(this,'${p.id}',event)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" stroke="#333" stroke-width="2" fill="none">
+                        <path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/>
+                    </svg>
+                </button>
+
+                <img src="${p.img}" alt="${p.name}">
+            </div>
+
+            <div class="product-info">
+                <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
+                <div class="pname">${p.name}</div>
+                <div class="pcat">${p.cat}</div>
+
+                <button class="add-btn" onclick="handleAdd(this,'${p.id}')">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderAll() {
+    renderSection('newArrivals', NEW_ARRIVALS);
+    renderSection('bestSellers', BEST_SELLERS);
+    renderSection('weaponItems', WEAPON_ITEMS);
+    renderSection('cosplayItems', COSPLAY_ITEMS);
+}
+
+function handleAdd(btn, id) {
+    addToCart(id);
+
+    btn.textContent = '✓ Added';
+    btn.classList.add('added');
+
+    setTimeout(() => {
+        btn.textContent = 'Add to Cart';
+        btn.classList.remove('added');
+    }, 1500);
+}
+
+function scrollProducts(containerId, dir) {
+    document.getElementById(containerId).scrollBy({
+        left: dir * 260,
+        behavior: 'smooth'
+    });
+}
+
+function subscribeNews() {
+    const val = document.getElementById('newsEmail').value;
+
+    if (val && val.includes('@')) {
+        showToast('✓ Subscribed to newsletter');
+        document.getElementById('newsEmail').value = '';
+    } else {
+        showToast('Please enter a valid email');
+    }
+}
+
+/* Sidebar drawer (mobile) */
+function openSidebar(){
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* Top-right auth link: shows current user / logout */
+
+(function () {
+    const link = document.getElementById('topAuthLink');
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+
+    if (user) {
+        link.textContent = 'Logout (' + user.name + ')';
+
+        link.onclick = function (e) {
+            e.preventDefault();
+            localStorage.removeItem('anistock_user');
+            window.location.href = 'login.html';
+        };
+    } else {
+        link.href = 'login.html';
+    }
+})();
+
+renderAll();
+updateCartCount();
+</script>
+</body>
+</html>

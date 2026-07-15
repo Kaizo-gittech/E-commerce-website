@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — AniStock</title>
+<script>
+/* AUTH GUARD: visitors must log in / create an account before browsing */
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<style>
+  :root {
+    --blue: #1d3f9e;
+    --blue-dark: #152f78;
+    --ink: #1a1d29;
+    --ink-soft: #5b6072;
+    --bg: #ffffff;
+    --bg-soft: #f7f7f9;
+    --border: #e6e6ea;
+    --gold: #c9962c;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+ul {
+    list-style: none;
+}
+
+.app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+}
+
+.sidebar {
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: #fff;
+}
+
+.logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+}
+
+.logo small {
+    display: block;
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.nav-main {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nav-main a,
+.nav-bottom a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--ink);
+    transition: background .15s;
+}
+
+.nav-main a:hover,
+.nav-bottom a:hover {
+    background: var(--bg-soft);
+}
+
+.nav-main a.active {
+    color: var(--blue);
+    background: #eef2fb;
+    font-weight: 600;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    stroke: var(--ink-soft);
+    stroke-width: 1.8;
+    fill: none;
+}
+
+.nav-main a.active .icon {
+    stroke: var(--blue);
+}
+
+.nav-bottom {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+ .main {
+    min-width: 0;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
+}
+
+.topbar-left-group{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    min-width:0;
+}
+
+.hamburger-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink:0;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    background: var(--ink);
+}
+
+.breadcrumb {
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 6px;
+    white-space:nowrap;
+}
+
+.breadcrumb a:hover {
+    color: var(--blue);
+}
+
+.search-box {
+    flex: 1;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    font-size: 13px;
+    flex: 1;
+    min-width:0;
+}
+
+.topbar-right {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 20, .45);
+    z-index: 999;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 36px;
+    padding: 32px 40px;
+}
+
+.filters h2 {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.filter-group {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.filter-group h4 {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+}
+
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    margin-bottom: 9px;
+    cursor: pointer;
+}
+
+.price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.chip {
+    border: 1px solid var(--border);
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 12.5px;
+    border-radius: 3px;
+    cursor: pointer;
+    background: #fff;
+}
+
+.chip.active {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: #eef2fb;
+}
+
+.chip.disabled {
+    color: #b8bac2;
+    background: #f7f7f9;
+    cursor: not-allowed;
+}
+
+.apply-btn {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid var(--blue);
+    color: var(--blue);
+    background: #fff;
+    font-weight: 600;
+    font-size: 13.5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.apply-btn:hover {
+    background: var(--blue);
+    color: #fff;
+}
+
+.listing-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.listing-head h1 {
+    font-family: var(--serif);
+    font-size: 28px;
+    margin-bottom: 4px;
+}
+
+.listing-head p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+}
+
+.sort-wrap {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sort-wrap select {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: #fff;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+.product-card {
+    cursor: pointer;
+}
+
+.product-img {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    background: #eee;
+}
+
+.product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .3s;
+}
+
+.product-card:hover .product-img img {
+    transform: scale(1.05);
+}
+
+.badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    color: #fff;
+}
+
+.badge.new {
+    background: var(--blue);
+}
+
+.badge.limited {
+    background: #c0394f;
+}
+
+.wish-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.wish-btn.active svg {
+    fill: #e0435c;
+    stroke: #e0435c;
+}
+
+.product-info {
+    padding-top: 12px;
+}
+
+.pcat-label {
+    font-size: 10.5px;
+    letter-spacing: .8px;
+    color: var(--ink-soft);
+    font-weight: 600;
+}
+
+.pname {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 3px 0 5px;
+}
+
+.stars {
+    font-size: 12px;
+    color: var(--gold);
+}
+
+.stars span {
+    color: var(--ink-soft);
+    font-size: 12px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.price {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.add-mini {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.add-mini:hover {
+    background: var(--ink);
+    color: #fff;
+}
+
+.add-mini.added {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 36px;
+}
+
+.pagination button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.pagination button.active {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+}
+
+.pagination button:hover:not(.active) {
+    background: var(--bg-soft);
+}
+
+  footer {
+    background: var(--bg-soft);
+    padding: 36px 40px 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+}
+
+.foot-grid {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+}
+
+.foot-logo {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 6px;
+}
+
+.foot-grid p {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+}
+
+.foot-links {
+    display: flex;
+    gap: 40px;
+}
+
+.foot-links h4 {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+}
+
+.foot-links li {
+    font-size: 13px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.foot-links li:hover {
+    color: var(--blue);
+}
+
+.copyright {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: #fff;
+    padding: 13px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    transform: translateY(120%);
+    transition: transform .3s ease;
+    z-index: 999;
+}
+
+.toast.show {
+    transform: translateY(0);
+}
+
+.cart-count {
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    margin-left: 2px;
+}
+
+@media (max-width: 900px) {
+    .app {
+        grid-template-columns: 1fr;
+    }
+
+    .hamburger-btn{
+        display:flex;
+    }
+
+    .sidebar {
+        display:flex;
+        position:fixed;
+        left:-260px;
+        top:0;
+        width:240px;
+        height:100vh;
+        z-index:1000;
+        box-shadow:2px 0 24px rgba(0,0,0,.18);
+        transition:left .28s ease;
+    }
+
+    .sidebar.open{
+        left:0;
+    }
+
+    .content {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .filters{
+        border-bottom:1px solid var(--border);
+        padding-bottom:20px;
+        margin-bottom:8px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search-box {
+        display: none;
+    }
+
+    .breadcrumb span:nth-child(2),
+    .breadcrumb a:first-child{
+        display:none;
+    }
+}
+
+@media (max-width:600px){
+    .topbar-right span{
+        display:none;
+    }
+}
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">AniStock<small>PREMIUM ANIME GEAR</small></div>
+    <nav class="nav-main">
+      <a href="index.html"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</a>
+      <a href="shop.html" class="active"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Shop</a>
+      <a href="shop.html?sort=new"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/></svg>New Arrivals</a>
+      <a href="shop.html?sort=best"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Best Sellers</a>
+      <a href="shop.html?cat=cosplay"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12l4-8 4 3 4-3 4 8-4 8H8z"/></svg>Cosplay</a>
+      <a href="shop.html?cat=weapons"><svg class="icon" viewBox="0 0 24 24"><path d="M3 21l7-7M14 3l7 7-9 9-4-4z"/></svg>Weapons</a>
+      <a href="shop.html?cat=figures"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>Action Figures</a>
+    </nav>
+    <div class="nav-bottom">
+      <a href="account.html"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</a>
+      <a href="checkout.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Cart<span class="cart-count" id="cartCountSide">0</span></a>
+      <a href="#"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>Wishlist</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left-group">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="breadcrumb"><a href="index.html">Home</a><span>›</span><a href="shop.html">Shop</a><span>›</span><span>All Collections</span></div>
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input type="text" placeholder="Search curated goods..." id="searchInput" oninput="renderGrid()">
+      </div>
+      <div class="topbar-right">
+        <span>Currency</span><span>Language</span>
+        <a href="checkout.html" style="color:var(--ink); display:flex; align-items:center;">Cart<span class="cart-count" id="cartCount">0</span></a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="filters">
+        <h2>Filters <svg width="16" height="16" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><path d="M4 6h16M4 12h10M4 18h6"/></svg></h2>
+
+        <div class="filter-group">
+          <h4>CATEGORY</h4>
+          <label class="check-row"><input type="checkbox" id="cat-all" checked onchange="onCatAll()"> All Collection</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="apparel" onchange="onCatChange()"> Apparel</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="cosplay" onchange="onCatChange()"> Cosplay Props</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="weapons" onchange="onCatChange()"> Weapons</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="figures" onchange="onCatChange()"> Figures</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>PRICE</h4>
+          <div class="price-grid" id="priceGrid">
+            <div class="chip" data-range="500-1000">₹500-₹1000</div>
+            <div class="chip" data-range="1000-2000">₹1000-₹2000</div>
+            <div class="chip" data-range="2000-3000">₹2000-₹3000</div>
+            <div class="chip" data-range="3000-4000">₹3000-₹4000</div>
+            <div class="chip" data-range="4000-5000">₹4000-₹5000</div>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>MATERIAL (WEARABLE)</h4>
+          <div class="price-grid" id="matGrid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="chip" data-mat="Cotton">Cotton</div>
+            <div class="chip" data-mat="Silk">Silk</div>
+            <div class="chip" data-mat="Polyester">Polyester</div>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <h4>MATERIAL (WEAPON)</h4>
+          <div class="price-grid" id="matGridWeapon" style="grid-template-columns:repeat(2,1fr);">
+            <div class="chip" data-mat="Wood">Wood</div>
+            <div class="chip" data-mat="3D Printed">3D Printed</div>
+            <div class="chip" data-mat="Craft Foam">Craft Foam</div>
+            <div class="chip" data-mat="Foam Clay">Foam Clay</div>
+          </div>
+        </div>
+
+        <button class="apply-btn" onclick="renderGrid()">Apply Filters</button>
+      </div>
+
+      <div class="listing">
+        <div class="listing-head">
+          <div>
+            <h1>Collection Series</h1>
+            <p id="resultCount">Showing 12 refined pieces for the modern enthusiast.</p>
+          </div>
+          <div class="sort-wrap">
+            Sort By:
+            <select id="sortSelect" onchange="renderGrid()">
+              <option value="editorial">Editorial Choice</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="foot-grid">
+        <div>
+          <div class="foot-logo">AniStock</div>
+          <p>© 2024 AniStock Archives. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PRODUCTS = [
+  {id:'s1', name:'Shadow Ronin Garment', cat:'apparel', catLabel:'APPAREL', price:2450, rating:4.5, reviews:128, badge:'New Edition', img:'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=500&auto=format&fit=crop', mat:'Cotton'},
+  {id:'s2', name:'Modern Tabi Silhouette', cat:'apparel', catLabel:'FOOTWEAR', price:4200, rating:4, reviews:42, img:'https://images.unsplash.com/photo-1638247025967-b4e6b18a5cd7?q=80&w=500&auto=format&fit=crop', mat:'Polyester'},
+  {id:'s3', name:'Vanguard Mecha Helm', cat:'cosplay', catLabel:'PROP REPLICA', price:4800, rating:5, reviews:56, img:'https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?q=80&w=500&auto=format&fit=crop', mat:'Foam Clay'},
+  {id:'s4', name:'Ronin Tactical Cloak', cat:'apparel', catLabel:'APPAREL', price:3200, rating:4, reviews:92, img:'https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=500&auto=format&fit=crop', mat:'Cotton'},
+  {id:'s5', name:'Contemporary Haori', cat:'apparel', catLabel:'APPAREL', price:1850, rating:5, reviews:204, badge:'Limited Stock', img:'https://images.unsplash.com/photo-1548126032-079a0fb0099d?q=80&w=500&auto=format&fit=crop', mat:'Silk'},
+  {id:'s6', name:'Vanguard Tech Ensemble', cat:'apparel', catLabel:'APPAREL', price:3800, rating:4, reviews:89, img:'https://images.unsplash.com/photo-1591213954196-2d0c46b1a831?q=80&w=500&auto=format&fit=crop', mat:'Polyester'},
+  {id:'s7', name:'Exhibition Blade', cat:'weapons', catLabel:'WEAPONS', price:1250, rating:5, reviews:312, img:'https://images.unsplash.com/photo-1600717535275-0b394da10788?q=80&w=500&auto=format&fit=crop', mat:'Wood'},
+  {id:'s8', name:'Miniature Vanguard', cat:'figures', catLabel:'FIGURES', price:750, rating:4, reviews:18, img:'https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?q=80&w=500&auto=format&fit=crop', mat:''},
+  {id:'s9', name:'Twin Dragon Katana Set', cat:'weapons', catLabel:'WEAPONS', price:2100, rating:4.5, reviews:89, img:'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?q=80&w=500&auto=format&fit=crop', mat:'Wood'},
+  {id:'s10', name:'Heirloom Katana Display', cat:'weapons', catLabel:'WEAPONS', price:3400, rating:5, reviews:67, badge:'New Edition', img:'https://images.unsplash.com/photo-1601814933824-fd0b574dd592?q=80&w=500&auto=format&fit=crop', mat:'3D Printed'},
+  {id:'s11', name:'Warrior Battle Armor', cat:'cosplay', catLabel:'FULL ARMOR SET', price:4600, rating:4.5, reviews:103, img:'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=500&auto=format&fit=crop', mat:'Craft Foam'},
+  {id:'s12', name:'Elite Guardian Statue', cat:'figures', catLabel:'FIGURES', price:1350, rating:5, reviews:45, img:'https://images.unsplash.com/photo-1614632537190-23e4146777db?q=80&w=500&auto=format&fit=crop', mat:''},
+];
+
+let activeCats = [];
+let activePriceRange = null;
+let activeMat = null;
+let currentPage = 1;
+
+function onCatAll(){
+  document.getElementById('cat-all').checked = true;
+  document.querySelectorAll('.cat-cb').forEach(cb=>cb.checked=false);
+  activeCats = [];
+  renderGrid();
+}
+function onCatChange(){
+  const checked = [...document.querySelectorAll('.cat-cb:checked')].map(cb=>cb.value);
+  activeCats = checked;
+  document.getElementById('cat-all').checked = checked.length===0;
+  renderGrid();
+}
+document.getElementById('priceGrid').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  const range = chip.dataset.range;
+  document.querySelectorAll('#priceGrid .chip').forEach(c=>c.classList.remove('active'));
+  if(activePriceRange === range){ activePriceRange = null; } else { activePriceRange = range; chip.classList.add('active'); }
+  renderGrid();
+});
+document.getElementById('matGrid').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  const mat = chip.dataset.mat;
+  document.querySelectorAll('#matGrid .chip, #matGridWeapon .chip').forEach(c=>c.classList.remove('active'));
+  if(activeMat === mat){ activeMat = null; } else { activeMat = mat; chip.classList.add('active'); }
+  renderGrid();
+});
+document.getElementById('matGridWeapon').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  const mat = chip.dataset.mat;
+  document.querySelectorAll('#matGrid .chip, #matGridWeapon .chip').forEach(c=>c.classList.remove('active'));
+  if(activeMat === mat){ activeMat = null; } else { activeMat = mat; chip.classList.add('active'); }
+  renderGrid();
+});
+
+function getCart(){ return JSON.parse(localStorage.getItem('anistock_cart') || '[]'); }
+function saveCart(c){ localStorage.setItem('anistock_cart', JSON.stringify(c)); updateCartCount(); }
+function addToCart(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  const cart = getCart();
+  const existing = cart.find(x=>x.id===id);
+  if(existing){ existing.qty++; } else { cart.push({id:p.id, name:p.name, price:p.price, img:p.img, qty:1}); }
+  saveCart(cart);
+  showToast(`✓ ${p.name} added to cart`);
+}
+function updateCartCount(){
+  const cart = getCart();
+  const count = cart.reduce((a,c)=>a+c.qty,0);
+  document.querySelectorAll('#cartCount, #cartCountSide').forEach(el=>el.textContent = count);
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function toggleWish(btn, id, e){
+  e.preventDefault(); e.stopPropagation();
+  btn.classList.toggle('active');
+}
+
+function stars(rating){
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5;
+  let s = '★'.repeat(full);
+  if(half) s += '☆';
+  s += '☆'.repeat(5-full-(half?1:0));
+  return s;
+}
+
+function filterProducts(){
+  let list = [...PRODUCTS];
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if(q) list = list.filter(p=>p.name.toLowerCase().includes(q));
+  if(activeCats.length) list = list.filter(p=>activeCats.includes(p.cat));
+  if(activePriceRange){
+    const [min,max] = activePriceRange.split('-').map(Number);
+    list = list.filter(p=>p.price>=min && p.price<=max);
+  }
+  if(activeMat) list = list.filter(p=>p.mat===activeMat);
+  const sort = document.getElementById('sortSelect').value;
+  if(sort==='price-asc') list.sort((a,b)=>a.price-b.price);
+  if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  if(sort==='rating') list.sort((a,b)=>b.rating-a.rating);
+  return list;
+}
+
+function renderGrid(){
+  const list = filterProducts();
+  document.getElementById('resultCount').textContent = `Showing ${list.length} refined piece${list.length!==1?'s':''} for the modern enthusiast.`;
+  const grid = document.getElementById('grid');
+  if(list.length===0){
+    grid.innerHTML = `<p style="grid-column:1/-1; color:var(--ink-soft); padding:40px 0;">No items match your filters. Try adjusting them.</p>`;
+    document.getElementById('pagination').innerHTML='';
+    return;
+  }
+  grid.innerHTML = list.map(p=>`
+    <div class="product-card">
+      <div class="product-img">
+        ${p.badge?`<span class="badge ${p.badge.includes('Limited')?'limited':'new'}">${p.badge}</span>`:''}
+        <button class="wish-btn" onclick="toggleWish(this,'${p.id}',event)">
+          <svg width="15" height="15" viewBox="0 0 24 24" stroke="#333" stroke-width="2" fill="none"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>
+        </button>
+        <img src="${p.img}" alt="${p.name}">
+      </div>
+      <div class="product-info">
+        <div class="pcat-label">${p.catLabel}</div>
+        <div class="pname">${p.name}</div>
+        <div class="stars">${stars(p.rating)} <span>(${p.reviews})</span></div>
+        <div class="price-row">
+          <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
+          <button class="add-mini" onclick="handleAdd(this,'${p.id}')">🛒 Add</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  renderPagination();
+}
+function handleAdd(btn,id){
+  addToCart(id);
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✓ Added';
+  btn.classList.add('added');
+  setTimeout(()=>{ btn.innerHTML=orig; btn.classList.remove('added'); }, 1400);
+}
+function renderPagination(){
+  const pages = [1,2,3,'...',8];
+  document.getElementById('pagination').innerHTML = `
+    <button onclick="showToast('Already on first page')">‹</button>
+    ${pages.map(p=>p==='...' ? `<span style="padding:8px 4px;">...</span>` : `<button class="${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`).join('')}
+    <button onclick="goPage(currentPage+1)"></button>
+  `;
+}
+function goPage(p){
+  currentPage = p;
+  showToast(`Showing page ${p}`);
+  renderPagination();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* Sidebar drawer (mobile) */
+function openSidebar(){
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* read URL params for category pre-filter */
+(function initFromURL(){
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get('cat');
+  if(cat){
+    const cb = document.querySelector(`.cat-cb[value="${cat}"]`);
+    if(cb){ cb.checked = true; onCatChange(); }
+  }
+  const sort = params.get('sort');
+  if(sort==='new') document.getElementById('sortSelect').value='editorial';
+  if(sort==='best') document.getElementById('sortSelect').value='rating';
+})();
+
+renderGrid();
+updateCartCount();
+</script>
+</body>
+</html>

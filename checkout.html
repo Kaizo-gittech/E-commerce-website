@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — AniStock</title>
+<script>
+/* AUTH GUARD: visitors must log in / create an account before browsing */
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<style>
+  :root{
+    --blue:#1d3f9e;
+    --blue-dark:#152f78;
+    --ink:#1a1d29;
+    --ink-soft:#5b6072;
+    --bg:#f7f7f9;
+    --border:#e6e6ea;
+    --error:#c0394f;
+    --green:#1c8a3e;
+    --serif:Georgia, 'Times New Roman', serif;
+    --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:#fff;
+    line-height:1.5;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 32px;
+    border-bottom:1px solid var(--border);
+}
+
+.back-link{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--serif);
+    font-size:20px;
+    font-weight:700;
+    color:var(--blue);
+}
+
+.secure{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+}
+
+.steps{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    padding:26px 20px;
+    max-width:700px;
+    margin:0 auto;
+}
+
+.step{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    position:relative;
+    flex:1;
+}
+
+.step-circle{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    border:2px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:#fff;
+    z-index:2;
+}
+
+.step.done .step-circle{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
+}
+
+.step.active .step-circle{
+    border-color:var(--blue);
+    color:var(--blue);
+}
+
+.step-label{
+    font-size:11px;
+    letter-spacing:.6px;
+    color:var(--ink-soft);
+    font-weight:600;
+}
+
+.step.active .step-label,
+.step.done .step-label{
+    color:var(--ink);
+}
+
+.step-line{
+    position:absolute;
+    top:14px;
+    left:-50%;
+    width:100%;
+    height:2px;
+    background:var(--border);
+    z-index:1;
+}
+
+.step.done .step-line{
+    background:var(--blue);
+}
+
+.step:first-child .step-line{
+    display:none;
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:1fr 380px;
+    gap:0;
+    max-width:1240px;
+    margin:0 auto;
+    padding:0 32px 60px;
+}
+
+.left{
+    padding-right:40px;
+}
+
+.panel-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:6px;
+}
+
+.panel-title h2{
+    font-family:var(--serif);
+    font-size:22px;
+}
+
+.panel-title .bar{
+    width:4px;
+    height:22px;
+    background:var(--blue);
+    border-radius:2px;
+}
+
+.panel-sub{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+    margin-left:14px;
+}
+
+  .pay-option{
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:14px;
+    overflow:hidden;
+}
+
+.pay-option.selected{
+    border-color:var(--blue);
+    box-shadow:0 0 0 1px var(--blue);
+}
+
+.pay-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 20px;
+    cursor:pointer;
+}
+
+.pay-head-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:15px;
+    font-weight:600;
+}
+
+.radio{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:2px solid var(--border);
+    position:relative;
+    flex-shrink:0;
+}
+
+.pay-option.selected .radio{
+    border-color:var(--blue);
+}
+
+.pay-option.selected .radio::after{
+    content:'';
+    position:absolute;
+    inset:3px;
+    background:var(--blue);
+    border-radius:50%;
+}
+
+.pay-icons span{
+    display:inline-block;
+    width:30px;
+    height:20px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:3px;
+    margin-left:4px;
+    text-align:center;
+    font-size:11px;
+    line-height:19px;
+}
+
+.pay-body{
+    padding:0 20px 20px;
+    display:none;
+}
+
+.pay-option.selected .pay-body{
+    display:block;
+}
+
+.input-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.input-row.two{
+    grid-template-columns:1fr 1fr;
+}
+
+.styled-input{
+    position:relative;
+}
+
+.styled-input input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:5px;
+    font-size:14px;
+    outline:none;
+}
+
+.styled-input input:focus{
+    border-color:var(--blue);
+}
+
+.styled-input input.err{
+    border-color:var(--error);
+}
+
+.styled-input .icon-r{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#999;
+    font-size:14px;
+}
+
+.check-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--ink-soft);
+}
+
+.err-text{
+    font-size:11.5px;
+    color:var(--error);
+    margin-top:-9px;
+    margin-bottom:10px;
+    display:none;
+}
+
+.err-text.show{
+    display:block;
+}
+
+.summary{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:24px;
+    position:sticky;
+    top:20px;
+    height:fit-content;
+}
+
+.summary h3{
+    font-family:var(--serif);
+    font-size:19px;
+    margin-bottom:16px;
+}
+
+.sum-item{
+    display:flex;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.sum-item img{
+    width:52px;
+    height:52px;
+    border-radius:6px;
+    object-fit:cover;
+    background:var(--bg);
+}
+
+.sum-mid{
+    flex:1;
+}
+  .sum-name{
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.3px;
+}
+
+.sum-meta{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+}
+
+.sum-price{
+    font-size:13.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.empty-cart{
+    padding:20px 0;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+}
+
+.combo-box{
+    background:var(--bg);
+    border-radius:6px;
+    padding:14px;
+    margin:16px 0;
+}
+
+.combo-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.3px;
+    margin-bottom:8px;
+}
+
+.combo-row span:last-child{
+    color:var(--blue);
+}
+
+.combo-bar{
+    height:6px;
+    background:#e4e4ea;
+    border-radius:4px;
+    overflow:hidden;
+}
+
+.combo-fill{
+    height:100%;
+    background:var(--blue);
+    border-radius:4px;
+    transition:width .4s ease;
+}
+
+.combo-note{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:8px;
+}
+
+.totals{
+    margin-top:6px;
+}
+
+.total-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13.5px;
+    padding:6px 0;
+    color:var(--ink-soft);
+}
+
+.total-row.discount span:last-child{
+    color:var(--blue);
+}
+
+.total-row.grand{
+    font-size:17px;
+    font-weight:700;
+    color:var(--ink);
+    border-top:1px solid var(--border);
+    margin-top:8px;
+    padding-top:14px;
+}
+
+.confirm-btn{
+    width:100%;
+    padding:15px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:16px;
+    transition:background .15s;
+}
+
+.confirm-btn:hover{
+    background:var(--blue-dark);
+}
+
+.confirm-btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.trust-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:16px;
+    border-top:1px solid var(--border);
+    padding-top:14px;
+}
+
+.toast{
+    position:fixed;
+    bottom:24px;
+    right:24px;
+    background:var(--ink);
+    color:#fff;
+    padding:13px 18px;
+    border-radius:6px;
+    font-size:13.5px;
+    transform:translateY(120%);
+    transition:transform .3s ease;
+    z-index:999;
+}
+
+.toast.show{
+    transform:translateY(0);
+}
+
+@media (max-width:900px){
+
+    .layout{
+        grid-template-columns:1fr;
+        padding:0 18px 40px;
+    }
+
+    .left{
+        padding-right:0;
+        margin-bottom:30px;
+    }
+
+    .steps{
+        max-width:100%;
+    }
+
+}
+
+.wallet-grid{
+    display:grid;
+    grid-template-columns:repeat(2,140px);
+    justify-content:center;
+    gap:12px;
+}
+
+.wallet-box{
+    width:300px;
+    height:140px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:8px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    padding:10px;
+    margin:auto;
+    cursor:pointer;
+    transition:.3s ease;
+}
+
+.wallet-box:hover{
+    border-color:var(--blue);
+    transform:translateY(-2px);
+    box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+
+.wallet-box img{
+    width:120px;
+    height:120px;
+    object-fit:contain;
+    display:block;
+    margin:10px auto;
+}
+
+.wallet-box span{
+    font-size:11px;
+    font-weight:600;
+    text-align:center;
+}
+
+.pay-body img{
+    display:block;
+    margin:auto;
+}
+
+@media(max-width:768px){
+
+    .wallet-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:480px){
+
+    .wallet-grid{
+        grid-template-columns:1fr;
+    }
+
+    .pay-body img{
+        width:180px !important;
+    }
+
+}
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="back-link">← AniStock</a>
+  <div class="secure">🔒 SECURE CHECKOUT</div>
+</header>
+
+<div class="steps">
+  <div class="step done"><div class="step-circle">✓</div><div class="step-label">SHIPPING</div></div>
+  <div class="step done"><div class="step-circle">✓</div><div class="step-line"></div><div class="step-label">DELIVERY</div></div>
+  <div class="step active"><div class="step-circle">3</div><div class="step-line"></div><div class="step-label">PAYMENT</div></div>
+  <div class="step"><div class="step-circle">4</div><div class="step-line"></div><div class="step-label">REVIEW</div></div>
+</div>
+
+<div class="layout">
+  <div class="left">
+    <div class="panel-title"><div class="bar"></div><h2>Payment Method</h2></div>
+    <p class="panel-sub">All transactions are secure and encrypted.</p>
+
+    <div class="pay-option selected" id="opt-card">
+      <div class="pay-head" onclick="selectPay('card')">
+        <div class="pay-head-left"><span class="radio"></span> Credit / Debit Card</div>
+        <div class="pay-icons"><span>VISA</span><span>MC</span></div>
+      </div>
+      <div class="pay-body">
+        <div class="input-row">
+          <div class="styled-input">
+            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" oninput="formatCard(this)">
+            <span class="icon-r">💳</span>
+          </div>
+          <div class="err-text" id="cardNumberErr">Enter a valid 16-digit card number.</div>
+        </div>
+        <div class="input-row">
+          <div class="styled-input"><input type="text" id="cardName" placeholder="Name on Card"></div>
+          <div class="err-text" id="cardNameErr">Name is required.</div>
+        </div>
+        <div class="input-row two">
+          <div>
+            <div class="styled-input"><input type="text" id="cardExpiry" placeholder="Expiry (MM/YY)" maxlength="5" oninput="formatExpiry(this)"></div>
+            <div class="err-text" id="cardExpiryErr">Enter a valid expiry date.</div>
+          </div>
+          <div>
+            <div class="styled-input"><input type="text" id="cardCvc" placeholder="CVC" maxlength="4"><span class="icon-r">?</span></div>
+            <div class="err-text" id="cardCvcErr">Enter a valid CVC.</div>
+          </div>
+        </div>
+        <label class="check-line"><input type="checkbox"> Save this card for future purchases</label>
+      </div>
+    </div>
+
+   <div class="pay-option" id="opt-upi">
+    <div class="pay-head" onclick="selectPay('upi')">
+        <div class="pay-head-left">
+            <span class="radio"></span>
+            UPI / QR Scan
+        </div>
+        <span>▦</span>
+    </div>
+
+    <div class="pay-body">
+
+        <div style="text-align:center;margin-bottom:20px;">
+            <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=demo@upi&pn=AniStock&am=999&cu=INR"
+                alt="Demo QR Code"
+                style="width:140px;max-width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;background:#fff;">
+
+            <p style="margin-top:10px;font-size:13px;color:var(--ink-soft);">
+                Demo QR Code
+            </p>
+        </div>
+
+        <div class="styled-input" style="margin-bottom:15px;">
+            <input type="text" id="upiId" placeholder="yourname@upi">
+        </div>
+
+        <h4 style="margin-bottom:15px;">Supported UPI Apps</h4>
+
+        <div class="wallet-grid">
+
+            <div class="wallet-box">
+                <img src="https://www.bing.com/th/id/OIP.vJA62RAjgycviUkhsbRevAHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=ImgAns&rm=2" >
+                <span></span>
+            </div>
+
+            <div class="wallet-box">
+                <img src="https://www.bing.com/th/id/OIP.NqcK2sc2VhSqdyAvqgTSJwHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=ImgAns&rm=2" >
+                <span></span>
+            </div>
+
+            <div class="wallet-box">
+                <img src="https://tse3.mm.bing.net/th/id/OIP.tWzNTMZhYybw7RRl3b5_bQHaEr?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" >
+                <span></span>
+            </div>
+
+            <div class="wallet-box">
+                <img src="https://tse3.mm.bing.net/th/id/OIP.22d-lhaSQg_OmK9D4VPpSwHaE8?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" >
+                <span></span>
+            </div>
+
+            <div class="wallet-box">
+                <img src="https://img.jagranjosh.com/images/2021/July/1572021/Bhima-UPI.jpg" >
+                <span></span>
+            </div>
+
+        </div>
+
+        <p style="margin-top:18px;font-size:12px;color:var(--ink-soft);text-align:center;">
+            Scan the QR code or enter your UPI ID above.
+        </p>
+
+    </div>
+</div>
+
+
+  <div class="summary">
+    <h3>Order Summary</h3>
+    <div id="cartItems"></div>
+
+    <div class="combo-box">
+      <div class="combo-row"><span>COMBO DISCOUNT PROGRESS</span><span id="comboLabel">Level 0</span></div>
+      <div class="combo-bar"><div class="combo-fill" id="comboFill" style="width:0%"></div></div>
+      <div class="combo-note" id="comboNote">Add items to unlock combo rewards.</div>
+    </div>
+
+    <div class="totals">
+      <div class="total-row"><span>Subtotal</span><span id="sumSubtotal">₹0</span></div>
+      <div class="total-row"><span>Shipping (Standard)</span><span id="sumShipping">₹150</span></div>
+      <div class="total-row discount" id="discountRow" style="display:none;"><span>Combo Discount</span><span id="sumDiscount">-₹0</span></div>
+      <div class="total-row grand"><span>Total</span><span id="sumTotal">₹0</span></div>
+    </div>
+
+    <button class="confirm-btn" id="confirmBtn" onclick="confirmPayment()">Confirm Payment</button>
+    <div class="trust-row">🛡 256-bit SSL encrypted payment</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function getCart(){ return JSON.parse(localStorage.getItem('anistock_cart') || '[]'); }
+function saveCart(c){ localStorage.setItem('anistock_cart', JSON.stringify(c)); }
+
+function selectPay(opt){
+  ['card','upi','wallet'].forEach(o=>document.getElementById('opt-'+o).classList.toggle('selected', o===opt));
+}
+
+function renderCart(){
+  const cart = getCart();
+  const wrap = document.getElementById('cartItems');
+  if(cart.length===0){
+    wrap.innerHTML = `<div class="empty-cart">Your cart is empty. <a href="shop.html" style="color:var(--blue);">Browse the shop →</a></div>`;
+  } else {
+    wrap.innerHTML = cart.map(item=>`
+      <div class="sum-item">
+        <img src="${item.img}" alt="${item.name}">
+        <div class="sum-mid">
+          <div class="sum-name">${item.name.toUpperCase()}</div>
+          <div class="sum-meta">Qty: ${item.qty}
+            <a href="#" style="color:var(--blue); margin-left:8px;" onclick="changeQty('${item.id}',1);return false;">+</a>
+            <a href="#" style="color:var(--blue); margin-left:4px;" onclick="changeQty('${item.id}',-1);return false;">−</a>
+            <a href="#" style="color:var(--error); margin-left:8px;" onclick="removeItem('${item.id}');return false;">Remove</a>
+          </div>
+        </div>
+        <div class="sum-price">₹${(item.price*item.qty).toLocaleString('en-IN')}</div>
+      </div>
+    `).join('');
+  }
+  computeTotals(cart);
+}
+function changeQty(id, delta){
+  let cart = getCart();
+  const item = cart.find(x=>x.id===id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty<=0) cart = cart.filter(x=>x.id!==id);
+  saveCart(cart);
+  renderCart();
+}
+function removeItem(id){
+  let cart = getCart().filter(x=>x.id!==id);
+  saveCart(cart);
+  renderCart();
+  showToast('Item removed from cart');
+}
+
+function computeTotals(cart){
+  const subtotal = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const shipping = cart.length ? 150 : 0;
+  const comboThreshold = 5500; // level 2 -> free shipping/discount unlock reference
+  const level = subtotal >= comboThreshold ? 2 : subtotal >= 3000 ? 1 : 0;
+  const discount = level>=1 ? Math.round(subtotal*0.10) : 0;
+  const pct = Math.min(100, Math.round((subtotal/comboThreshold)*100));
+
+  document.getElementById('comboLabel').textContent = level>=2 ? 'Level 2 Reached!' : level===1 ? 'Level 1 Reached' : 'Level 0';
+  document.getElementById('comboFill').style.width = pct + '%';
+  const remaining = Math.max(0, comboThreshold - subtotal);
+  document.getElementById('comboNote').textContent = remaining>0
+    ? `Add ₹${remaining.toLocaleString('en-IN')} more for free express shipping & exclusive sticker pack.`
+    : `You've unlocked free express shipping & exclusive sticker pack!`;
+
+  document.getElementById('sumSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  document.getElementById('sumShipping').textContent = level>=2 ? 'FREE' : `₹${shipping}`;
+  const discountRow = document.getElementById('discountRow');
+  if(discount>0){
+    discountRow.style.display='flex';
+    document.getElementById('sumDiscount').textContent = `-₹${discount.toLocaleString('en-IN')}`;
+  } else {
+    discountRow.style.display='none';
+  }
+  const total = subtotal + (level>=2?0:shipping) - discount;
+  document.getElementById('sumTotal').textContent = `₹${Math.max(0,total).toLocaleString('en-IN')}`;
+  document.getElementById('confirmBtn').disabled = cart.length===0;
+}
+
+function formatCard(input){
+  let v = input.value.replace(/\D/g,'').slice(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(input){
+  let v = input.value.replace(/\D/g,'').slice(0,4);
+  if(v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+  input.value = v;
+}
+
+function validateCard(){
+  let ok = true;
+  const num = document.getElementById('cardNumber');
+  const name = document.getElementById('cardName');
+  const exp = document.getElementById('cardExpiry');
+  const cvc = document.getElementById('cardCvc');
+  const numDigits = num.value.replace(/\s/g,'');
+  if(numDigits.length !== 16){ num.classList.add('err'); document.getElementById('cardNumberErr').classList.add('show'); ok=false; }
+  else { num.classList.remove('err'); document.getElementById('cardNumberErr').classList.remove('show'); }
+  if(!name.value.trim()){ name.classList.add('err'); document.getElementById('cardNameErr').classList.add('show'); ok=false; }
+  else { name.classList.remove('err'); document.getElementById('cardNameErr').classList.remove('show'); }
+  if(!/^\d{2}\/\d{2}$/.test(exp.value)){ exp.classList.add('err'); document.getElementById('cardExpiryErr').classList.add('show'); ok=false; }
+  else { exp.classList.remove('err'); document.getElementById('cardExpiryErr').classList.remove('show'); }
+  if(cvc.value.length < 3){ cvc.classList.add('err'); document.getElementById('cardCvcErr').classList.add('show'); ok=false; }
+  else { cvc.classList.remove('err'); document.getElementById('cardCvcErr').classList.remove('show'); }
+  return ok;
+}
+
+function confirmPayment(){
+  const cart = getCart();
+  if(cart.length===0){ showToast('Your cart is empty'); return; }
+  const selected = document.getElementById('opt-card').classList.contains('selected') ? 'card' :
+                    document.getElementById('opt-upi').classList.contains('selected') ? 'upi' : 'wallet';
+  if(selected==='card' && !validateCard()) return;
+  if(selected==='upi'){
+    const upi = document.getElementById('upiId').value;
+    if(!upi.includes('@')){ showToast('Enter a valid UPI ID'); return; }
+  }
+  // save order summary for confirmation page
+  const subtotalText = document.getElementById('sumTotal').textContent;
+  localStorage.setItem('anistock_last_order', JSON.stringify({items: cart, total: subtotalText, id: 'ANI-' + Math.floor(1000+Math.random()*9000) + '-OMEGA'}));
+  localStorage.setItem('anistock_cart', '[]');
+  window.location.href = 'confirmation.html';
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* seed demo cart if empty, so page isn't blank on first visit */
+(function seed(){
+  const cart = getCart();
+  if(cart.length===0){
+    saveCart([
+      {id:'ck1', name:'Neon Katana Replica', price:4200, qty:1, img:'https://images.unsplash.com/photo-1600717535275-0b394da10788?q=80&w=200&auto=format&fit=crop'},
+      {id:'ck2', name:'Mecha Pilot Jacket', price:2850, qty:1, img:'https://images.unsplash.com/photo-1548126032-079a0fb0099d?q=80&w=200&auto=format&fit=crop'}
+    ]);
+  }
+})();
+renderCart();
+</script>
+</body>
+</html>
