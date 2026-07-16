@@ -32,6 +32,13 @@ body{
     align-items:center;
     justify-content:center;
     padding:40px 20px;
+     background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+        url("https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
 }
 
 a{
@@ -52,17 +59,24 @@ a{
 }
 
 .visual{
-    position:relative;
-    background:
+    position: relative;
+
+    background-image:
         linear-gradient(180deg, rgba(10,15,25,.1), rgba(10,15,25,.85)),
-        url('https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop')
-        center/cover;
-    min-height:560px;
-    padding:34px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    color:#fff;
+        url("https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop");
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    min-height: 100%;
+    height: 100%;
+    padding: 34px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #fff;
 }
 
 .visual-top{
@@ -190,6 +204,8 @@ a{
 
 .input-wrap{
     position:relative;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
 }
 
 .input-wrap input{
@@ -208,6 +224,32 @@ a{
 
 .input-wrap input.err{
     border-color:var(--error);
+}
+
+.input-wrap select{
+    width:100%;
+    height:100%;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    outline:none;
+    background:transparent;
+    color:#bfb6b6;      
+    font-size:15px;
+    font-family:inherit;
+    padding:12px 16px;
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    cursor:pointer;
+}
+
+.input-wrap select:valid{
+    color:#bcafaf;     
+}
+
+.input-wrap select option{
+    background:white; 
+    color:#bcafaf;
 }
 
 .toggle-eye{
@@ -280,23 +322,28 @@ a{
 
 .social-btn{
     width:100%;
-    padding:12px;
+    padding:12px 16px;
     border:1px solid var(--border);
     border-radius:5px;
     background:#fff;
-    font-size:13.5px;
-    font-weight:600;
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:10px;
+    gap:12px;
     cursor:pointer;
-    margin-bottom:10px;
-    transition:.15s;
+    font-size:14px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.social-btn img{
+    width:22px;
+    height:22px;
+    object-fit:contain;
 }
 
 .social-btn:hover{
-    background:var(--bg);
+    background:#f5f5f5;
 }
 
 .terms{
@@ -306,6 +353,28 @@ a{
     margin-top:20px;
     line-height:1.6;
 }
+
+.phone-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.phone-group select{
+    width:110px;
+    height:44px;
+    border:none;
+    outline:none;
+    background:#1d1d1d;
+    color:#fff;
+    border-radius:8px;
+    padding:0 8px;
+}
+
+.phone-group input{
+    flex:1;
+}
+
 
 @media (max-width:860px){
 
@@ -324,6 +393,9 @@ a{
 }
 </style>
 </head>
+
+
+Anistock login fixed · HTML
 <body>
 <div class="card">
   <div class="visual">
@@ -336,163 +408,338 @@ a{
       <p>Unlock exclusive drops, manage your cosplay arsenal, and join a community of elite collectors.</p>
     </div>
   </div>
-
+ 
   <div class="form-side">
     <div class="tabs">
       <div class="tab active" id="tabLogin" onclick="switchTab('login')">LOGIN</div>
       <div class="tab" id="tabCreate" onclick="switchTab('create')">CREATE</div>
     </div>
-
-    <div class="demo-hint" id="loginHint">
-      A demo account already exists — sign in with<br>
-      <strong>kira.shinobi@neon.net</strong> / <strong>demo1234</strong>
-      <div><button type="button" onclick="fillDemo()">Autofill demo login</button></div>
-    </div>
-
+ 
     <!-- LOGIN FORM -->
     <form id="loginForm" onsubmit="handleLogin(event)">
       <div class="field">
         <label class="field-label">EMAIL / ID</label>
         <div class="input-wrap">
-          <input type="text" id="loginEmail" placeholder="collector@anistock.com">
+          <input type="text" id="loginEmail" placeholder="">
         </div>
         <div class="err-msg" id="loginEmailErr">Enter a valid email or ID.</div>
       </div>
       <div class="field">
         <label class="field-label">PASSWORD <a href="#" onclick="alert('Password reset link sent (demo).'); return false;">Forgot?</a></label>
         <div class="input-wrap">
-          <input type="password" id="loginPassword" placeholder="••••••••">
-          <button type="button" class="toggle-eye" onclick="togglePw('loginPassword', this)">
-            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#666" stroke-width="2" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <input type="password" id="loginPassword" placeholder="Password">
+          <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)"><i class="fa fa-eye"></i></button>
         </div>
         <div class="err-msg" id="loginPasswordErr">Incorrect email or password.</div>
       </div>
-      <button type="submit" class="btn-main">AUTHENTICATE →</button>
+      <button type="submit" class="btn-main">LOGIN →</button>
     </form>
-
+ 
     <!-- CREATE FORM -->
     <form id="createForm" style="display:none;" onsubmit="handleCreate(event)">
+ 
       <div class="field">
-        <label class="field-label">DISPLAY NAME</label>
-        <div class="input-wrap"><input type="text" id="createName" placeholder="Kira_99"></div>
-        <div class="err-msg" id="createNameErr">Display name is required.</div>
+        <label class="field-label">FIRST NAME</label>
+        <div class="input-wrap"><input type="text" id="createFirstName" placeholder=""></div>
+        <div class="err-msg" id="createFirstNameErr">First name is required.</div>
       </div>
+ 
+      <div class="field">
+        <label class="field-label">LAST NAME</label>
+        <div class="input-wrap"><input type="text" id="createLastName" placeholder=""></div>
+        <div class="err-msg" id="createLastNameErr">Last name is required.</div>
+      </div>
+ 
       <div class="field">
         <label class="field-label">EMAIL</label>
-        <div class="input-wrap"><input type="text" id="createEmail" placeholder="collector@anistock.com"></div>
+        <div class="input-wrap"><input type="text" id="createEmail" placeholder=""></div>
         <div class="err-msg" id="createEmailErr">Enter a valid email, or that account already exists.</div>
       </div>
+ 
       <div class="field">
         <label class="field-label">PASSWORD</label>
         <div class="input-wrap">
           <input type="password" id="createPassword" placeholder="Minimum 6 characters">
-          <button type="button" class="toggle-eye" onclick="togglePw('createPassword', this)">
-            <svg width="17" height="17" viewBox="0 0 24 24" stroke="#666" stroke-width="2" fill="none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+          <button type="button" class="pw-toggle" onclick="togglePw('createPassword', this)"><i class="fa fa-eye"></i></button>
         </div>
         <div class="err-msg" id="createPasswordErr">Password must be at least 6 characters.</div>
       </div>
+ 
+      <div class="field">
+        <label class="field-label">PHONE</label>
+        <div class="input-wrap">
+          <input type="tel" id="createPhone" placeholder="Phone Number">
+        </div>
+        <div class="err-msg" id="createPhoneErr">Enter a valid phone number.</div>
+      </div>
+ 
+      <!-- GENDER -->
+      <div class="field">
+        <label class="field-label">GENDER</label>
+        <div class="input-wrap">
+          <select id="createGender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div class="err-msg" id="createGenderErr">Please select a gender.</div>
+      </div>
+ 
+      <!-- ADDRESS -->
+      <div class="field">
+        <label class="field-label">ADDRESS</label>
+        <div class="input-wrap">
+          <input type="text" id="createAddress" placeholder="House No., Street, Area">
+        </div>
+        <div class="err-msg" id="createAddressErr">Address is required.</div>
+      </div>
+ 
+      <!-- NEARBY LOCATION -->
+      <div class="field">
+        <label class="field-label">NEARBY LOCATION / LANDMARK</label>
+        <div class="input-wrap">
+          <input type="text" id="createLandmark" placeholder="Nearby landmark">
+        </div>
+        <div class="err-msg" id="createLandmarkErr">Nearby location is required.</div>
+      </div>
+ 
+      <!-- PINCODE -->
+      <div class="field">
+        <label class="field-label">PINCODE</label>
+        <div class="input-wrap">
+          <input type="text" id="createPincode" maxlength="10" placeholder="Pincode">
+        </div>
+        <div class="err-msg" id="createPincodeErr">Enter a valid pincode.</div>
+      </div>
+ 
       <button type="submit" class="btn-main">CREATE ACCOUNT →</button>
     </form>
-
-    <div class="divider">OR CONNECT WITH</div>
-    <button class="social-btn" onclick="socialLogin('Google')">🔵 GOOGLE</button>
-    <button class="social-btn" onclick="socialLogin('Apple ID')"> APPLE ID</button>
-    <button class="social-btn" onclick="socialLogin('Discord')">🎮 DISCORD</button>
-
-    <div class="terms">By connecting, you agree to our <a href="#">Terms</a> & <a href="#">Privacy Policy</a>.</div>
+ 
+    <div id="loginExtras">
+ 
+      <div class="divider">OR CONNECT WITH</div>
+ 
+      <button class="social-btn" onclick="socialLogin('Google')">
+        <img src="https://tse4.mm.bing.net/th/id/OIP.HgH-NjiOdFOrkmwjsZCCfAHaHl?r=0&w=2400&h=2456&rs=1&pid=ImgDetMain&o=7&rm=3" alt="Google">
+        <span>Continue with Google</span>
+      </button>
+ 
+      <button class="social-btn" onclick="socialLogin('Apple ID')">
+        <img src="https://i.imgflip.com/6i8mvk.png" alt="Apple">
+        <span>Continue with Apple</span>
+      </button>
+ 
+      <button class="social-btn" onclick="socialLogin('Discord')">
+        <img src="https://www.bing.com/th/id/OIP.EZkdm25nbQDs_PjFN8hmewHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=ImgAns&rm=2" alt="Discord">
+        <span>Continue with Discord</span>
+      </button>
+ 
+    </div>
+ 
+    <div class="terms">
+      By connecting, you agree to our
+      <a href="#">Terms</a> &
+      <a href="#">Privacy Policy</a>.
+    </div>
+ 
   </div>
 </div>
-
+ 
 <script>
 const ACCOUNTS_KEY = 'anistock_accounts';
-
-/* Seed one demo account so a first-time visitor always has working credentials */
-function seedDemoAccount(){
-  let accounts = [];
-  try{ accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); }catch(e){ accounts = []; }
-  if(!accounts.find(a => a.email.toLowerCase() === 'kira.shinobi@neon.net')){
-    accounts.push({name:'Kira_99', email:'kira.shinobi@neon.net', password:'demo1234'});
-    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-  }
-}
-seedDemoAccount();
-
+ 
 function fillDemo(){
   document.getElementById('loginEmail').value = 'kira.shinobi@neon.net';
   document.getElementById('loginPassword').value = 'demo1234';
 }
-
-function switchTab(tab){
-  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
-  document.getElementById('tabCreate').classList.toggle('active', tab==='create');
-  document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
-  document.getElementById('createForm').style.display = tab==='create' ? 'block' : 'none';
-  document.getElementById('loginHint').style.display = tab==='login' ? 'block' : 'none';
-}
+ 
 function togglePw(id, btn){
   const input = document.getElementById(id);
-  input.type = input.type === 'password' ? 'text' : 'password';
-  btn.style.opacity = input.type === 'text' ? '0.5' : '1';
+  const icon = btn.querySelector('i');
+ 
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) icon.classList.replace('fa-eye', 'fa-eye-slash');
+  } else {
+    input.type = 'password';
+    if (icon) icon.classList.replace('fa-eye-slash', 'fa-eye');
+  }
 }
-
+ 
 function handleLogin(e){
   e.preventDefault();
   let ok = true;
   const email = document.getElementById('loginEmail');
   const pw = document.getElementById('loginPassword');
+ 
   if(!email.value.trim()){ email.classList.add('err'); ok=false; }
   else { email.classList.remove('err'); }
+ 
   if(pw.value.length < 6){ pw.classList.add('err'); ok=false; }
   else { pw.classList.remove('err'); }
-  if(!ok){ document.getElementById('loginPasswordErr').classList.toggle('show', pw.value.length<6); return; }
-
+ 
+  if(!ok){
+    document.getElementById('loginPasswordErr').classList.toggle('show', pw.value.length<6);
+    return;
+  }
+ 
   const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
   const match = accounts.find(a => a.email.toLowerCase() === email.value.trim().toLowerCase() && a.password === pw.value);
+ 
   if(!match){
     email.classList.add('err'); pw.classList.add('err');
     document.getElementById('loginPasswordErr').textContent = 'Incorrect email or password.';
     document.getElementById('loginPasswordErr').classList.add('show');
     return;
   }
+ 
   document.getElementById('loginPasswordErr').classList.remove('show');
   localStorage.setItem('anistock_user', JSON.stringify({name: match.name, email: match.email}));
   window.location.href = 'index.html';
 }
-
+ 
 function handleCreate(e){
   e.preventDefault();
   let ok = true;
-  const name = document.getElementById('createName');
-  const email = document.getElementById('createEmail');
-  const pw = document.getElementById('createPassword');
+ 
+  const firstname = document.getElementById('createFirstName');
+  const lastname  = document.getElementById('createLastName');
+  const email     = document.getElementById('createEmail');
+  const pw        = document.getElementById('createPassword');
+  const phone     = document.getElementById('createPhone');
+  const gender    = document.getElementById('createGender');
+  const address   = document.getElementById('createAddress');
+  const landmark  = document.getElementById('createLandmark');
+  const pincode   = document.getElementById('createPincode');
+ 
   const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
   const exists = accounts.find(a => a.email.toLowerCase() === email.value.trim().toLowerCase());
+ 
+  
+  if(!firstname.value.trim()){
+    firstname.classList.add('err');
+    document.getElementById('createFirstNameErr').classList.add('show');
+    ok = false;
+  } else {
+    firstname.classList.remove('err');
+    document.getElementById('createFirstNameErr').classList.remove('show');
+  }
+ 
+  if(!lastname.value.trim()){
+    lastname.classList.add('err');
+    document.getElementById('createLastNameErr').classList.add('show');
+    ok = false;
+  } else {
+    lastname.classList.remove('err');
+    document.getElementById('createLastNameErr').classList.remove('show');
+  }
+ 
 
-  if(!name.value.trim()){ name.classList.add('err'); document.getElementById('createNameErr').classList.add('show'); ok=false; }
-  else { name.classList.remove('err'); document.getElementById('createNameErr').classList.remove('show'); }
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+  if(!emailValid || exists){
+    email.classList.add('err');
+    document.getElementById('createEmailErr').classList.add('show');
+    ok = false;
+  } else {
+    email.classList.remove('err');
+    document.getElementById('createEmailErr').classList.remove('show');
+  }
+ 
+  if(pw.value.length < 6){
+    pw.classList.add('err');
+    document.getElementById('createPasswordErr').classList.add('show');
+    ok = false;
+  } else {
+    pw.classList.remove('err');
+    document.getElementById('createPasswordErr').classList.remove('show');
+  }
+ 
+  const phoneValid = /^\+?[0-9]{7,15}$/.test(phone.value.trim());
 
-  if(!email.value.trim() || exists){ email.classList.add('err'); document.getElementById('createEmailErr').classList.add('show'); ok=false; }
-  else { email.classList.remove('err'); document.getElementById('createEmailErr').classList.remove('show'); }
-
-  if(pw.value.length < 6){ pw.classList.add('err'); document.getElementById('createPasswordErr').classList.add('show'); ok=false; }
-  else { pw.classList.remove('err'); document.getElementById('createPasswordErr').classList.remove('show'); }
-
+  if(!phoneValid){
+    phone.classList.add('err');
+    document.getElementById('createPhoneErr').classList.add('show');
+    ok = false;
+  } else {
+    phone.classList.remove('err');
+    document.getElementById('createPhoneErr').classList.remove('show');
+  }
+ 
+  if(!gender.value){
+    gender.classList.add('err');
+    document.getElementById('createGenderErr').classList.add('show');
+    ok = false;
+  } else {
+    gender.classList.remove('err');
+    document.getElementById('createGenderErr').classList.remove('show');
+  }
+ 
+  if(!address.value.trim()){
+    address.classList.add('err');
+    document.getElementById('createAddressErr').classList.add('show');
+    ok = false;
+  } else {
+    address.classList.remove('err');
+    document.getElementById('createAddressErr').classList.remove('show');
+  }
+ 
+  if(!landmark.value.trim()){
+    landmark.classList.add('err');
+    document.getElementById('createLandmarkErr').classList.add('show');
+    ok = false;
+  } else {
+    landmark.classList.remove('err');
+    document.getElementById('createLandmarkErr').classList.remove('show');
+  }
+ 
+  const pincodeValid = /^[0-9]{4,10}$/.test(pincode.value.trim());
+  if(!pincodeValid){
+    pincode.classList.add('err');
+    document.getElementById('createPincodeErr').classList.add('show');
+    ok = false;
+  } else {
+    pincode.classList.remove('err');
+    document.getElementById('createPincodeErr').classList.remove('show');
+  }
+ 
   if(!ok) return;
-
-  accounts.push({name: name.value.trim(), email: email.value.trim(), password: pw.value});
+ 
+  const fullname = firstname.value.trim() + ' ' + lastname.value.trim();
+ 
+  accounts.push({
+    name: fullname,
+    firstName: firstname.value.trim(),
+    lastName: lastname.value.trim(),
+    email: email.value.trim(),
+    password: pw.value,
+    phone: phone.value.trim(),
+    gender: gender.value,
+    address: address.value.trim(),
+    landmark: landmark.value.trim(),
+    pincode: pincode.value.trim()
+  });
+ 
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-  localStorage.setItem('anistock_user', JSON.stringify({name: name.value.trim(), email: email.value.trim()}));
+  localStorage.setItem('anistock_user', JSON.stringify({name: fullname, email: email.value.trim()}));
   window.location.href = 'index.html';
 }
-
+ 
 function socialLogin(provider){
   localStorage.setItem('anistock_user', JSON.stringify({name:'Kira_99', email:'kira.shinobi@neon.net'}));
   alert(`Connecting with ${provider}... (demo)`);
   window.location.href = 'index.html';
 }
-
+ 
+function switchTab(tab){
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabCreate').classList.toggle('active', !isLogin);
+  document.getElementById('loginForm').style.display = isLogin ? '' : 'none';
+  document.getElementById('createForm').style.display = isLogin ? 'none' : '';
+  document.getElementById('loginExtras').style.display = isLogin ? '' : 'none';
+}
+ 
 /* If already logged in, skip straight to the shop */
 (function(){
   const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
