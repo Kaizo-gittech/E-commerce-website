@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop — AniStock</title>
 <script>
-/* AUTH GUARD: visitors must log in / create an account before browsing */
 (function(){
   try{
     const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
@@ -40,7 +39,6 @@ button, input, select { font-family: inherit; }
     min-height: 100vh;
 }
 
-/* ============ SIDEBAR ============ */
 .sidebar {
     border-right: 1px solid var(--border);
     padding: 28px 20px;
@@ -117,7 +115,6 @@ button, input, select { font-family: inherit; }
 
 .sidebar-overlay.show { display: block; }
 
-/* ============ MAIN / TOPBAR ============ */
 .main { min-width: 0; }
 
 .topbar {
@@ -182,7 +179,6 @@ button, input, select { font-family: inherit; }
     margin-left: 2px;
 }
 
-/* ============ FLIPKART-STYLE FILTER BAR ============ */
 .filter-bar {
     display: flex;
     align-items: center;
@@ -285,7 +281,6 @@ button, input, select { font-family: inherit; }
 
 .clear-filters-btn:hover { color: #c0394f; }
 
-/* ============ LISTING ============ */
 .content { padding: 32px 40px; }
 
 .listing-head {
@@ -404,10 +399,30 @@ footer {
     margin-top: 20px;
 }
 
-.foot-grid { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-bottom: 20px; }
-.foot-logo { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
-.foot-grid p { font-size: 12.5px; color: var(--ink-soft); }
-.copyright { font-size: 11.5px; color: var(--ink-soft); border-top: 1px solid var(--border); padding-top: 14px; }
+.foot-grid { 
+  display: flex;
+  justify-content: space-between; 
+  flex-wrap: wrap; gap: 20px;
+  padding-bottom: 20px;
+}
+  
+.foot-logo {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700; 
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+  
+.foot-grid p {
+  font-size: 12.5px; 
+  color: var(--ink-soft); 
+}
+.copyright {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--border);
+  padding-top: 14px; }
 
 .toast {
     position: fixed;
@@ -428,7 +443,6 @@ footer {
 
 .toast.show { transform: translateY(0); }
 
-/* ============ RESPONSIVE ============ */
 
 /* Tablets */
 @media (max-width: 1024px) {
@@ -444,7 +458,7 @@ footer {
     .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Phones: sidebar becomes a slide-in drawer, filter bar & grid stay usable, min 2 columns */
+/* Phones */
 @media (max-width: 700px) {
     .app { grid-template-columns: 1fr; }
     .hamburger-btn { display: flex; }
