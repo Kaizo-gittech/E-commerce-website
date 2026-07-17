@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Enter the Clan — AniStock</title>
+<!-- FontAwesome for the eye icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root{
     --blue:#1d3f9e;
@@ -26,13 +28,12 @@
 body{
     font-family:var(--sans);
     color:var(--ink);
-    background:var(--bg);
     min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:40px 20px;
-     background:
+    padding:20px;
+    background:
         linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
         url("https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop");
     background-size:cover;
@@ -48,35 +49,30 @@ a{
 
 .card{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    max-width:1200px;
+    grid-template-columns:1.1fr 0.9fr; /* Better balance between sides */
+    max-width:1100px;
     width:100%;
     background:#fff;
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:12px;
     overflow:hidden;
-    box-shadow:0 2px 24px rgba(0,0,0,.04);
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
 .visual{
     position: relative;
-
     background-image:
         linear-gradient(180deg, rgba(10,15,25,.1), rgba(10,15,25,.85)),
         url("https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop");
-
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-
-    min-height: 100%;
-    height: 100%;
-    padding: 34px;
-
+    padding: 40px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     color: #fff;
+    min-height: 450px;
 }
 
 .visual-top{
@@ -126,10 +122,11 @@ a{
 }
 
 .form-side{
-    padding:44px 48px;
+    padding:40px;
     display:flex;
     flex-direction:column;
     justify-content:center;
+    background:#fff;
 }
 
 .tabs{
@@ -157,34 +154,6 @@ a{
     border-bottom-color:var(--blue);
 }
 
-.demo-hint{
-    background:#eef2fb;
-    border:1px solid #c7d3f0;
-    border-radius:6px;
-    padding:12px 14px;
-    font-size:12px;
-    color:var(--blue-dark);
-    margin-bottom:20px;
-    line-height:1.6;
-}
-
-.demo-hint strong{
-    font-family:monospace;
-    font-size:12px;
-}
-
-.demo-hint button{
-    margin-top:6px;
-    background:var(--blue);
-    color:#fff;
-    border:none;
-    padding:6px 10px;
-    border-radius:4px;
-    font-size:11px;
-    font-weight:700;
-    cursor:pointer;
-}
-
 .field{
     margin-bottom:18px;
 }
@@ -204,18 +173,29 @@ a{
 
 .input-wrap{
     position:relative;
-    border: 1.5px solid var(--border);
-    border-radius: 6px;
+    display:flex;
+    align-items:center;
 }
 
 .input-wrap input{
     width:100%;
     padding:12px 14px;
-    border:1px solid var(--border);
-    border-radius:5px;
+    border:1.5px solid var(--border);
+    border-radius:6px;
     font-size:14px;
     outline:none;
-    transition:border-color .15s;
+    transition:border-color .15s, box-shadow .15s;
+}
+
+/* Eye button icon alignment inside password fields */
+.input-wrap .pw-toggle {
+    position: absolute;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .input-wrap input:focus{
@@ -228,39 +208,33 @@ a{
 
 .input-wrap select{
     width:100%;
-    height:100%;
     border: 1.5px solid var(--border);
     border-radius: 6px;
     outline:none;
-    background:transparent;
-    color:#bfb6b6;      
-    font-size:15px;
+    background:#fff;
+    color:var(--ink);      
+    font-size:14px;
     font-family:inherit;
-    padding:12px 16px;
+    padding:12px 14px;
     appearance:none;
     -webkit-appearance:none;
     -moz-appearance:none;
     cursor:pointer;
 }
 
-.input-wrap select:valid{
-    color:#bcafaf;     
+/* Custom dropdown arrow to replace native styling securely */
+.input-wrap::after {
+    content: "▼";
+    font-size: 10px;
+    color: var(--ink-soft);
+    position: absolute;
+    right: 15px;
+    pointer-events: none;
 }
 
-.input-wrap select option{
-    background:white; 
-    color:#bcafaf;
-}
-
-.toggle-eye{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    cursor:pointer;
-    background:none;
-    border:none;
-    padding:0;
+/* Select wrapper doesn't need an arrow icon if it contains a regular text field */
+.input-wrap:has(input)::after {
+    display: none;
 }
 
 .err-msg{
@@ -280,7 +254,7 @@ a{
     background:var(--blue);
     color:#fff;
     border:none;
-    border-radius:5px;
+    border-radius:6px;
     font-size:14px;
     font-weight:700;
     letter-spacing:.5px;
@@ -295,11 +269,6 @@ a{
 
 .btn-main:hover{
     background:var(--blue-dark);
-}
-
-.btn-main:disabled{
-    opacity:.6;
-    cursor:not-allowed;
 }
 
 .divider{
@@ -324,7 +293,7 @@ a{
     width:100%;
     padding:12px 16px;
     border:1px solid var(--border);
-    border-radius:5px;
+    border-radius:6px;
     background:#fff;
     display:flex;
     align-items:center;
@@ -334,11 +303,12 @@ a{
     font-size:14px;
     font-weight:600;
     transition:.2s;
+    margin-bottom: 10px;
 }
 
 .social-btn img{
-    width:22px;
-    height:22px;
+    width:20px;
+    height:20px;
     object-fit:contain;
 }
 
@@ -354,50 +324,58 @@ a{
     line-height:1.6;
 }
 
-.phone-group{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+/* RESPONSIVE MEDIA QUERIES */
 
-.phone-group select{
-    width:110px;
-    height:44px;
-    border:none;
-    outline:none;
-    background:#1d1d1d;
-    color:#fff;
-    border-radius:8px;
-    padding:0 8px;
-}
-
-.phone-group input{
-    flex:1;
-}
-
-
-@media (max-width:860px){
-
-    .card{
-        grid-template-columns:1fr;
+/* For Tablets and smaller laptops */
+@media (max-width:992px){
+    .card {
+        grid-template-columns: 1fr; /* Stack columns vertically */
+        max-width: 550px; /* Standardize card container for mid-size viewports */
     }
 
-    .visual{
-        display:none;
+    .visual {
+        min-height: 250px;
+        padding: 30px;
     }
 
-    .form-side{
-        padding:32px 24px;
+    .visual-bottom h2 {
+        font-size: 26px;
+    }
+}
+
+/* For Mobile Devices */
+@media (max-width:576px){
+    body {
+        padding: 10px; /* Less viewport margin constraint on mobile */
     }
 
+    .card {
+        border-radius: 8px;
+    }
+
+    /* Hide visual panel on mobile entirely to prioritize form */
+    .visual {
+        display: none;
+    }
+
+    .form-side {
+        padding: 24px 16px; /* Optimized mobile density */
+    }
+
+    .tabs {
+        gap: 18px;
+    }
+
+    .social-btn {
+        font-size: 13px; /* Slightly compact text for small screens */
+    }
 }
 </style>
 </head>
 
-
-Anistock login fixed · HTML
 <body>
 <div class="card">
+  <!-- Visual Branding Side -->
   <div class="visual">
     <div class="visual-top">
       <div class="brand">Anistock<small>PREMIUM ANIME GEAR</small></div>
@@ -409,6 +387,7 @@ Anistock login fixed · HTML
     </div>
   </div>
  
+  <!-- Action Form Side -->
   <div class="form-side">
     <div class="tabs">
       <div class="tab active" id="tabLogin" onclick="switchTab('login')">LOGIN</div>
@@ -420,7 +399,7 @@ Anistock login fixed · HTML
       <div class="field">
         <label class="field-label">EMAIL / ID</label>
         <div class="input-wrap">
-          <input type="text" id="loginEmail" placeholder="">
+          <input type="text" id="loginEmail" placeholder="Enter your email or ID">
         </div>
         <div class="err-msg" id="loginEmailErr">Enter a valid email or ID.</div>
       </div>
@@ -428,7 +407,7 @@ Anistock login fixed · HTML
         <label class="field-label">PASSWORD <a href="#" onclick="alert('Password reset link sent (demo).'); return false;">Forgot?</a></label>
         <div class="input-wrap">
           <input type="password" id="loginPassword" placeholder="Password">
-          <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)"><i class="fa fa-eye"></i></button>
+          <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div class="err-msg" id="loginPasswordErr">Incorrect email or password.</div>
       </div>
@@ -440,19 +419,19 @@ Anistock login fixed · HTML
  
       <div class="field">
         <label class="field-label">FIRST NAME</label>
-        <div class="input-wrap"><input type="text" id="createFirstName" placeholder=""></div>
+        <div class="input-wrap"><input type="text" id="createFirstName" placeholder="First Name"></div>
         <div class="err-msg" id="createFirstNameErr">First name is required.</div>
       </div>
  
       <div class="field">
         <label class="field-label">LAST NAME</label>
-        <div class="input-wrap"><input type="text" id="createLastName" placeholder=""></div>
+        <div class="input-wrap"><input type="text" id="createLastName" placeholder="Last Name"></div>
         <div class="err-msg" id="createLastNameErr">Last name is required.</div>
       </div>
  
       <div class="field">
         <label class="field-label">EMAIL</label>
-        <div class="input-wrap"><input type="text" id="createEmail" placeholder=""></div>
+        <div class="input-wrap"><input type="text" id="createEmail" placeholder="you@domain.com"></div>
         <div class="err-msg" id="createEmailErr">Enter a valid email, or that account already exists.</div>
       </div>
  
@@ -460,7 +439,7 @@ Anistock login fixed · HTML
         <label class="field-label">PASSWORD</label>
         <div class="input-wrap">
           <input type="password" id="createPassword" placeholder="Minimum 6 characters">
-          <button type="button" class="pw-toggle" onclick="togglePw('createPassword', this)"><i class="fa fa-eye"></i></button>
+          <button type="button" class="pw-toggle" onclick="togglePw('createPassword', this)"><i class="fa-solid fa-eye"></i></button>
         </div>
         <div class="err-msg" id="createPasswordErr">Password must be at least 6 characters.</div>
       </div>
@@ -473,7 +452,6 @@ Anistock login fixed · HTML
         <div class="err-msg" id="createPhoneErr">Enter a valid phone number.</div>
       </div>
  
-      <!-- GENDER -->
       <div class="field">
         <label class="field-label">GENDER</label>
         <div class="input-wrap">
@@ -481,12 +459,12 @@ Anistock login fixed · HTML
             <option value="">Select Gender</option>
             <option>Male</option>
             <option>Female</option>
+            <option>Non-Binary</option>
           </select>
         </div>
         <div class="err-msg" id="createGenderErr">Please select a gender.</div>
       </div>
  
-      <!-- ADDRESS -->
       <div class="field">
         <label class="field-label">ADDRESS</label>
         <div class="input-wrap">
@@ -495,7 +473,6 @@ Anistock login fixed · HTML
         <div class="err-msg" id="createAddressErr">Address is required.</div>
       </div>
  
-      <!-- NEARBY LOCATION -->
       <div class="field">
         <label class="field-label">NEARBY LOCATION / LANDMARK</label>
         <div class="input-wrap">
@@ -504,7 +481,6 @@ Anistock login fixed · HTML
         <div class="err-msg" id="createLandmarkErr">Nearby location is required.</div>
       </div>
  
-      <!-- PINCODE -->
       <div class="field">
         <label class="field-label">PINCODE</label>
         <div class="input-wrap">
@@ -516,8 +492,8 @@ Anistock login fixed · HTML
       <button type="submit" class="btn-main">CREATE ACCOUNT →</button>
     </form>
  
+    <!-- Social Login Section -->
     <div id="loginExtras">
- 
       <div class="divider">OR CONNECT WITH</div>
  
       <button class="social-btn" onclick="socialLogin('Google')">
@@ -534,7 +510,6 @@ Anistock login fixed · HTML
         <img src="https://www.bing.com/th/id/OIP.EZkdm25nbQDs_PjFN8hmewHaHa?w=193&h=193&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=ImgAns&rm=2" alt="Discord">
         <span>Continue with Discord</span>
       </button>
- 
     </div>
  
     <div class="terms">
@@ -542,17 +517,11 @@ Anistock login fixed · HTML
       <a href="#">Terms</a> &
       <a href="#">Privacy Policy</a>.
     </div>
- 
   </div>
 </div>
  
 <script>
 const ACCOUNTS_KEY = 'anistock_accounts';
- 
-function fillDemo(){
-  document.getElementById('loginEmail').value = 'kira.shinobi@neon.net';
-  document.getElementById('loginPassword').value = 'demo1234';
-}
  
 function togglePw(id, btn){
   const input = document.getElementById(id);
@@ -560,10 +529,16 @@ function togglePw(id, btn){
  
   if (input.type === 'password') {
     input.type = 'text';
-    if (icon) icon.classList.replace('fa-eye', 'fa-eye-slash');
+    if (icon) {
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    }
   } else {
     input.type = 'password';
-    if (icon) icon.classList.replace('fa-eye-slash', 'fa-eye');
+    if (icon) {
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
   }
 }
  
@@ -612,11 +587,9 @@ function handleCreate(e){
   const address   = document.getElementById('createAddress');
   const landmark  = document.getElementById('createLandmark');
   const pincode   = document.getElementById('createPincode');
- 
   const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
   const exists = accounts.find(a => a.email.toLowerCase() === email.value.trim().toLowerCase());
  
-  
   if(!firstname.value.trim()){
     firstname.classList.add('err');
     document.getElementById('createFirstNameErr').classList.add('show');
@@ -635,7 +608,6 @@ function handleCreate(e){
     document.getElementById('createLastNameErr').classList.remove('show');
   }
  
-
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
   if(!emailValid || exists){
     email.classList.add('err');
@@ -656,7 +628,6 @@ function handleCreate(e){
   }
  
   const phoneValid = /^\+?[0-9]{7,15}$/.test(phone.value.trim());
-
   if(!phoneValid){
     phone.classList.add('err');
     document.getElementById('createPhoneErr').classList.add('show');
