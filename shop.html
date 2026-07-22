@@ -145,23 +145,82 @@ button, input, select { font-family: inherit; }
     flex-shrink: 0;
 }
 
-.hamburger-btn span { display: block; width: 16px; height: 2px; background: var(--ink); }
+.hamburger-btn span{
+  display: block; 
+  width: 16px; height:
+  2px; background: 
+  var(--ink); 
+}
 
-.breadcrumb { font-size: 13px; color: var(--ink-soft); display: flex; gap: 6px; white-space: nowrap; }
-.breadcrumb a:hover { color: var(--blue); }
+.breadcrumb { 
+  font-size: 13px; 
+  color: var(--ink-soft); 
+  display: flex; 
+  gap: 6px;
+  white-space: nowrap;
 
-.search-box {
+}
+.breadcrumb a:hover {
+  color: var(--blue);
+}
+
+.search-wrap {
+    position: relative;
     flex: 1;
     max-width: 480px;
+}
+
+.search-box {
     display: flex;
     align-items: center;
     gap: 8px;
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 9px 12px;
+    background: #fff;
 }
 
 .search-box input { border: none; outline: none; font-size: 13px; flex: 1; min-width: 0; background: transparent; }
+
+.search-suggestions {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(20,20,30,.15);
+    padding: 8px;
+    z-index: 500;
+}
+
+.search-suggestions.show { display: block; }
+
+.search-suggest-label {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding: 6px 10px 4px;
+}
+
+.search-suggest-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 10px;
+    font-size: 13.5px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: var(--ink);
+}
+
+.search-suggest-item svg { flex-shrink: 0; stroke: var(--ink-soft); }
+
+.search-suggest-item:hover { background: var(--bg-soft); color: var(--blue); }
+.search-suggest-item:hover svg { stroke: var(--blue); }
 
 .topbar-right {
     display: flex;
@@ -182,7 +241,7 @@ button, input, select { font-family: inherit; }
     margin-left: 2px;
 }
 
-/* ============ FLIPKART-STYLE FILTER BAR ============ */
+/* filter in search bar*/
 .filter-bar {
     display: flex;
     align-items: center;
@@ -428,6 +487,196 @@ footer {
 
 .toast.show { transform: translateY(0); }
 
+/* ============ SETTINGS PANEL ============ */
+.settings-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(10,12,20,.5);
+    z-index:2000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.settings-overlay.show{
+    display:flex;
+}
+
+.settings-modal{
+    background:#fff;
+    border-radius:10px;
+    max-width:640px;
+    width:100%;
+    max-height:85vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(10,12,20,.3);
+}
+
+.settings-modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 24px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+}
+
+.settings-modal-head h2{
+    font-family:var(--serif);
+    font-size:22px;
+}
+
+.settings-close{
+    border:none;
+    background:var(--bg-soft);
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:14px;
+    color:var(--ink);
+}
+
+.settings-close:hover{
+    background:var(--border);
+}
+
+.settings-body{
+    overflow-y:auto;
+    padding:6px 0;
+}
+
+.settings-section{
+    border-bottom:1px solid var(--border);
+}
+
+.settings-section:last-child{
+    border-bottom:none;
+}
+
+.settings-section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 24px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:14px;
+}
+
+.settings-section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.settings-icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;
+    height:30px;
+    border-radius:7px;
+    background:var(--bg-soft);
+    flex-shrink:0;
+}
+
+.settings-icon svg{
+    width:16px;
+    height:16px;
+    stroke:var(--ink);
+    stroke-width:1.8;
+    fill:none;
+}
+
+.settings-section-head:hover{
+    background:var(--bg-soft);
+}
+
+.settings-section-head .chev{
+    transition:transform .2s;
+    color:var(--ink-soft);
+    font-weight:400;
+}
+
+.settings-section.open .settings-section-head .chev{
+    transform:rotate(180deg);
+}
+
+.settings-section-items{
+    display:none;
+    padding:0 24px 14px;
+}
+
+.settings-section.open .settings-section-items{
+    display:block;
+}
+
+.settings-item-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    font-size:13.5px;
+    color:var(--ink);
+    cursor:pointer;
+    border-top:1px solid var(--bg-soft);
+}
+
+.settings-item-row:first-child{
+    border-top:none;
+}
+
+.settings-item-row:hover{
+    color:var(--blue);
+}
+
+.settings-item-row.settings-danger{
+    color:#c0394f;
+}
+
+.settings-item-row.settings-danger:hover{
+    color:#9c2c3d;
+}
+
+.settings-chevron-small{
+    color:var(--ink-soft);
+    font-size:14px;
+}
+
+.settings-toggle{
+    width:38px;
+    height:22px;
+    border-radius:12px;
+    background:var(--border);
+    position:relative;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.settings-toggle.on{
+    background:var(--blue);
+}
+
+.settings-toggle::after{
+    content:'';
+    position:absolute;
+    top:2px;
+    left:2px;
+    width:18px;
+    height:18px;
+    background:#fff;
+    border-radius:50%;
+    transition:left .2s;
+}
+
+.settings-toggle.on::after{
+    left:18px;
+}
+
 /* ============ RESPONSIVE ============ */
 
 /* Tablets */
@@ -464,7 +713,7 @@ footer {
     .sidebar.open { left: 0; }
 
     .topbar { flex-wrap: wrap; row-gap: 10px; padding: 14px 16px; }
-    .search-box { max-width: none; order: 3; flex-basis: 100%; }
+    .search-wrap { max-width: none; order: 3; flex-basis: 100%; }
     .breadcrumb { display: none; }
     .topbar-right span.opt { display: none; }
 
@@ -472,6 +721,10 @@ footer {
     .content { padding: 20px; }
 
     .grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+    .settings-modal{
+        max-height:92vh;
+    }
 }
 
 @media (max-width: 480px) {
@@ -512,6 +765,7 @@ footer {
       <a href="account.html"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Account</a>
       <a href="checkout.html"><svg class="icon" viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>Cart<span class="cart-count" id="cartCountSide">0</span></a>
       <a href="#"><svg class="icon" viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>Wishlist</a>
+      <a href="#" id="settingsLink" onclick="openSettings(event)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
     </div>
   </aside>
 
@@ -524,9 +778,12 @@ footer {
         <div class="breadcrumb"><a href="index.html">Home</a><span>›</span><a href="shop.html">Shop</a><span>›</span><span>All Collections</span></div>
       </div>
 
-      <div class="search-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input type="text" placeholder="Search curated goods..." id="searchInput" oninput="renderGrid()">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+          <input type="text" placeholder="Search category e.g. apparel, weapons, shoes..." id="searchInput" onkeydown="handleShopSearchKey(event)" onfocus="showShopSuggestions()" onblur="hideShopSuggestions()">
+        </div>
+        <div class="search-suggestions" id="shopSuggestions"></div>
       </div>
 
       <div class="topbar-right">
@@ -545,6 +802,8 @@ footer {
           <label class="check-row"><input type="checkbox" class="cat-cb" value="cosplay" onchange="onCatChange()"> Cosplay Props</label>
           <label class="check-row"><input type="checkbox" class="cat-cb" value="weapons" onchange="onCatChange()"> Weapons</label>
           <label class="check-row"><input type="checkbox" class="cat-cb" value="figures" onchange="onCatChange()"> Figures</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="figures" onchange="onCatChange()"> Shoes</label>
+          <label class="check-row"><input type="checkbox" class="cat-cb" value="figures" onchange="onCatChange()"> Bottom Wear</label>
         </div>
       </div>
 
@@ -631,6 +890,16 @@ footer {
 
 <div class="toast" id="toast"></div>
 
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
+  <div class="settings-modal">
+    <div class="settings-modal-head">
+      <h2>Settings</h2>
+      <button class="settings-close" onclick="closeSettings()" aria-label="Close settings">✕</button>
+    </div>
+    <div class="settings-body" id="settingsBody"></div>
+  </div>
+</div>
+
 <script>
 const PRODUCTS = [
   {id:'s1', name:'Shadow Ronin Garment', cat:'apparel', catLabel:'APPAREL', price:2450, rating:4.5, reviews:128, badge:'New Edition', img:'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=500&auto=format&fit=crop', mat:'Cotton'},
@@ -704,6 +973,7 @@ function clearAllFilters(){
   document.querySelectorAll('.cat-cb').forEach(cb=>cb.checked=false);
   document.querySelectorAll('#priceGrid .chip, #matGrid .chip, #matGridWeapon .chip').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('open'));
+  document.getElementById('searchInput').value = '';
   renderGrid();
 }
 
@@ -785,7 +1055,11 @@ function stars(rating){
 function filterProducts(){
   let list = [...PRODUCTS];
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  if(q) list = list.filter(p=>p.name.toLowerCase().includes(q));
+  if(q) list = list.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.cat.toLowerCase().includes(q) ||
+    p.catLabel.toLowerCase().includes(q)
+  );
   if(activeCats.length) list = list.filter(p=>activeCats.includes(p.cat));
   if(activePriceRange){
     const [min,max] = activePriceRange.split('-').map(Number);
@@ -797,6 +1071,47 @@ function filterProducts(){
   if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
   if(sort==='rating') list.sort((a,b)=>b.rating-a.rating);
   return list;
+}
+
+/* Search only runs when Enter is pressed, or a suggestion is clicked, so a
+   category term like "apparel" / "weapons" / "shoes" narrows the grid to
+   just that category. */
+
+const SHOP_CATEGORY_SUGGESTIONS = ['Apparel', 'Weapons', 'Cosplay', 'Figures', 'Footwear'];
+
+const SHOP_CATEGORY_ICON_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" stroke-width="1.8" fill="none"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>';
+
+function renderShopSuggestions(){
+  const wrap = document.getElementById('shopSuggestions');
+  wrap.innerHTML =
+    `<div class="search-suggest-label">BROWSE BY CATEGORY</div>` +
+    SHOP_CATEGORY_SUGGESTIONS.map(c =>
+      `<div class="search-suggest-item" onmousedown="selectShopSuggestion('${c}')">${SHOP_CATEGORY_ICON_SVG}<span>${c}</span></div>`
+    ).join('');
+}
+
+function showShopSuggestions(){
+  renderShopSuggestions();
+  document.getElementById('shopSuggestions').classList.add('show');
+}
+
+function hideShopSuggestions(){
+  setTimeout(()=>document.getElementById('shopSuggestions').classList.remove('show'), 150);
+}
+
+function selectShopSuggestion(cat){
+  document.getElementById('searchInput').value = cat;
+  document.getElementById('shopSuggestions').classList.remove('show');
+  currentPage = 1;
+  renderGrid();
+}
+
+function handleShopSearchKey(e){
+  if(e.key !== 'Enter') return;
+  e.preventDefault();
+  document.getElementById('shopSuggestions').classList.remove('show');
+  currentPage = 1;
+  renderGrid();
 }
 
 function renderGrid(){
@@ -887,6 +1202,127 @@ function closeSidebar(){
 
 renderGrid();
 updateCartCount();
+
+/* setting icon  */
+const SETTINGS_ICONS = {
+  profile: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  security: '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  address: '<svg viewBox="0 0 24 24"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>',
+  payment: '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>',
+  orders: '<svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  notifications: '<svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  privacy: '<svg viewBox="0 0 24 24"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/></svg>',
+  wishlist: '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>',
+  language: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/></svg>',
+  logout: '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>'
+};
+
+const SETTINGS_DATA = [
+  { title: 'Profile Information', icon: SETTINGS_ICONS.profile, items: ['Full Name','Username','Profile Picture','Email Address','Phone Number','Date of Birth (optional)'] },
+  { title: 'Security', icon: SETTINGS_ICONS.security, items: ['Change Password','Two-Factor Authentication (2FA)','Login Activity','Logout from all devices'] },
+  { title: 'Address Management', icon: SETTINGS_ICONS.address, items: ['Add Address','Edit Address','Delete Address','Set Default Shipping Address','Set Default Billing Address'] },
+  { title: 'Payment Information', icon: SETTINGS_ICONS.payment, items: ['Saved Cards (optional)','Saved UPI IDs','Preferred Payment Method'] },
+  { title: 'Order Preferences', icon: SETTINGS_ICONS.orders, items: ['Order History','Track Orders','Returns and Refunds'] },
+  { title: 'Notifications', icon: SETTINGS_ICONS.notifications, items: ['Email Notifications','SMS Notifications','Promotional Offers','Order Updates'], toggles: ['Email Notifications','SMS Notifications','Promotional Offers','Order Updates'] },
+  { title: 'Privacy Settings', icon: SETTINGS_ICONS.privacy, items: ['Manage Personal Data','Download Account Data','Delete Account'], danger: ['Delete Account'] },
+  { title: 'Wishlist', icon: SETTINGS_ICONS.wishlist, items: ['View Saved Products','Move Items to Cart'] },
+  { title: 'Language and Appearance', icon: SETTINGS_ICONS.language, items: ['Language Preference','Theme (Light / Dark Mode)'], toggles: ['Theme (Light / Dark Mode)'] },
+  { title: 'Account Actions', icon: SETTINGS_ICONS.logout, items: ['Log Out','Delete Account','Deactivate Account (optional)'], danger: ['Delete Account','Deactivate Account (optional)'] }
+];
+
+function renderSettings(){
+  const body = document.getElementById('settingsBody');
+  body.innerHTML = SETTINGS_DATA.map((sec, i) => `
+    <div class="settings-section" id="sec-${i}">
+      <div class="settings-section-head" onclick="toggleSection(${i})">
+        <span class="settings-section-title"><span class="settings-icon">${sec.icon}</span>${sec.title}</span><span class="chev">▾</span>
+      </div>
+      <div class="settings-section-items">
+        ${sec.items.map(item => {
+          const isDanger = sec.danger && sec.danger.includes(item);
+          const isToggle = sec.toggles && sec.toggles.includes(item);
+          return `<div class="settings-item-row ${isDanger ? 'settings-danger' : ''}" onclick="handleSettingsAction('${sec.title.replace(/'/g,"")}','${item.replace(/'/g,"")}', event)">
+            <span>${item}</span>
+            ${isToggle
+              ? `<span class="settings-toggle" onclick="toggleSwitch(this, event)"></span>`
+              : `<span class="settings-chevron-small">›</span>`}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSection(i){
+  document.getElementById('sec-' + i).classList.toggle('open');
+}
+
+function toggleSwitch(el, e){
+  e.stopPropagation();
+  el.classList.toggle('on');
+  showToast(el.classList.contains('on') ? '✓ Enabled' : 'Disabled');
+}
+
+function handleSettingsAction(section, item, e){
+  if (e && e.target.classList.contains('settings-toggle')) return;
+
+  if (item === 'Log Out') {
+    localStorage.removeItem('anistock_user');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  if (item === 'Logout from all devices') {
+    localStorage.removeItem('anistock_user');
+    showToast('✓ Logged out from all devices');
+    setTimeout(() => window.location.href = 'login.html', 900);
+    return;
+  }
+
+  if (item === 'Delete Account' || item === 'Deactivate Account (optional)') {
+    const verb = item.toLowerCase().replace(' (optional)', '');
+    if (confirm(`Are you sure you want to ${verb}? This action cannot be undone.`)) {
+      localStorage.removeItem('anistock_user');
+      showToast('Your request has been submitted');
+      setTimeout(() => window.location.href = 'login.html', 1200);
+    }
+    return;
+  }
+
+  if (item === 'View Saved Products') {
+    closeSettings();
+    window.location.href = 'shop.html';
+    return;
+  }
+
+  if (item === 'Order History' || item === 'Track Orders') {
+    closeSettings();
+    window.location.href = 'account.html';
+    return;
+  }
+
+  if (item === 'Preferred Payment Method' || item.includes('Saved Cards') || item === 'Saved UPI IDs') {
+    closeSettings();
+    window.location.href = 'account.html';
+    return;
+  }
+
+  showToast(`Opening: ${item}`);
+}
+
+function openSettings(e){
+  if (e) e.preventDefault();
+  renderSettings();
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function closeSettingsOnOverlay(e){
+  if (e.target.id === 'settingsOverlay') closeSettings();
+}
 </script>
 </body>
 </html>

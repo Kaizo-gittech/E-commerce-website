@@ -1,0 +1,159 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — AniStock</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">AniStock<small>PREMIUM ANIME GEAR</small></div>
+    <nav class="nav-main">
+      <a href="/">Home</a>
+      <a href="/shop" class="active">Shop</a>
+      <a href="/shop?sort=editorial">New Arrivals</a>
+      <a href="/shop?sort=rating">Best Sellers</a>
+      <a href="/shop?category=cosplay">Cosplay</a>
+      <a href="/shop?category=weapons">Weapons</a>
+      <a href="/shop?category=figures">Figures</a>
+    </nav>
+    <div class="nav-bottom">
+      <a href="/account">Account</a>
+      <a href="/checkout">Cart<span class="cart-count" id="cartCountSide">0</span></a>
+      <a href="#">Wishlist</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger-btn" onclick="openSidebar()" aria-label="Open menu"><span></span><span></span><span></span></button>
+
+      <form class="search-box" method="GET" action="/shop">
+        <svg width="14" height="14" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input type="text" name="q" value="{{ q }}" placeholder="Search curated goods...">
+        <input type="hidden" name="category" value="{{ category }}">
+        <input type="hidden" name="price" value="{{ price_range }}">
+        <input type="hidden" name="material" value="{{ material }}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+      </form>
+
+      <div class="topbar-right"><span>Currency</span><span>Language</span></div>
+    </div>-->
+
+    <!-- Filter bar: submitting this form re-runs the SQL query in app.py -->
+    <!--<form id="filterForm" class="filter-bar" method="GET" action="/shop">
+      <input type="hidden" name="q" value="{{ q }}">
+      <input type="hidden" name="sort" value="{{ sort }}">
+      <input type="hidden" id="priceInput" name="price" value="{{ price_range }}">
+      <input type="hidden" id="materialInput" name="material" value="{{ material }}">
+
+      <div class="filter-pill {{ 'has-value' if category else '' }}" data-pill="category">
+        <button type="button" class="pill-toggle" onclick="togglePill('category')">Category ▾</button>
+        <div class="filter-dropdown">
+          {% set cat_list = category.split(',') if category else [] %}
+          {% for c in ['apparel','cosplay','weapons','figures'] %}
+          <label class="check-row">
+            <input type="checkbox" name="category" value="{{ c }}" onchange="this.form.submit()" {% if c in cat_list %}checked{% endif %}>
+            {{ c|capitalize }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-pill {{ 'has-value' if price_range else '' }}" data-pill="price">
+        <button type="button" class="pill-toggle" onclick="togglePill('price')">Price ▾</button>
+        <div class="filter-dropdown">
+          {% for r in ['500-1000','1000-2000','2000-3000','3000-4000','4000-5000'] %}
+          <div class="chip {{ 'active' if price_range==r else '' }}" onclick="setPrice('{{ r }}')">₹{{ r.split('-')[0] }}-₹{{ r.split('-')[1] }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-pill {{ 'has-value' if material in ['Cotton','Silk','Polyester'] else '' }}" data-pill="matwear">
+        <button type="button" class="pill-toggle" onclick="togglePill('matwear')">Material (Wearable) ▾</button>
+        <div class="filter-dropdown">
+          {% for m in ['Cotton','Silk','Polyester'] %}
+          <div class="chip {{ 'active' if material==m else '' }}" onclick="setMaterial('{{ m }}')">{{ m }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="filter-pill {{ 'has-value' if material in ['Wood','3D Printed','Craft Foam','Foam Clay'] else '' }}" data-pill="matweapon">
+        <button type="button" class="pill-toggle" onclick="togglePill('matweapon')">Material (Weapon) ▾</button>
+        <div class="filter-dropdown">
+          {% for m in ['Wood','3D Printed','Craft Foam','Foam Clay'] %}
+          <div class="chip {{ 'active' if material==m else '' }}" onclick="setMaterial('{{ m }}')">{{ m }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <a class="clear-filters-btn" href="/shop">Clear All</a>
+    </form>
+
+    <div class="content">
+      <div class="listing-head">
+        <div>
+          <h1>Collection Series</h1>
+          <p>Showing {{ products|length }} of {{ total }} refined pieces — page {{ page }} of {{ total_pages }}</p>
+        </div>
+        <form method="GET" action="/shop" class="sort-wrap">
+          <input type="hidden" name="q" value="{{ q }}">
+          <input type="hidden" name="category" value="{{ category }}">
+          <input type="hidden" name="price" value="{{ price_range }}">
+          <input type="hidden" name="material" value="{{ material }}">
+          Sort By:
+          <select name="sort" onchange="this.form.submit()">
+            <option value="editorial" {{ 'selected' if sort=='editorial' else '' }}>Editorial Choice</option>
+            <option value="price-asc" {{ 'selected' if sort=='price-asc' else '' }}>Price: Low to High</option>
+            <option value="price-desc" {{ 'selected' if sort=='price-desc' else '' }}>Price: High to Low</option>
+            <option value="rating" {{ 'selected' if sort=='rating' else '' }}>Rating</option>
+          </select>
+        </form>
+      </div>
+
+      <div class="grid">
+        {% for p in products %}
+        <a class="product-card" href="/product/{{ p.id }}">
+          <div class="product-img">
+            {% if p.badge %}<span class="badge {{ 'limited' if 'Limited' in p.badge else 'new' }}">{{ p.badge }}</span>{% endif %}
+            <img src="{{ p.img }}" alt="{{ p.name }}">
+          </div>
+          <div class="product-info">
+            <div class="pcat-label">{{ p.cat_label }}</div>
+            <div class="pname">{{ p.name }}</div>
+            <div class="stars">★ {{ p.rating }} <span>({{ p.reviews }})</span></div>
+            <div class="price-row"><div class="price">₹{{ "{:,}".format(p.price) }}</div></div>
+            <div class="btn-group">
+              <button type="button" class="add-mini" onclick="event.preventDefault();event.stopPropagation();addToCart({{ p.id }}, '{{ p.name|replace("'", "\\'") }}', {{ p.price }}, '{{ p.img }}')">🛒 Add</button>
+              <button type="button" class="buy-mini" onclick="event.preventDefault();event.stopPropagation();buyNow({{ p.id }}, '{{ p.name|replace("'", "\\'") }}', {{ p.price }}, '{{ p.img }}')">Buy Now</button>
+            </div>
+          </div>
+        </a>
+        {% else %}
+        <p style="grid-column:1/-1; color:var(--ink-soft); padding:40px 0;">No items match your filters. Try adjusting them.</p>
+        {% endfor %}
+      </div>
+
+      <div class="pagination">
+        {% for p in range(1, total_pages + 1) %}
+        <a href="/shop?page={{ p }}&q={{ q }}&category={{ category }}&price={{ price_range }}&material={{ material }}&sort={{ sort }}">
+          <button class="{{ 'active' if p == page else '' }}">{{ p }}</button>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <footer style="background:var(--bg-soft); padding:30px 40px; border-top:1px solid var(--border); margin-top:20px;">
+      <div style="font-family:var(--serif); font-size:18px; color:var(--blue); font-weight:700;">AniStock</div>
+      <p style="font-size:12.5px; color:var(--ink-soft); margin-top:4px;">© 2026 AniStock Archives. All rights reserved.</p>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>-->

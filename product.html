@@ -1,0 +1,79 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ product.name }} — AniStock</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">AniStock<small>PREMIUM ANIME GEAR</small></div>
+    <nav class="nav-main">
+      <a href="/">Home</a>
+      <a href="/shop">Shop</a>
+      <a href="/shop?category=cosplay">Cosplay</a>
+      <a href="/shop?category=weapons">Weapons</a>
+      <a href="/shop?category=figures">Figures</a>
+    </nav>
+    <div class="nav-bottom">
+      <a href="/account">Account</a>
+      <a href="/checkout">Cart<span class="cart-count" id="cartCountSide">0</span></a>
+      <a href="#">Wishlist</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger-btn" onclick="openSidebar()" aria-label="Open menu"><span></span><span></span><span></span></button>
+      <a href="/shop" style="font-size:13px; color:var(--ink-soft);">← Back to Shop</a>
+    </div>
+
+    <div class="pd-wrap">
+      <div class="pd-img">
+        <img src="{{ product.img }}" alt="{{ product.name }}">
+      </div>
+      <div class="pd-info">
+        <div class="pd-cat">{{ product.cat_label }}</div>
+        <h1 class="pd-title">{{ product.name }}</h1>
+        <div class="stars">★ {{ product.rating }} <span>({{ product.reviews }} reviews)</span></div>
+        <div class="pd-price">₹{{ "{:,}".format(product.price) }}</div>
+
+        <div class="pd-meta">
+          {% if product.material %}<span>Material: <strong>{{ product.material }}</strong></span>{% endif %}
+          <span>In stock: <strong>{{ product.stock }}</strong></span>
+        </div>
+
+        <p class="pd-desc">{{ product.description }}</p>
+
+        <div class="pd-btns">
+          <button type="button" class="add-mini" onclick="addToCart({{ product.id }}, '{{ product.name|replace("'", "\\'") }}', {{ product.price }}, '{{ product.img }}')">🛒 Add to Cart</button>
+          <button type="button" class="buy-mini" onclick="buyNow({{ product.id }}, '{{ product.name|replace("'", "\\'") }}', {{ product.price }}, '{{ product.img }}')">Buy Now</button>
+        </div>
+      </div>
+    </div>
+
+    {% if related %}
+    <h3 class="related-title">You may also like</h3>
+    <div class="related-grid">
+      {% for p in related %}
+      <a class="product-card" href="/product/{{ p.id }}">
+        <div class="product-img"><img src="{{ p.img }}" alt="{{ p.name }}"></div>
+        <div class="product-info">
+          <div class="pcat-label">{{ p.cat_label }}</div>
+          <div class="pname">{{ p.name }}</div>
+          <div class="price-row"><div class="price">₹{{ "{:,}".format(p.price) }}</div></div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>-->
