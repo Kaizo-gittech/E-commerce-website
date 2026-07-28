@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Veloura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<style>.theme-pending-dark{ background:#161616 !important; }</style>
+<style>
+  :root{
+    --maroon:#2F2F2F;
+    --maroon-dark:#1A1A1A;
+    --gold:#B08D57;
+    --gold-light:#D4C2A1;
+    --ink:#222222;
+    --ink-soft:#6D6D6D;
+    --bg:#F6F6F5;
+    --border:#E8E8E8;
+    --green:#2E8B57;
+    --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans:'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode{
+    --maroon:#D4C2A1;
+    --maroon-dark:#B08D57;
+    --gold:#D4C2A1;
+    --gold-light:#E8DCC4;
+    --ink:#EDEDED;
+    --ink-soft:#A8A8A8;
+    --bg:#161616;
+    --border:#333333;
+}
+body.dark-mode .card{ background:#1E1E1E; }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:var(--sans); color:var(--ink); background:var(--bg); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+a{ color:inherit; text-decoration:none; }
+
+.ph{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center; background:linear-gradient(135deg, var(--bg), #D4C2A1); color:var(--gold); font-family:var(--serif); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; padding:6px; }
+
+.card{ max-width:660px; width:100%; background:#fff; border:1px solid var(--border); border-radius:8px; padding:50px; text-align:center; box-shadow:0 2px 30px rgba(60,30,20,.06); }
+
+.check-icon{ width:64px; height:64px; background:linear-gradient(135deg, var(--maroon), var(--gold)); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 22px; animation:pop .4s ease; }
+@keyframes pop{ 0%{ transform:scale(0); } 70%{ transform:scale(1.1); } 100%{ transform:scale(1); } }
+
+h1{ font-family:var(--serif); font-size:30px; font-weight:600; margin-bottom:10px; color:var(--maroon); }
+.subtitle{ font-size:14px; color:var(--ink-soft); max-width:400px; margin:0 auto 36px; line-height:1.7; }
+
+.section-title{ text-align:left; font-size:16px; font-weight:600; margin-bottom:14px; font-family:var(--serif); color:var(--maroon); }
+
+.gear-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px; }
+.gear-item{ display:flex; gap:12px; align-items:center; border:1px solid var(--border); border-radius:6px; padding:14px; text-align:left; }
+.gear-item .gear-thumb{ width:48px; height:48px; border-radius:4px; overflow:hidden; flex-shrink:0; }
+.gear-name{ font-size:13.5px; font-weight:500; }
+.gear-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+
+.info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:32px; }
+.info-card{ background:var(--bg); border-radius:6px; padding:20px; text-align:left; }
+.info-card h4{ font-family:var(--serif); font-size:16px; margin-bottom:14px; color:var(--maroon); }
+.info-row{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px; color:var(--ink-soft); }
+.info-row span:last-child{ color:var(--ink); font-weight:600; }
+.verified-chip{ background:#e9f5ea; color:var(--green); font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px; }
+
+.eta{ display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; margin-bottom:2px; }
+.eta-sub{ font-size:11px; color:var(--ink-soft); letter-spacing:.5px; margin-left:26px; text-transform:uppercase; }
+
+.tracking-box{ background:#fff; border:1px solid var(--border); border-radius:5px; padding:10px 12px; margin-top:14px; display:flex; justify-content:space-between; font-size:12px; }
+.tracking-box span:last-child{ color:var(--maroon); font-weight:700; }
+
+.continue-btn{ display:inline-flex; align-items:center; gap:8px; background:var(--maroon); color:#fff; border:none; padding:15px 34px; font-size:12.5px; letter-spacing:1px; text-transform:uppercase; font-weight:600; border-radius:3px; cursor:pointer; text-decoration:none; }
+.continue-btn:hover{ background:var(--maroon-dark); }
+
+@media (max-width:600px){
+  .gear-grid, .info-grid{ grid-template-columns:1fr; }
+  .card{ padding:32px 22px; }
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="check-icon">
+    <svg width="30" height="30" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5" fill="none"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <h1>Order Confirmed</h1>
+  <p class="subtitle">Your edit has been secured. We're preparing your pieces with care for immediate dispatch.</p>
+
+  <div class="section-title">Your Selection</div>
+  <div class="gear-grid" id="gearGrid"></div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h4>Order Details</h4>
+      <div class="info-row"><span>Order ID:</span><span id="orderId">#MR-0000-EDIT</span></div>
+      <div class="info-row"><span>Date:</span><span id="orderDate"></span></div>
+      <div class="info-row"><span>Total Value:</span><span id="orderTotal">₹0</span></div>
+      <div class="info-row"><span>Payment Status:</span><span class="verified-chip">✓ Verified</span></div>
+    </div>
+    <div class="info-card">
+      <h4>Delivery Status</h4>
+      <div style="font-size:11px; color:var(--ink-soft); letter-spacing:.8px; margin-bottom:6px; text-transform:uppercase;">Estimated Arrival:</div>
+      <div class="eta">🚚 <span id="etaDate">Oct 28 – Oct 31</span></div>
+      <div class="eta-sub">Standard Delivery</div>
+      <div class="tracking-box"><span>Tracking:</span><span>PENDING_DISPATCH</span></div>
+    </div>
+  </div>
+
+  <a href="shop.html" class="continue-btn">Continue Shopping</a>
+</div>
+
+<script>
+function formatDate(d){
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+function imgFallback(el, label){
+  const box = document.createElement('div');
+  box.className = 'ph';
+  box.textContent = label;
+  el.replaceWith(box);
+}
+(function init(){
+  const order = JSON.parse(localStorage.getItem('anistock_last_order') || 'null');
+  const today = new Date();
+  document.getElementById('orderDate').textContent = formatDate(today);
+
+  const arrival1 = new Date(today); arrival1.setDate(today.getDate()+4);
+  const arrival2 = new Date(today); arrival2.setDate(today.getDate()+7);
+  document.getElementById('etaDate').textContent = `${formatDate(arrival1).split(',')[0]} – ${formatDate(arrival2)}`;
+
+  const grid = document.getElementById('gearGrid');
+  if(order && order.items && order.items.length){
+    document.getElementById('orderId').textContent = '#' + order.id;
+    document.getElementById('orderTotal').textContent = order.total;
+    grid.innerHTML = order.items.map(item=>`
+      <div class="gear-item">
+        <div class="gear-thumb"><img src="${item.img}" alt="${item.name}" onerror="imgFallback(this,'${item.name}')"></div>
+        <div>
+          <div class="gear-name">${item.name}</div>
+          <div class="gear-sub">Qty: ${item.qty}</div>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    grid.innerHTML = `
+      <div class="gear-item">
+        <div class="gear-thumb"><div class="ph">Necklace</div></div>
+        <div><div class="gear-name">Kundan Bloom Necklace Set</div><div class="gear-sub">Fine Jewellery</div></div>
+      </div>
+      <div class="gear-item">
+        <div class="gear-thumb"><div class="ph">Heels</div></div>
+        <div><div class="gear-name">Champagne Block Heels</div><div class="gear-sub">Footwear</div></div>
+      </div>`;
+    document.getElementById('orderTotal').textContent = '₹11,100';
+  }
+})();
+
+(function initTheme(){
+  if (localStorage.getItem('anistock_theme') === 'dark') document.body.classList.add('dark-mode');
+})();
+</script>
+</body>
+</html>
