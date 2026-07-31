@@ -266,19 +266,20 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
 <body>
 
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar-overlay".product_id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar".product_id="sidebar">
   <div class="side-logo">Veloura</div>
   <nav>
     <a href="index.html">Home</a>
     <a href="shop.html">Shop All</a>
+    
     <a href="shop.html?sort=new">New Arrivals</a>
     <a href="shop.html?sort=best">Best Sellers</a>
     <a href="shop.html?cat=jewellery">Jewellery</a>
-    <a href="shop.html?cat=clothing">Clothing</a>
     <a href="shop.html?cat=footwear">Footwear</a>
     <a href="shop.html?cat=perfume">Perfume</a>
+    <a href="shop.html?cat=cosmetics">Cosmetics</a>
   </nav>
   <div class="side-bottom">
     <a href="account.html">Account</a>
@@ -286,87 +287,179 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <a href="shop.html">Wishlist</a>
     <a href="#" onclick="openSettings(event)">Settings</a>
   </div>
-</aside>
+</aside> 
+
 
 <header class="navbar">
   <div class="nav-left">
-    <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
+    <button class="hamburger-btn".product_id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
     <a href="index.html" class="nav-logo">Veloura<small>THE WOMEN'S EDIT</small></a>
   </div>
 
-  <nav class="nav-links">
-    <div class="nav-item"><a href="shop.html">Shop</a></div>
-    <div class="nav-item">
-      <a href="shop.html?cat=jewellery">Jewellery</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=jewellery">Necklaces</a>
-          <a href="shop.html?cat=jewellery">Earrings</a>
-          <a href="shop.html?cat=jewellery">Bangles &amp; Rings</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Jewellery</div></div>
-      </div>
+  <!-- Cosmetics -->
+<div class="nav-item">
+  <a href="shop.html?cat=cosmetics">Cosmetics</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Makeup</h4>
+      <a href="shop.html?cat=cosmetics">Lipsticks, Glosses &amp; Lip Liners</a>
+      <a href="shop.html?cat=cosmetics">Foundations, Concealers &amp; Compacts</a>
+      <a href="shop.html?cat=cosmetics">Eyeliners, Kajal &amp; Mascara</a>
+      <a href="shop.html?cat=cosmetics">Highlighters, Blushes &amp; Eyeshadows</a>
     </div>
-    <div class="nav-item">
-      <a href="shop.html?cat=clothing">Clothing</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=clothing">Ethnic Wear</a>
-          <a href="shop.html?cat=clothing">Sarees</a>
-          <a href="shop.html?cat=clothing">Western Wear</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Clothing</div></div>
-      </div>
+    <div class="mega-col">
+      <h4>Skincare</h4>
+      <a href="shop.html?cat=cosmetics">Serums &amp; Face Oils</a>
+      <a href="shop.html?cat=cosmetics">Moisturisers &amp; Night Creams</a>
+      <a href="shop.html?cat=cosmetics">Sunscreen &amp; UV Protection</a>
+      <a href="shop.html?cat=cosmetics">Face Washes &amp; Cleansers</a>
     </div>
-    <div class="nav-item">
-      <a href="shop.html?cat=footwear">Footwear</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=footwear">Heels</a>
-          <a href="shop.html?cat=footwear">Juttis</a>
-          <a href="shop.html?cat=footwear">Sandals</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Footwear</div></div>
-      </div>
+    <div class="mega-col">
+      <h4>Haircare &amp; Body Care</h4>
+      <a href="shop.html?cat=cosmetics">Shampoos &amp; Conditioners</a>
+      <a href="shop.html?cat=cosmetics">Hair Serums &amp; Masks</a>
+      <a href="shop.html?cat=cosmetics">Body Lotions, Washes &amp; Scrubs</a>
     </div>
-    <div class="nav-item">
-      <a href="shop.html?cat=perfume">Perfume</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=perfume">Eau de Parfum</a>
-          <a href="shop.html?cat=perfume">Attars</a>
-          <a href="shop.html?cat=perfume">Gift Sets</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Perfume</div></div>
-      </div>
+  </div>
+</div>
+
+<!-- Jewellery -->
+<div class="nav-item">
+  <a href="shop.html?cat=jewellery">Jewellery</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Fine &amp; Precious Jewellery</h4>
+      <a href="shop.html?cat=jewellery">Gold, Diamond &amp; Silver Rings</a>
+      <a href="shop.html?cat=jewellery">Necklaces &amp; Pendants</a>
+      <a href="shop.html?cat=jewellery">Bracelets &amp; Bangles</a>
     </div>
-    <div class="nav-item"><a href="shop.html?sort=new">New Arrivals</a></div>
-  </nav>
+    <div class="mega-col">
+      <h4>Fashion &amp; Costume Jewellery</h4>
+      <a href="shop.html?cat=jewellery">Statement Earrings &amp; Hoops</a>
+      <a href="shop.html?cat=jewellery">Chokers &amp; Layered Chains</a>
+      <a href="shop.html?cat=jewellery">Trendy Rings &amp; Cuffs</a>
+    </div>
+    <div class="mega-col">
+      <h4>Traditional &amp; Bridal</h4>
+      <a href="shop.html?cat=jewellery">Temple &amp; Kundan Jewellery Sets</a>
+      <a href="shop.html?cat=jewellery">Maang Tikkas &amp; Matha Pattis</a>
+      <a href="shop.html?cat=jewellery">Anklets (Payal) &amp; Toe Rings</a>
+      <a href="shop.html?cat=jewellery">Nose Pins &amp; Naths</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footwear -->
+<div class="nav-item">
+  <a href="shop.html?cat=footwear">Footwear</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Heels &amp; Wedges</h4>
+      <a href="shop.html?cat=footwear">Stilettos &amp; Pumps</a>
+      <a href="shop.html?cat=footwear">Block Heels &amp; Kitten Heels</a>
+      <a href="shop.html?cat=footwear">Platform Wedges</a>
+    </div>
+    <div class="mega-col">
+      <h4>Flats &amp; Ethnic</h4>
+      <a href="shop.html?cat=footwear">Juttis &amp; Mojris</a>
+      <a href="shop.html?cat=footwear">Ballerinas &amp; Loafers</a>
+      <a href="shop.html?cat=footwear">Kolhapuri Sandals &amp; Slides</a>
+    </div>
+    <div class="mega-col">
+      <h4>Casual &amp; Sports</h4>
+      <a href="shop.html?cat=footwear">Sneakers &amp; Slip-ons</a>
+      <a href="shop.html?cat=footwear">Running &amp; Walking Shoes</a>
+      <a href="shop.html?cat=footwear">Flip-flops &amp; Beach Slides</a>
+    </div>
+  </div>
+</div>
+
+<!-- Bags & Accessories -->
+<div class="nav-item">
+  <a href="shop.html?cat=bags-accessories">Bags &amp; Accessories</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Handbags &amp; Everyday</h4>
+      <a href="shop.html?cat=bags-accessories">Tote Bags &amp; Shoulder Bags</a>
+      <a href="shop.html?cat=bags-accessories">Satchels &amp; Hobo Bags</a>
+      <a href="shop.html?cat=bags-accessories">Sling &amp; Crossbody Bags</a>
+    </div>
+    <div class="mega-col">
+      <h4>Evening &amp; Occasion</h4>
+      <a href="shop.html?cat=bags-accessories">Box Clutches &amp; Envelope Bags</a>
+      <a href="shop.html?cat=bags-accessories">Traditional Potli Bags</a>
+      <a href="shop.html?cat=bags-accessories">Party Pouches</a>
+    </div>
+    <div class="mega-col">
+      <h4>Travel &amp; Utility</h4>
+      <a href="shop.html?cat=bags-accessories">Backpacks &amp; Mini Backpacks</a>
+      <a href="shop.html?cat=bags-accessories">Wallets &amp; Card Holders</a>
+      <a href="shop.html?cat=bags-accessories">Laptop Sleeves &amp; Travel Pouches</a>
+    </div>
+  </div>
+</div>
+
+<!-- Fragrances -->
+<div class="nav-item">
+  <a href="shop.html?cat=fragrances">Fragrances</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Perfumes (Eau de Parfum / Eau de Toilette)</h4>
+      <a href="shop.html?cat=fragrances">Floral &amp; Fruity</a>
+      <a href="shop.html?cat=fragrances">Woody &amp; Oriental</a>
+      <a href="shop.html?cat=fragrances">Fresh &amp; Citrus</a>
+    </div>
+    <div class="mega-col">
+      <h4>Daily Wear &amp; Mists</h4>
+      <a href="shop.html?cat=fragrances">Body Sprays &amp; Deodorants</a>
+      <a href="shop.html?cat=fragrances">Scented Body Mists</a>
+    </div>
+    <div class="mega-col">
+      <h4>Gift Sets &amp; Minis</h4>
+      <a href="shop.html?cat=fragrances">Luxury Discovery Sets</a>
+      <a href="shop.html?cat=fragrances">Pocket Perfumes &amp; Travel Sprays</a>
+    </div>
+  </div>
+</div>
+
+<!-- New Arrivals -->
+<div class="nav-item">
+  <a href="shop.html?cat=new-arrivals">New Arrivals</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Latest Collections</h4>
+      <a href="shop.html?cat=new-arrivals">Seasonal Collections (Festive, Summer, Winter)</a>
+      <a href="shop.html?cat=new-arrivals">Bestsellers &amp; Trending</a>
+      <a href="shop.html?cat=new-arrivals">Celebrity &amp; Designer Drops</a>
+    </div>
+  </div>
+</div>
 
   <div class="nav-right">
     <div class="nav-search-wrap">
       <div class="nav-search-box">
         <svg width="13" height="13" viewBox="0 0 24 24" stroke="#999" stroke-width="2" fill="none"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input type="text" placeholder="Search jewellery, sarees, perfume..." id="searchInput" onkeydown="handleShopSearchKey(event)" onfocus="showShopSuggestions()" onblur="hideShopSuggestions()">
+        <input type="text" placeholder="Search jewellery, sarees, perfume...".product_id="searchInput" onkeydown="handleShopSearchKey(event)" onfocus="showShopSuggestions()" onblur="hideShopSuggestions()">
       </div>
-      <div class="search-suggestions" id="shopSuggestions"></div>
+      <div class="search-suggestions".product_id="shopSuggestions"></div>
     </div>
     <a class="nav-icon-btn" href="shop.html" title="Wishlist">
       <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>
     </a>
     <a class="nav-icon-btn" href="checkout.html" title="Cart">
       <svg viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>
-      <span class="cart-count" id="cartCountSide">0</span>
+      <span class="cart-count".product_id="cartCountSide">0</span>
     </a>
+    
     <button class="dots-btn" onclick="openSettings(event)" title="Menu" aria-label="Open menu">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
-    </button>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <line x1="4" y1="6" x2="20" y2="6"></line>
+    <line x1="4" y1="12" x2="20" y2="12"></line>
+    <line x1="4" y1="18" x2="20" y2="18"></line>
+  </svg>
+</button>
   </div>
 </header>
 
@@ -382,7 +475,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <div class="filter-section open" data-filter="category">
       <div class="filter-section-head" onclick="toggleFilterSection('category')">Category <span class="chevron">▾</span></div>
       <div class="filter-section-body">
-        <label class="check-row"><input type="checkbox" id="cat-all" checked onchange="onCatAll()"> All Collection</label>
+        <label class="check-row"><input type="checkbox".product_id="cat-all" checked onchange="onCatAll()"> All Collection</label>
         <label class="check-row"><input type="checkbox" class="cat-cb" value="jewellery" onchange="onCatChange()"> Jewellery</label>
         <label class="check-row"><input type="checkbox" class="cat-cb" value="clothing" onchange="onCatChange()"> Clothing</label>
         <label class="check-row"><input type="checkbox" class="cat-cb" value="footwear" onchange="onCatChange()"> Footwear</label>
@@ -394,7 +487,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <div class="filter-section" data-filter="price">
       <div class="filter-section-head" onclick="toggleFilterSection('price')">Price <span class="chevron">▾</span></div>
       <div class="filter-section-body">
-        <div class="price-grid" id="priceGrid">
+        <div class="price-grid".product_id="priceGrid">
           <div class="chip" data-range="500-1500">₹500-₹1500</div>
           <div class="chip" data-range="1500-3000">₹1500-₹3000</div>
           <div class="chip" data-range="3000-5000">₹3000-₹5000</div>
@@ -407,7 +500,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <div class="filter-section" data-filter="matwear">
       <div class="filter-section-head" onclick="toggleFilterSection('matwear')">Material (Clothing) <span class="chevron">▾</span></div>
       <div class="filter-section-body">
-        <div class="price-grid" id="matGrid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="price-grid".product_id="matGrid" style="grid-template-columns:repeat(3,1fr);">
           <div class="chip" data-mat="Cotton">Cotton</div>
           <div class="chip" data-mat="Silk">Silk</div>
           <div class="chip" data-mat="Georgette">Georgette</div>
@@ -418,7 +511,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <div class="filter-section" data-filter="matjewel">
       <div class="filter-section-head" onclick="toggleFilterSection('matjewel')">Material (Jewellery) <span class="chevron">▾</span></div>
       <div class="filter-section-body">
-        <div class="price-grid" id="matGridJewel" style="grid-template-columns:repeat(2,1fr);">
+        <div class="price-grid".product_id="matGridJewel" style="grid-template-columns:repeat(2,1fr);">
           <div class="chip" data-mat="Gold">Gold</div>
           <div class="chip" data-mat="Diamond">Diamond</div>
           <div class="chip" data-mat="Kundan">Kundan</div>
@@ -432,11 +525,11 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
     <div class="listing-head">
       <div>
         <h1>The Women's Collection</h1>
-        <p id="resultCount">Showing 12 refined pieces for the modern woman.</p>
+        <p.product_id="resultCount">Showing 12 refined pieces for the modern woman.</p>
       </div>
       <div class="sort-wrap">
         Sort By:
-        <select id="sortSelect" onchange="renderGrid()">
+        <select.product_id="sortSelect" onchange="renderGrid()">
           <option value="editorial">Editorial Choice</option>
           <option value="price-asc">Price: Low to High</option>
           <option value="price-desc">Price: High to Low</option>
@@ -445,9 +538,9 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
       </div>
     </div>
 
-    <div class="grid" id="grid"></div>
+    <div class="grid".product_id="grid"></div>
 
-    <div class="pagination" id="pagination">
+    <div class="pagination".product_id="pagination">
       <button onclick="goPage(1)" class="active">1</button>
       <button onclick="goPage(2)">2</button>
       <button onclick="goPage(3)">3</button>
@@ -464,15 +557,15 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 44px 44px 22px
   </div>
 </footer>
 
-<div class="toast" id="toast"></div>
+<div class="toast".product_id="toast"></div>
 
-<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
+<div class="settings-overlay".product_id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
   <div class="settings-modal">
     <div class="settings-modal-head">
       <h2>Settings</h2>
       <button class="settings-close" onclick="closeSettings()" aria-label="Close settings">✕</button>
     </div>
-    <div class="settings-body" id="settingsBody"></div>
+    <div class="settings-body".product_id="settingsBody"></div>
   </div>
 </div>
 
@@ -484,25 +577,16 @@ function imgFallback(el, label){
   el.replaceWith(box);
 }
 
-/* Replace img paths below with your own photography */
-let PRODUCTS = [
-  {id:'s1', name:'Kundan Bloom Necklace Set', cat:'jewellery', catLabel:'JEWELLERY', price:8500, rating:4.5, reviews:128, badge:'New Edition', img:'images/jewellery-necklace-1.jpg', mat:'Kundan'},
-  {id:'s2', name:'Champagne Block Heels', cat:'footwear', catLabel:'FOOTWEAR', price:2600, rating:4, reviews:42, img:'images/footwear-heels-1.jpg', mat:''},
-  {id:'s3', name:'Hand-Embroidered Anarkali', cat:'clothing', catLabel:'CLOTHING', price:4200, rating:5, reviews:56, img:'images/clothing-anarkali-1.jpg', mat:'Georgette'},
-  {id:'s4', name:'Jasmine Oud Eau de Parfum', cat:'perfume', catLabel:'PERFUME', price:3200, rating:4, reviews:92, img:'images/perfume-jasmine-1.jpg', mat:''},
-  {id:'s5', name:'Banarasi Silk Saree', cat:'clothing', catLabel:'CLOTHING', price:6800, rating:5, reviews:204, badge:'Limited Stock', img:'images/clothing-saree-1.jpg', mat:'Silk'},
-  {id:'s6', name:'Classic Gold Jhumka Earrings', cat:'jewellery', catLabel:'JEWELLERY', price:3450, rating:4, reviews:89, img:'images/jewellery-jhumka-1.jpg', mat:'Gold'},
-  {id:'s7', name:'Rose Attar Discovery Set', cat:'perfume', catLabel:'PERFUME', price:1450, rating:5, reviews:312, img:'images/perfume-rose-1.jpg', mat:''},
-  {id:'s8', name:'Hand-Embellished Juttis', cat:'footwear', catLabel:'FOOTWEAR', price:1850, rating:4, reviews:18, img:'images/footwear-juttis-1.jpg', mat:''},
-  {id:'s9', name:'Rose Gold Bangle Set', cat:'jewellery', catLabel:'JEWELLERY', price:5200, rating:4.5, reviews:89, img:'images/jewellery-bangle-1.jpg', mat:'Gold'},
-  {id:'s10', name:'Diamond Solitaire Ring', cat:'jewellery', catLabel:'JEWELLERY', price:24500, rating:5, reviews:67, badge:'New Edition', img:'images/jewellery-ring-1.jpg', mat:'Diamond'},
-  {id:'s11', name:'Cotton Kurta Set', cat:'clothing', catLabel:'CLOTHING', price:2100, rating:4.5, reviews:103, img:'images/clothing-kurta-1.jpg', mat:'Cotton'},
-  {id:'s12', name:'Suede Ankle Strap Sandals', cat:'footwear', catLabel:'FOOTWEAR', price:1950, rating:5, reviews:45, img:'images/footwear-sandals-1.jpg', mat:''},
-  {id:'s13', name:'Amber Musk Eau de Parfum', cat:'perfume', catLabel:'PERFUME', price:3600, rating:4.5, reviews:71, img:'images/perfume-amber-1.jpg', mat:''},
-  {id:'s14', name:'Polki Choker Necklace', cat:'jewellery', catLabel:'JEWELLERY', price:18500, rating:5, reviews:33, badge:'New Edition', img:'images/jewellery-polki-1.jpg', mat:'Kundan'},
-  {id:'s15', name:'Chikankari Georgette Kurti', cat:'clothing', catLabel:'CLOTHING', price:3100, rating:4, reviews:58, img:'images/clothing-kurti-1.jpg', mat:'Georgette'},
-  {id:'s16', name:'Pearl Drop Silver Earrings', cat:'jewellery', catLabel:'JEWELLERY', price:1650, rating:4, reviews:26, img:'images/jewellery-pearl-1.jpg', mat:'Silver'},
-];
+let PRODUCTS = [];
+
+async function loadProducts() {
+    const response = await fetch("/api/products");
+    PRODUCTS = await response.json();
+
+    renderGrid();   // Your existing function
+}
+
+loadProducts();
 
 let activeCats = [];
 let activePriceRange = null;
@@ -569,13 +653,27 @@ document.getElementById('matGridJewel').addEventListener('click', e=>{
 
 function getCart(){ return JSON.parse(localStorage.getItem('anistock_cart') || '[]'); }
 function saveCart(c){ localStorage.setItem('anistock_cart', JSON.stringify(c)); updateCartCount(); }
-function addToCart(id){
-  const p = PRODUCTS.find(x=>x.id===id);
-  if(!p) return;
-  const cart = getCart();
-  const existing = cart.find(x=>x.id===id);
-  if(existing){ existing.qty++; } else { cart.push({id:p.id, name:p.name, price:p.price, img:p.img, qty:1}); }
-  saveCart(cart);
+function addToCart(product_id){
+    const p = PRODUCTS.find(x => x.product_id == product_id);
+    if(!p) return;
+
+    const cart = getCart();
+
+    const existing = cart.find(x => x.product_id == product_id);
+
+    if(existing){
+        existing.qty++;
+    }else{
+        cart.push({
+            product_id: p.product_id,
+            name: p.product_name,
+            price: p.price,
+            img: p.image1,
+            qty: 1
+        });
+    }
+
+    saveCart(cart);
 }
 function updateCartCount(){
   const cart = getCart();
@@ -588,7 +686,7 @@ function showToast(msg){
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2200);
 }
-function toggleWish(btn, id, e){ e.preventDefault(); e.stopPropagation(); btn.classList.toggle('active'); }
+function toggleWish(btn,product_id, e){ e.preventDefault(); e.stopPropagation(); btn.classList.toggle('active'); }
 
 function stars(rating){
   const full = Math.floor(rating);
@@ -602,8 +700,14 @@ function stars(rating){
 function filterProducts(){
   let list = [...PRODUCTS];
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  if(q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q) || p.catLabel.toLowerCase().includes(q));
-  if(activeCats.length) list = list.filter(p=>activeCats.includes(p.cat));
+if(q){
+    list = list.filter(p =>
+        (p.product_name || "").toLowerCase().includes(q) ||
+        (p.category_name || "").toLowerCase().includes(q) ||
+        (p.catLabel || "").toLowerCase().includes(q)
+    );
+}
+  if(activeCats.length) list = list.filter(p=>activeCats.includes(p.category_name));
   if(activePriceRange){
     const [min,max] = activePriceRange.split('-').map(Number);
     list = list.filter(p=>p.price>=min && p.price<=max);
@@ -642,36 +746,43 @@ function renderGrid(){
   grid.innerHTML = list.map(p=>`
     <div class="product-card">
       <div class="product-img">
-        ${p.badge?`<span class="badge ${p.badge.includes('Limited')?'limited':'new'}">${p.badge}</span>`:''}
-        <button class="wish-btn" onclick="toggleWish(this,'${p.id}',event)">
+       ${p.badge ? `<span class="badge ${p.badge.includes("Limited") ? "limited" : "new"}">${p.badge}</span>` : ""}
+        <button class="wish-btn" onclick="toggleWish(this,'${p.product_id}',event)">
           <svg width="15" height="15" viewBox="0 0 24 24" stroke="#333" stroke-width="2" fill="none"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>
         </button>
-        <img src="${p.img}" alt="${p.name}" onerror="imgFallback(this,'${p.catLabel}')">
+        <img src="${p.image1}" alt="${p.product_name}"onerror="imgFallback(this,'${p.category_name || p.product_name}')">
       </div>
       <div class="product-info">
-        <div class="pcat-label">${p.catLabel}</div>
-        <div class="pname">${p.name}</div>
-        <div class="stars">${stars(p.rating)} <span>(${p.reviews})</span></div>
+        <div class="pcat-label">${p.catLabel || p.category_name}</div>
+        <div class="pname">${p.product_name}</div>
+        <div class="stars">${stars(p.rating || 0)} <span>(${p.total_reviews || 0})</span></div>
         <div class="price-row"><div class="price">₹${p.price.toLocaleString('en-IN')}</div></div>
         <div class="btn-group">
-          <button class="add-mini" onclick="handleAdd(this,'${p.id}',event)">🛍 Add</button>
-          <button class="buy-mini" onclick="handleBuy('${p.id}',event)">Buy Now</button>
+          <button class="add-mini" onclick="handleAdd(this,'${p.product_id}',event)">🛍 Add</button>
+          <button class="buy-mini" onclick="handleBuy('${p.product_id}',event)">Buy Now</button>
         </div>
       </div>
     </div>
   `).join('');
   renderPagination();
 }
-function handleAdd(btn,id,e){
-  if(e) e.stopPropagation();
-  addToCart(id);
-  showToast('✓ Added to bag');
-  const orig = btn.innerHTML;
-  btn.innerHTML = '✓ Added';
-  btn.classList.add('added');
-  setTimeout(()=>{ btn.innerHTML=orig; btn.classList.remove('added'); }, 1400);
+function handleAdd(btn, product_id, e){
+    if(e) e.stopPropagation();
+    addToCart(product_id);
+    showToast("✓ Added to bag");
+    const orig = btn.innerHTML;
+    btn.innerHTML = "✓ Added";
+    btn.classList.add("added");
+    setTimeout(()=>{
+        btn.innerHTML = orig;
+        btn.classList.remove("added");
+    },1400);
 }
-function handleBuy(id,e){ if(e) e.stopPropagation(); addToCart(id); window.location.href = 'checkout.html'; }
+function handleBuy(product_id, e){
+    if(e) e.stopPropagation();
+    addToCart(product_id);
+    window.location.href = 'checkout.html';
+}
 function renderPagination(){
   document.getElementById('pagination').innerHTML = `
     <button onclick="goPage(1)" class="${currentPage===1?'active':''}">1</button>
@@ -697,7 +808,6 @@ function closeSidebar(){ document.getElementById('sidebar').classList.remove('op
 })();
 
 updateCartCount();
-renderGrid();
 
 const SETTINGS_ICONS = {
   profile: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',

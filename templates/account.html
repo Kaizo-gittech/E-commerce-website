@@ -196,7 +196,12 @@ footer div span:hover{ color:var(--gold-light); }
 .dots-btn svg{ width:18px; height:18px; }
 
 @media (max-width:900px){
-    .navbar{ padding:14px 18px; }
+    /* Indriya-style Mobile Header */
+    .navbar { position: relative; padding: 14px 18px; justify-content: space-between; }
+    .nav-left { flex: 1; }
+    .nav-logo { position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; margin: 0; }
+    .nav-logo small { text-align: center; font-size: 8px; }
+
     .nav-links{ display:none; }
     .hamburger-btn{ display:flex; }
     .sidebar{ display:flex; flex-direction:column; position:fixed; left:-280px; top:0; width:260px; height:100vh; z-index:1000; background:#fff; box-shadow:2px 0 24px rgba(0,0,0,.18); transition:left .28s ease; padding:26px 22px; }
@@ -205,10 +210,17 @@ footer div span:hover{ color:var(--gold-light); }
     .sidebar nav a{ display:block; padding:12px 6px; font-size:13.5px; letter-spacing:.5px; text-transform:uppercase; color:var(--ink); border-bottom:1px solid var(--bg-soft); font-weight:500; }
     .sidebar nav a:hover{ color:var(--maroon); }
     .sidebar .side-bottom{ margin-top:auto; padding-top:18px; border-top:1px solid var(--border); }
+    
     .grid2{ grid-template-columns:1fr; }
     .field-row{ grid-template-columns:1fr; }
     .main{ padding:24px 20px; }
     .settings-modal{ max-height:92vh; }
+}
+@media (max-width: 640px) {
+    .nav-logo { font-size: 22px; }
+}
+@media (max-width: 360px) {
+    .navbar { padding: 10px; }
 }
 </style>
 </head>
@@ -218,7 +230,7 @@ footer div span:hover{ color:var(--gold-light); }
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <aside class="sidebar" id="sidebar">
-  <div class="side-logo">Veloura</div>
+  <div class="side-logo">VolMa</div>
   <nav>
     <a href="index.html">Home</a>
     <a href="shop.html">Shop All</a>
@@ -227,6 +239,7 @@ footer div span:hover{ color:var(--gold-light); }
     <a href="shop.html?cat=clothing">Clothing</a>
     <a href="shop.html?cat=footwear">Footwear</a>
     <a href="shop.html?cat=perfume">Perfume</a>
+    <a href="shop.html?cat=cosmetics">Cosmetics</a>
   </nav>
   <div class="side-bottom">
     <a href="account.html">Account</a>
@@ -243,6 +256,7 @@ footer div span:hover{ color:var(--gold-light); }
     </button>
     <a href="index.html" class="nav-logo">Veloura<small>THE WOMEN'S EDIT</small></a>
   </div>
+  
   <nav class="nav-links">
     <div class="nav-item"><a href="shop.html">Shop</a></div>
     <div class="nav-item">
@@ -603,5 +617,5 @@ function closeSettingsOnOverlay(e){ if (e.target.id === 'settingsOverlay') close
   if (localStorage.getItem('anistock_theme') === 'dark') document.body.classList.add('dark-mode');
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a23438f44ac67643',t:'MTc4NTQxMzAzMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

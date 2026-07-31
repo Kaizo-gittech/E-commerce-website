@@ -6,11 +6,13 @@
 <title>Veloura — The Women's Edit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <script>
   (function(){
     try{
       const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
       if(!user){ window.location.replace('login.html'); }
+      if(localStorage.getItem('anistock_theme') === 'dark'){ document.documentElement.classList.add('theme-pending-dark'); }
       }catch(e){ window.location.replace('login.html'); }
     })
     ();
@@ -106,22 +108,18 @@ ul { list-style: none; }
 
 .nav-left { display: flex; align-items: center; gap: 18px; }
 
-.hamburger-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--border);
-    background: #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    flex-direction: column;
-    gap: 4px;
+.menu-btn{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    background:none;
+    cursor:pointer;
+    color: var(--ink);
     flex-shrink: 0;
+    padding: 4px;
 }
-
-.hamburger-btn span { display: block; width: 16px; height: 1.5px; background: var(--ink); }
+.menu-btn svg{ stroke: var(--ink); }
 
 .nav-logo {
     font-family: var(--serif);
@@ -300,18 +298,62 @@ ul { list-style: none; }
 .search-suggest-item:hover { background: var(--bg-soft); color: var(--maroon); }
 
 /* ===== Mobile sidebar drawer ===== */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(30, 15, 10, .5);
-    z-index: 999;
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    opacity:0;
+    visibility:hidden;
+    transition:.3s;
+    z-index:999;
 }
-.sidebar-overlay.show { display: block; }
+.overlay.show{
+    opacity:1;
+    visibility:visible;
+}
 
-.sidebar {
-    display: none;
+.sidebar{
+    position:fixed;
+    top:0;
+    left:-280px;
+    width:280px;
+    max-width: 82vw;
+    height:100%;
+    background:#fff;
+    box-shadow:5px 0 20px rgba(0,0,0,.15);
+    transition:.35s ease;
+    z-index:1000;
+    padding-top:70px;
+    overflow-y: auto;
 }
+.sidebar.open{
+    left:0;
+}
+.sidebar a{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 24px;
+    text-decoration:none;
+    color:#222;
+    border-bottom:1px solid #eee;
+    font-weight:500;
+}
+.sidebar a:hover{
+    background:#f8f8f8;
+}
+.close-btn{
+    position:absolute;
+    top:18px;
+    right:18px;
+    border:none;
+    background:none;
+    font-size:24px;
+    cursor:pointer;
+    color: var(--ink);
+}
+.sidebar .side-logo { font-family: var(--serif); font-size: 20px; color: var(--maroon); font-weight: 700; padding: 0 24px 18px; }
+.sidebar .side-bottom { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 6px; }
 
 /* ===== Hero ===== */
 .hero {
@@ -676,6 +718,7 @@ section { padding: 62px 44px; }
     background: var(--bg-soft);
 }
 
+
 .trending-eyebrow {
     display: flex;
     align-items: center;
@@ -698,12 +741,68 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 
 .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 30px; padding-bottom: 34px; border-bottom: 1px solid rgba(255,255,255,.15); }
 
-.foot-logo { font-family: var(--serif); font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.foot-logo { font-family: var(--serif); font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 12px; }
 .foot-grid > div > p { font-size: 13px; color: #d9c6b8; max-width: 240px; line-height: 1.7; }
 .foot-grid h4 { font-size: 10.5px; letter-spacing: 1.5px; margin-bottom: 16px; color: var(--gold-light); text-transform: uppercase; }
 .foot-grid li { font-size: 13.5px; margin-bottom: 11px; color: #f1e6da; cursor: pointer; }
 .foot-grid li:hover { color: var(--gold-light); }
 
+.foot-brand-row{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.foot-logo-icon{
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #fff;
+  object-fit: contain;
+}
+
+.foot-name-block{
+  display: flex;
+  flex-direction: column;
+}
+
+.foot-logo{
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.foot-tagline{
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.foot-divider{
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,.25);
+  flex-shrink: 0;
+}
+
+.footer-social{
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.footer-social a{
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
 .newsletter-row { display: flex; margin-top: 12px; gap: 0; }
 .newsletter-row input {
     flex: 1;
@@ -761,14 +860,30 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 .no-results { color: var(--ink-soft); font-size: 14px; padding: 30px 0; }
 
 /* ============ SETTINGS PANEL ============ */
-.settings-overlay{ display:none; position:fixed; inset:0; background:rgba(30,15,10,.5); z-index:2000; align-items:center; justify-content:center; padding:20px; }
-.settings-overlay.show{ display:flex; }
-.settings-modal{ background:#fff; border-radius:8px; max-width:640px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 50px rgba(60,20,20,.3); }
+.settings-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:2000; }
+.settings-overlay.show{ display:block; }
+.settings-modal{
+    position:fixed;
+    top:0;
+    right:-380px;
+    width:380px;
+    max-width:86vw;
+    height:100%;
+    background:#fff;
+    border-radius:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:-5px 0 20px rgba(0,0,0,.15);
+    transition:right .35s ease;
+    z-index:2001;
+}
+.settings-overlay.show .settings-modal{ right:0; }
 .settings-modal-head{ display:flex; justify-content:space-between; align-items:center; padding:22px 26px; border-bottom:1px solid var(--border); flex-shrink:0; }
 .settings-modal-head h2{ font-family:var(--serif); font-size:22px; color: var(--maroon); }
 .settings-close{ border:none; background:var(--bg-soft); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:14px; color:var(--ink); }
 .settings-close:hover{ background:var(--border); }
-.settings-body{ overflow-y:auto; padding:6px 0; }
+.settings-body{ overflow-y:auto; padding:6px 0; flex:1; }
 .settings-section{ border-bottom:1px solid var(--border); }
 .settings-section:last-child{ border-bottom:none; }
 .settings-section-head{ display:flex; justify-content:space-between; align-items:center; padding:16px 26px; cursor:pointer; font-weight:600; font-size:14px; }
@@ -800,158 +915,285 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 .dots-btn svg{ width:18px; height:18px; }
 
 /* ============ RESPONSIVE ============ */
+@media (max-width: 1280px) {
+    .navbar { padding: 16px 26px; gap: 16px; }
+    .nav-links { gap: 20px; }
+    .nav-search-box { width: 170px; }
+}
+
 @media (max-width: 1100px) {
-    .nav-links { gap: 22px; }
-    .nav-search-box { width: 160px; }
+    .navbar { padding: 14px 20px; gap: 12px; }
+    .nav-links { gap: 14px; }
+    .nav-item > a { font-size: 11.5px; }
+    .nav-search-box { width: 140px; }
+    .nav-right { gap: 14px; }
+}
+
+@media (max-width: 980px) {
+    .navbar { position: relative; padding: 14px 18px; justify-content: space-between; }
+    .nav-left { flex: 1; gap: 12px; }
+    .nav-search-wrap { display: none; }
+    .menu-btn { display: flex; }
+    .nav-links { display: none; }
+    
+    /* Indriya-style Header: Centered Logo */
+    .nav-logo { position: absolute; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; margin: 0; }
+    .nav-logo small { text-align: center; font-size: 8px; }
+    .nav-left img { display: none; } /* Hide icon to emphasize centered wordmark */
+
+    .desktop-settings-icon { display: none; }
+    .mobile-settings-icon { display: block; }
 }
 
 @media (max-width: 900px) {
-    .navbar { padding: 14px 18px; }
-    .nav-links { display: none; }
-    .nav-search-wrap { display: none; }
-    .hamburger-btn { display: flex; }
+    .hero { min-height: 380px; padding: 60px 22px; background-position: center 20%; }
+    .hero h1 { font-size: clamp(26px, 6vw, 34px); }
+    section { padding: 40px 0; }
+    .section-head { padding: 0 20px; }
 
-    .sidebar {
+    /* Indriya-style Mobile Horizontal Scroll Snapping */
+    .cat-grid, .product-scroll, .product-scroll.cols-3, .spotlight-grid {
         display: flex;
-        flex-direction: column;
-        position: fixed;
-        left: -280px;
-        top: 0;
-        width: 260px;
-        height: 100vh;
-        z-index: 1000;
-        background: #fff;
-        box-shadow: 2px 0 24px rgba(0,0,0,.18);
-        transition: left .28s ease;
-        padding: 26px 22px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 16px;
+        padding: 0 20px 20px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
-    .sidebar.open { left: 0; }
-    .sidebar .side-logo { font-family: var(--serif); font-size: 20px; color: var(--maroon); font-weight: 700; margin-bottom: 30px; }
-    .sidebar nav a {
-        display: block; padding: 12px 6px; font-size: 13.5px; letter-spacing: .5px; text-transform: uppercase;
-        color: var(--ink); border-bottom: 1px solid var(--bg-soft); font-weight: 500;
-    }
-    .sidebar nav a:hover { color: var(--maroon); }
-    .sidebar .side-bottom { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--border); }
+    .cat-grid::-webkit-scrollbar, .product-scroll::-webkit-scrollbar, .spotlight-grid::-webkit-scrollbar { display: none; }
 
-    .hero { min-height: 380px; padding: 60px 22px; }
-    .hero h1 { font-size: 34px; }
-    section { padding: 40px 20px; }
-    .cat-grid { grid-template-columns: 1fr; }
-    .cat-right { display: grid; grid-template-columns: 1fr 1fr; }
-    .product-scroll, .product-scroll.cols-3 { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .trending { grid-template-columns: 1fr; }
-    .trending-img { min-height: 220px; }
-    .spotlight-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
-    .style-carousel-wrap { padding: 0 20px; }
+    .cat-right { display: contents; } /* Unpacks cards into the cat-grid horizontal flex */
+    
+    .cat-card, .product-card, .spotlight-card {
+        flex: 0 0 65%; /* Shows 1.5 items */
+        scroll-snap-align: start;
+        min-width: 0;
+    }
+    
+    .trending { display: flex; flex-direction: column; padding: 0 20px; gap: 20px; }
+    .trending-img { min-height: 250px; }
+    
+    .style-carousel-wrap { padding: 0 20px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; display: flex; gap: 16px; }
+    .style-carousel-wrap::-webkit-scrollbar { display: none; }
     .style-arrow { display: none; }
-    .style-card { width: 190px; }
-    .foot-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .style-card { flex: 0 0 70%; scroll-snap-align: start; min-width: 0; }
+    
+    .foot-grid { grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 20px; }
     .newsletter-row { flex-direction: column; gap: 10px; }
     .newsletter-row input, .newsletter-row button { width: 100%; border-radius: 2px; }
-    .settings-modal{ max-height:92vh; }
+    .settings-modal{ width:100%; max-width:100%; }
+}
+
+@media (max-width: 640px) {
+    .navbar { padding: 12px 14px; }
+    .nav-logo { font-size: 22px; }
+    .nav-right { gap: 10px; }
+    .dots-btn, .nav-icon-btn { width: 32px; height: 32px; }
+    .menu-btn svg { width: 22px; height: 22px; }
+    
+    .cat-card, .product-card, .spotlight-card { flex: 0 0 75%; }
 }
 
 @media (max-width: 480px) {
     .hero h1 { font-size: 27px; }
-    .foot-grid { grid-template-columns: 1fr; text-align: left; }
+    .foot-grid { grid-template-columns: 1fr; text-align: left; padding: 0 14px; }
     .toast { left: 15px; right: 15px; bottom: 15px; }
+    
+    .cat-card, .product-card, .spotlight-card { flex: 0 0 85%; }
+    .style-card { flex: 0 0 85%; }
+}
+
+@media (max-width: 360px) {
+    .navbar { padding: 10px; }
+    .nav-right { gap: 6px; }
+    .nav-icon-btn span { display: none; }
+    
+    .cat-card, .product-card, .spotlight-card { flex: 0 0 90%; }
 }
 </style>
 </head>
 <body>
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
 <!-- Mobile drawer -->
-<aside class="sidebar" id="sidebar">
-  <div class="side-logo">Maison Riya</div>
-  <nav>
+<div id="sidebar" class="sidebar">
+    <button class="close-btn" onclick="toggleSidebar()" aria-label="Close menu">✕</button>
+    <div class="side-logo">VloMa</div>
     <a href="index.html">Home</a>
-    <a href="shop.html">Shop All</a>
-    <a href="shop.html?sort=new">New Arrivals</a>
-    <a href="shop.html?sort=best">Best Sellers</a>
-    <a href="shop.html?cat=jewellery">Jewellery</a>
-    <a href="shop.html?cat=clothing">Clothing</a>
-    <a href="shop.html?cat=footwear">Footwear</a>
-    <a href="shop.html?cat=perfume">Perfume</a>
-  </nav>
-  <div class="side-bottom">
-    <a href="account.html">Account</a>
-    <a href="checkout.html">Cart</a>
-    <a href="shop.html">Wishlist</a>
-    <a href="#" onclick="openSettings(event)">Settings</a>
-  </div>
-</aside>
+    <a href="shop.html">Shop All </a>
+    <a href="shop.html?sort=new">New Arrivals </a>
+    <a href="shop.html?sort=best">Best Sellers </a>
+    <a href="shop.html?cat=jewellery">Jewellery </a>
+    <a href="shop.html?cat=clothing">Clothing </a>
+    <a href="shop.html?cat=footwear">Footwear </a>
+    <a href="shop.html?cat=perfume">Perfume </a>
+</div>
+<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
 <!-- Desktop top navigation -->
 <header class="navbar">
   <div class="nav-left">
-    <button class="hamburger-btn" id="hamburgerBtn" onclick="openSidebar()" aria-label="Open menu">
-      <span></span><span></span><span></span>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Open Menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
     </button>
-    <a href="index.html" class="nav-logo">Maison Riya<small>THE WOMEN'S EDIT</small></a>
+    <img src="vloma.png" style="width: 40px; height: 40px; margin-right: 8px; border-radius:5px;">
+    <a href="index.html" class="nav-logo">VloMa<small>THE WOMEN'S EDIT</small></a>
   </div>
 
   <nav class="nav-links">
-    <div class="nav-item"><a href="shop.html">Shop</a></div>
 
     <div class="nav-item">
-      <a href="shop.html?cat=jewellery">Jewellery</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=jewellery">Necklaces</a>
-          <a href="shop.html?cat=jewellery">Earrings</a>
-          <a href="shop.html?cat=jewellery">Bangles &amp; Rings</a>
-          <a href="shop.html?cat=jewellery">Pendants</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Jewellery</div></div>
-      </div>
+  <a href="shop.html?cat=cosmatics">Cosmatics</a>
+  <div class="mega-menu">
+    
+    <!-- Makeup Column -->
+    <div class="mega-col">
+      <h4>Makeup</h4>
+      <a href="shop.html?cat=cosmatics">Lipsticks, Glosses &amp; Lip Liners</a>
+      <a href="shop.html?cat=cosmatics">Foundations, Concealers &amp; Compacts</a>
+      <a href="shop.html?cat=cosmatics">Eyeliners, Kajal &amp; Mascara</a>
+      <a href="shop.html?cat=cosmatics">Highlighters, Blushes &amp; Eyeshadows</a>
     </div>
 
-    <div class="nav-item">
-      <a href="shop.html?cat=clothing">Clothing</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=clothing">Ethnic Wear</a>
-          <a href="shop.html?cat=clothing">Sarees &amp; Drapes</a>
-          <a href="shop.html?cat=clothing">Western Wear</a>
-          <a href="shop.html?cat=clothing">Loungewear</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Clothing</div></div>
-      </div>
+    <!-- Skincare Column -->
+    <div class="mega-col">
+      <h4>Skincare</h4>
+      <a href="shop.html?cat=cosmatics">Serums &amp; Face Oils</a>
+      <a href="shop.html?cat=cosmatics">Moisturisers &amp; Night Creams</a>
+      <a href="shop.html?cat=cosmatics">Sunscreen &amp; UV Protection</a>
+      <a href="shop.html?cat=cosmatics">Face Washes &amp; Cleansers</a>
     </div>
 
-    <div class="nav-item">
-      <a href="shop.html?cat=footwear">Footwear</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=footwear">Heels</a>
-          <a href="shop.html?cat=footwear">Flats &amp; Juttis</a>
-          <a href="shop.html?cat=footwear">Sandals</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Footwear</div></div>
-      </div>
+    <!-- Haircare & Body Care Column -->
+    <div class="mega-col">
+      <h4>Haircare &amp; Body Care</h4>
+      <a href="shop.html?cat=cosmatics">Shampoos &amp; Conditioners</a>
+      <a href="shop.html?cat=cosmatics">Hair Serums &amp; Masks</a>
+      <a href="shop.html?cat=cosmatics">Body Lotions, Washes &amp; Scrubs</a>
     </div>
 
-    <div class="nav-item">
-      <a href="shop.html?cat=perfume">Perfume</a>
-      <div class="mega-menu">
-        <div class="mega-col">
-          <h4>By Category</h4>
-          <a href="shop.html?cat=perfume">Eau de Parfum</a>
-          <a href="shop.html?cat=perfume">Attars</a>
-          <a href="shop.html?cat=perfume">Gift Sets</a>
-        </div>
-        <div class="mega-visual"><div class="ph">Perfume</div></div>
-      </div>
-    </div>
+  </div>
+</div>
 
-    <div class="nav-item"><a href="shop.html?sort=new">New Arrivals</a></div>
+<!-- Jewellery -->
+<div class="nav-item">
+  <a href="shop.html?cat=jewellery">Jewellery</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Fine &amp; Precious Jewellery</h4>
+      <a href="shop.html?cat=jewellery">Gold, Diamond &amp; Silver Rings</a>
+      <a href="shop.html?cat=jewellery">Necklaces &amp; Pendants</a>
+      <a href="shop.html?cat=jewellery">Bracelets &amp; Bangles</a>
+    </div>
+    <div class="mega-col">
+      <h4>Fashion &amp; Costume Jewellery</h4>
+      <a href="shop.html?cat=jewellery">Statement Earrings &amp; Hoops</a>
+      <a href="shop.html?cat=jewellery">Chokers &amp; Layered Chains</a>
+      <a href="shop.html?cat=jewellery">Trendy Rings &amp; Cuffs</a>
+    </div>
+    <div class="mega-col">
+      <h4>Traditional &amp; Bridal</h4>
+      <a href="shop.html?cat=jewellery">Temple &amp; Kundan Jewellery Sets</a>
+      <a href="shop.html?cat=jewellery">Maang Tikkas &amp; Matha Pattis</a>
+      <a href="shop.html?cat=jewellery">Anklets (Payal) &amp; Toe Rings</a>
+      <a href="shop.html?cat=jewellery">Nose Pins &amp; Naths</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footwear -->
+<div class="nav-item">
+  <a href="shop.html?cat=footwear">Footwear</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Heels &amp; Wedges</h4>
+      <a href="shop.html?cat=footwear">Stilettos &amp; Pumps</a>
+      <a href="shop.html?cat=footwear">Block Heels &amp; Kitten Heels</a>
+      <a href="shop.html?cat=footwear">Platform Wedges</a>
+    </div>
+    <div class="mega-col">
+      <h4>Flats &amp; Ethnic</h4>
+      <a href="shop.html?cat=footwear">Juttis &amp; Mojris</a>
+      <a href="shop.html?cat=footwear">Ballerinas &amp; Loafers</a>
+      <a href="shop.html?cat=footwear">Kolhapuri Sandals &amp; Slides</a>
+    </div>
+    <div class="mega-col">
+      <h4>Casual &amp; Sports</h4>
+      <a href="shop.html?cat=footwear">Sneakers &amp; Slip-ons</a>
+      <a href="shop.html?cat=footwear">Running &amp; Walking Shoes</a>
+      <a href="shop.html?cat=footwear">Flip-flops &amp; Beach Slides</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- Bags & Accessories -->
+<div class="nav-item">
+  <a href="shop.html?cat=bags-accessories">Bags &amp; Accessories</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Handbags &amp; Everyday</h4>
+      <a href="shop.html?cat=bags-accessories">Tote Bags &amp; Shoulder Bags</a>
+      <a href="shop.html?cat=bags-accessories">Satchels &amp; Hobo Bags</a>
+      <a href="shop.html?cat=bags-accessories">Sling &amp; Crossbody Bags</a>
+    </div>
+    <div class="mega-col">
+      <h4>Evening &amp; Occasion</h4>
+      <a href="shop.html?cat=bags-accessories">Box Clutches &amp; Envelope Bags</a>
+      <a href="shop.html?cat=bags-accessories">Traditional Potli Bags</a>
+      <a href="shop.html?cat=bags-accessories">Party Pouches</a>
+    </div>
+    <div class="mega-col">
+      <h4>Travel &amp; Utility</h4>
+      <a href="shop.html?cat=bags-accessories">Backpacks &amp; Mini Backpacks</a>
+      <a href="shop.html?cat=bags-accessories">Wallets &amp; Card Holders</a>
+      <a href="shop.html?cat=bags-accessories">Laptop Sleeves &amp; Travel Pouches</a>
+    </div>
+  </div>
+</div>
+
+<!-- Fragrances -->
+<div class="nav-item">
+  <a href="shop.html?cat=fragrances">Fragrances</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Perfumes (Eau de Parfum / Eau de Toilette)</h4>
+      <a href="shop.html?cat=fragrances">Floral &amp; Fruity</a>
+      <a href="shop.html?cat=fragrances">Woody &amp; Oriental</a>
+      <a href="shop.html?cat=fragrances">Fresh &amp; Citrus</a>
+    </div>
+    <div class="mega-col">
+      <h4>Daily Wear &amp; Mists</h4>
+      <a href="shop.html?cat=fragrances">Body Sprays &amp; Deodorants</a>
+      <a href="shop.html?cat=fragrances">Scented Body Mists</a>
+    </div>
+    <div class="mega-col">
+      <h4>Gift Sets &amp; Minis</h4>
+      <a href="shop.html?cat=fragrances">Luxury Discovery Sets</a>
+      <a href="shop.html?cat=fragrances">Pocket Perfumes &amp; Travel Sprays</a>
+    </div>
+  </div>
+</div>
+
+<!-- New Arrivals -->
+<div class="nav-item">
+  <a href="shop.html?cat=new-arrivals">New Arrivals</a>
+  <div class="mega-menu">
+    <div class="mega-col">
+      <h4>Latest Collections</h4>
+      <a href="shop.html?cat=new-arrivals">Seasonal Collections (Festive, Summer, Winter)</a>
+      <a href="shop.html?cat=new-arrivals">Bestsellers &amp; Trending</a>
+      <a href="shop.html?cat=new-arrivals">Celebrity &amp; Designer Drops</a>
+    </div>
+  </div>
+</div>
   </nav>
+
 
   <div class="nav-right">
     <div class="nav-search-wrap">
@@ -969,12 +1211,18 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
       <svg viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>
       <span class="cart-count" id="cartCount">0</span>
     </a>
-    <a class="nav-icon-btn" href="#" id="topAuthLink" title="Login">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-    </a>
-    <button class="dots-btn" onclick="openSettings(event)" title="Menu" aria-label="Open menu">
-      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
-    </button>
+     <button class="dots-btn" onclick="openSettings(event)" title="Menu" aria-label="Open menu">
+  
+  <svg class="mobile-settings-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="4" y1="7" x2="20" y2="7"></line>
+    <line x1="4" y1="12" x2="20" y2="12"></line>
+    <line x1="4" y1="17" x2="20" y2="17"></line>
+    <circle cx="8" cy="7" r="1.5" fill="currentColor"></circle>
+    <circle cx="16" cy="12" r="1.5" fill="currentColor"></circle>
+    <circle cx="11" cy="17" r="1.5" fill="currentColor"></circle>
+  </svg>
+</button>
+   
   </div>
 </header>
 
@@ -994,7 +1242,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
         <div class="section-eyebrow">Shop By Category</div>
         <h2>Curated For You</h2>
       </div>
-      <a href="shop.html" class="view-all">View All →</a>
+      <a href="shop.html" class="view-all">View All </a>
     </div>
     <div class="cat-grid">
       <a class="cat-card" href="shop.html?cat=jewellery">
@@ -1016,7 +1264,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
         <div class="section-eyebrow">Just Landed</div>
         <h2>New Arrivals</h2>
       </div>
-      <a href="shop.html?sort=new" class="view-all">View All →</a>
+      <a href="shop.html?sort=new" class="view-all">View All </a>
     </div>
     <div class="product-scroll" id="newArrivals"></div>
   </section>
@@ -1029,7 +1277,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
         <h2>Fine Jewellery Highlights</h2>
         <p class="section-sub">Gold, kundan and diamond pieces for every occasion.</p>
       </div>
-      <a href="shop.html?cat=jewellery" class="view-all">View All →</a>
+      <a href="shop.html?cat=jewellery" class="view-all">View All </a>
     </div>
     <div class="product-scroll cols-3" id="jewelleryItems"></div>
   </section>
@@ -1119,7 +1367,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
         <div class="section-eyebrow">Signature Scents</div>
         <h2>Perfume Essentials</h2>
       </div>
-      <a href="shop.html?cat=perfume" class="view-all">View All →</a>
+      <a href="shop.html?cat=perfume" class="view-all">View All </a>
     </div>
     <div class="product-scroll cols-3" id="perfumeItems"></div>
   </section>
@@ -1137,9 +1385,37 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 <footer>
   <div class="foot-grid">
     <div>
-      <div class="foot-logo">Maison Riya</div>
-      <p>Curated jewellery, clothing, footwear and fragrance for the modern woman.</p>
+      <div class="foot-brand-row">
+        <img src="vloma.png"  class="foot-logo-icon" style="width: 80px; height: 80px; margin-right: 8px; border-radius:5px;">
+        <div>
+          <div class="foot-logo" style="font-size: 32px;">VloMa</div>
+          <div class="foot-tagline" style="font-size: 12px;">The Women's Edit</div>
+        </div>
+      </div>
+
+      <div class="footer-social">
+        <a href="#">
+          <i class="fab fa-instagram"></i>
+
+        </a>
+        <a href="#">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="#">
+          <i class="fab fa-linkedin-in"></i>
+    
+        </a>
+        <a href="#">
+          <i class="fab fa-youtube"></i>
+      
+        </a>
+        <a href="#">
+          <i class="fa-brands fa-x-twitter"></i>
+         
+        </a>
+      </div>
     </div>
+
     <div>
       <h4>Support</h4>
       <ul><li>Support Center</li><li>Payments</li><li>Shipping</li></ul>
@@ -1350,12 +1626,15 @@ function clearHomeSearch() {
 }
 
 /* Sidebar drawer (mobile) */
-function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('show'); }
-function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+}
 
 /* Top-right auth link: shows current user / logout */
 (function () {
     const link = document.getElementById('topAuthLink');
+    if (!link) return;
     const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
     if (user) {
         link.title = 'Logout (' + user.name + ')';
@@ -1507,5 +1786,5 @@ function closeSettingsOnOverlay(e){ if (e.target.id === 'settingsOverlay') close
   if (localStorage.getItem('anistock_theme') === 'dark') document.body.classList.add('dark-mode');
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2343443ddd37e2c',t:'MTc4NTQxMjgzOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
