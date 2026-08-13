@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — VloMa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  try{
+    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
+    if(!user){ window.location.replace('login.html'); }
+  }catch(e){ window.location.replace('login.html'); }
+  try{ if(localStorage.getItem('anistock_theme') === 'dark'){ document.documentElement.classList.add('theme-pending-dark'); } }catch(e){}
+})();
+</script>
+<style>.theme-pending-dark{ background:#161616 !important; }</style>
+<style>
+  :root{
+    --maroon:#2F2F2F;
+    --maroon-dark:#1A1A1A;
+    --gold:#B08D57;
+    --gold-light:#D4C2A1;
+    --ink:#222222;
+    --ink-soft:#6D6D6D;
+    --bg:#F6F6F5;
+    --border:#E8E8E8;
+    --error:#D14343;
+    --green:#2E8B57;
+    --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans:'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode{
+    --maroon:#D4C2A1;
+    --maroon-dark:#B08D57;
+    --gold:#D4C2A1;
+    --gold-light:#E8DCC4;
+    --ink:#EDEDED;
+    --ink-soft:#A8A8A8;
+    --bg:#161616;
+    --border:#333333;
+}
+body.dark-mode .card{ background:#1E1E1E; }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:var(--sans); color:var(--ink); background:#fff; line-height:1.6; }
+a{ color:inherit; text-decoration:none; }
+
+.ph{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center; background:linear-gradient(135deg, var(--bg), #D4C2A1); color:var(--gold); font-family:var(--serif); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; padding:6px; }
+
+header{ display:flex; justify-content:space-between; align-items:center; padding:20px 32px; border-bottom:1px solid var(--border); }
+.back-link{ display:flex; align-items:center; gap:10px; font-family:var(--serif); font-size:22px; font-weight:700; color:var(--maroon); }
+.secure{ display:flex; align-items:center; gap:6px; font-size:12px; letter-spacing:.5px; text-transform:uppercase; color:var(--ink-soft); font-weight:600; }
+
+.steps{ display:flex; align-items:center; justify-content:center; gap:0; padding:30px 20px; max-width:700px; margin:0 auto; }
+.step{ display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; flex:1; }
+.step-circle{ width:28px; height:28px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--ink-soft); background:#fff; z-index:2; }
+.step.done .step-circle{ background:var(--maroon); border-color:var(--maroon); color:#fff; }
+.step.active .step-circle{ border-color:var(--maroon); color:var(--maroon); }
+.step-label{ font-size:10.5px; letter-spacing:1px; color:var(--ink-soft); font-weight:600; text-transform:uppercase; }
+.step.active .step-label, .step.done .step-label{ color:var(--ink); }
+.step-line{ position:absolute; top:14px; left:-50%; width:100%; height:2px; background:var(--border); z-index:1; }
+.step.done .step-line{ background:var(--maroon); }
+.step:first-child .step-line{ display:none; }
+
+.layout{ display:grid; grid-template-columns:1fr 380px; gap:0; max-width:1240px; margin:0 auto; padding:0 32px 60px; }
+.left{ padding-right:40px; }
+
+.panel-title{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.panel-title h2{ font-family:var(--serif); font-size:23px; font-weight:600; color:var(--maroon); }
+.panel-title .bar{ width:4px; height:22px; background:var(--gold); border-radius:2px; }
+.panel-sub{ font-size:13px; color:var(--ink-soft); margin-bottom:22px; margin-left:14px; }
+
+.pay-option{ border:1px solid var(--border); border-radius:4px; margin-bottom:14px; overflow:hidden; }
+.pay-option.selected{ border-color:var(--maroon); box-shadow:0 0 0 1px var(--maroon); }
+.pay-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px; cursor:pointer; }
+.pay-head-left{ display:flex; align-items:center; gap:14px; font-size:14.5px; font-weight:500; }
+.radio{ width:18px; height:18px; border-radius:50%; border:2px solid var(--border); position:relative; flex-shrink:0; }
+.pay-option.selected .radio{ border-color:var(--maroon); }
+.pay-option.selected .radio::after{ content:''; position:absolute; inset:3px; background:var(--maroon); border-radius:50%; }
+.pay-icons span{ display:inline-block; width:30px; height:20px; background:var(--bg); border:1px solid var(--border); border-radius:3px; margin-left:4px; text-align:center; font-size:10.5px; line-height:19px; }
+.pay-body{ padding:0 20px 20px; display:none; }
+.pay-option.selected .pay-body{ display:block; }
+
+.input-row{ display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:14px; }
+.input-row.two{ grid-template-columns:1fr 1fr; }
+.styled-input{ position:relative; }
+.styled-input input{ width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:3px; font-size:14px; outline:none; font-family:inherit; }
+.styled-input input:focus{ border-color:var(--maroon); }
+.styled-input input.err{ border-color:var(--error); }
+.styled-input .icon-r{ position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#999; font-size:14px; }
+.check-line{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); }
+.err-text{ font-size:11.5px; color:var(--error); margin-top:-9px; margin-bottom:10px; display:none; }
+.err-text.show{ display:block; }
+
+.summary{ border:1px solid var(--border); border-radius:6px; padding:24px; position:sticky; top:20px; height:fit-content; }
+.summary h3{ font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:16px; color:var(--maroon); }
+.sum-item{ display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.sum-item .sum-thumb{ width:52px; height:52px; border-radius:3px; overflow:hidden; flex-shrink:0; }
+.sum-mid{ flex:1; }
+.sum-name{ font-size:12.5px; font-weight:600; letter-spacing:.2px; }
+.sum-meta{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+.sum-price{ font-size:13.5px; font-weight:600; white-space:nowrap; }
+.empty-cart{ padding:20px 0; text-align:center; color:var(--ink-soft); font-size:13px; }
+
+.combo-box{ background:var(--bg); border-radius:5px; padding:15px; margin:16px 0; }
+.combo-row{ display:flex; justify-content:space-between; font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
+.combo-row span:last-child{ color:var(--maroon); }
+.combo-bar{ height:6px; background:#e9dfcf; border-radius:4px; overflow:hidden; }
+.combo-fill{ height:100%; background:linear-gradient(90deg, var(--maroon), var(--gold)); border-radius:4px; transition:width .4s ease; }
+.combo-note{ font-size:11px; color:var(--ink-soft); margin-top:8px; }
+
+.totals{ margin-top:6px; }
+.total-row{ display:flex; justify-content:space-between; font-size:13.5px; padding:6px 0; color:var(--ink-soft); }
+.total-row.discount span:last-child{ color:var(--maroon); }
+.total-row.grand{ font-size:17px; font-weight:700; color:var(--ink); border-top:1px solid var(--border); margin-top:8px; padding-top:14px; }
+
+.confirm-btn{ width:100%; padding:15px; background:var(--maroon); color:#fff; border:none; border-radius:3px; font-size:13px; letter-spacing:.8px; text-transform:uppercase; font-weight:600; cursor:pointer; margin-top:16px; }
+.confirm-btn:hover{ background:var(--maroon-dark); }
+.confirm-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+.trust-row{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:11px; color:var(--ink-soft); margin-top:16px; border-top:1px solid var(--border); padding-top:14px; }
+
+.toast{ position:fixed; bottom:24px; right:24px; background:var(--ink); color:#fff; padding:13px 18px; border-radius:4px; font-size:13.5px; transform:translateY(120%); transition:transform .3s ease; z-index:999; }
+.toast.show{ transform:translateY(0); }
+
+.wallet-grid{ display:grid; grid-template-columns:repeat(4,1fr); justify-content:center; gap:10px; }
+.wallet-box{ height:78px; background:#fff; border:1px solid var(--border); border-radius:6px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px; overflow:hidden; padding:8px; cursor:pointer; transition:.2s ease; }
+.wallet-box:hover{ border-color:var(--maroon); transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.1); }
+.wallet-box.active{ border-color:var(--maroon); box-shadow:0 0 0 1px var(--maroon); }
+.wallet-box svg{ width:26px; height:26px; }
+.wallet-box img{
+    width:34px;
+    height:34px;
+    object-fit:contain;
+}
+.wallet-box span{ font-size:10px; font-weight:600; text-align:center; color:var(--ink-soft); }
+.pay-body img{ display:block; margin:auto; }
+
+#qrcode{ display:flex; align-items:center; justify-content:center; }
+#qrcode img{ image-rendering:pixelated; }
+.qr-amount{ font-family:var(--serif); font-size:15px; font-weight:600; color:var(--maroon); margin-top:12px; }
+
+/* Quick-add strip */
+.quickadd-wrap{ max-width:1240px; margin:0 auto; padding:0 32px 10px; }
+.quickadd-wrap .panel-title h2{ font-size:19px; }
+.quickadd-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.qa-card{ border:1px solid var(--border); border-radius:6px; padding:12px; text-align:left; display:flex; flex-direction:column; gap:8px; }
+.qa-thumb{ width:100%; height:90px; border-radius:4px; overflow:hidden; }
+.qa-thumb .ph{ font-size:10px; }
+.qa-name{ font-size:12.5px; font-weight:600; line-height:1.35; }
+.qa-price{ font-size:12px; color:var(--ink-soft); }
+.qa-add{ margin-top:auto; width:100%; padding:9px; background:transparent; border:1px solid var(--maroon); color:var(--maroon); border-radius:3px; font-size:11px; letter-spacing:.6px; text-transform:uppercase; font-weight:600; cursor:pointer; transition:.2s ease; }
+.qa-add:hover{ background:var(--maroon); color:#fff; }
+.qa-add.added{ background:var(--green); border-color:var(--green); color:#fff; }
+
+.qty-stepper{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); border-radius:3px; padding:2px 8px; }
+.qty-stepper button{ background:none; border:none; font-size:14px; cursor:pointer; color:var(--maroon); font-weight:700; width:16px; }
+.buy-now-btn{ width:100%; padding:15px; background:transparent; color:var(--maroon); border:1.5px solid var(--maroon); border-radius:3px; font-size:13px; letter-spacing:.8px; text-transform:uppercase; font-weight:600; cursor:pointer; margin-top:10px; }
+.buy-now-btn:hover{ background:var(--gold-light); }
+.buy-now-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+@media (max-width:900px){ .quickadd-grid{ grid-template-columns:repeat(2,1fr); } }
+
+@media (max-width:900px){
+    .layout{ grid-template-columns:1fr; padding:0 18px 40px; }
+    .left{ padding-right:0; margin-bottom:30px; }
+    .steps{ max-width:100%; }
+}
+@media(max-width:768px){ .wallet-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:480px){ .wallet-grid{ grid-template-columns:1fr; } .pay-body img{ width:180px !important; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="shop.html" class="back-link">← VloMa</a>
+  <div class="secure">🔒 Secure Checkout</div>
+</header>
+
+<div class="steps">
+  <div class="step done"><div class="step-circle">✓</div><div class="step-label">Shipping</div></div>
+  <div class="step done"><div class="step-circle">✓</div><div class="step-line"></div><div class="step-label">Delivery</div></div>
+  <div class="step active"><div class="step-circle">3</div><div class="step-line"></div><div class="step-label">Payment</div></div>
+  <div class="step"><div class="step-circle">4</div><div class="step-line"></div><div class="step-label">Review</div></div>
+</div>
+
+
+<div class="layout">
+  <div class="left">
+    <div class="panel-title"><div class="bar"></div><h2>Payment Method</h2></div>
+    <p class="panel-sub">All transactions are secure and encrypted.</p>
+
+    <div class="pay-option selected" id="opt-card">
+      <div class="pay-head" onclick="selectPay('card')">
+        <div class="pay-head-left"><span class="radio"></span> Credit / Debit Card</div>
+        <div class="pay-icons"><span>VISA</span><span>MC</span></div>
+      </div>
+      <div class="pay-body">
+        <div class="input-row">
+          <div class="styled-input">
+            <input type="text" id="cardNumber" placeholder="Card Number" maxlength="19" oninput="formatCard(this)">
+            <span class="icon-r">💳</span>
+          </div>
+          <div class="err-text" id="cardNumberErr">Enter a valid 16-digit card number.</div>
+        </div>
+        <div class="input-row">
+          <div class="styled-input"><input type="text" id="cardName" placeholder="Name on Card"></div>
+          <div class="err-text" id="cardNameErr">Name is required.</div>
+        </div>
+        <div class="input-row two">
+          <div>
+            <div class="styled-input"><input type="text" id="cardExpiry" placeholder="Expiry (MM/YY)" maxlength="5" oninput="formatExpiry(this)"></div>
+            <div class="err-text" id="cardExpiryErr">Enter a valid expiry date.</div>
+          </div>
+          <div>
+            <div class="styled-input"><input type="text" id="cardCvc" placeholder="CVC" maxlength="4"><span class="icon-r">?</span></div>
+            <div class="err-text" id="cardCvcErr">Enter a valid CVC.</div>
+          </div>
+        </div>
+        <label class="check-line"><input type="checkbox"> Save this card for future purchases</label>
+      </div>
+    </div>
+
+   <div class="pay-option" id="opt-upi">
+    <div class="pay-head" onclick="selectPay('upi')">
+        <div class="pay-head-left"><span class="radio"></span> UPI / QR Scan</div>
+        <span></span>
+    </div>
+    <div class="pay-body">
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="width:156px;height:156px;margin:0 auto;padding:8px;border:1px solid var(--border);border-radius:8px;background:#fff;">
+                <div id="qrcode"></div>
+            </div>
+            <div class="qr-amount" id="qrAmount">₹0</div>
+            <p style="margin-top:4px;font-size:12px;color:var(--ink-soft);">Scan with any UPI app to pay</p>
+        </div>
+        <div class="styled-input" style="margin-bottom:15px;">
+            <input type="text" id="upiId" placeholder="yourname@upi">
+        </div>
+        <h4 style="margin-bottom:15px; font-weight:500;">Pay with</h4>
+        <div class="wallet-grid" id="upiAppGrid">
+           <div class="wallet-box" onclick="selectUpiApp('Google Pay', this)">
+              <img src="https://images.seeklogo.com/logo-png/33/1/google-pay-logo-png_seeklogo-334912.png" alt="Google Pay" width="34" height="34">
+              <span>Google Pay</span>
+            </div>
+            <div class="wallet-box" onclick="selectUpiApp('PhonePe', this)">
+              <img src="https://images.seeklogo.com/logo-png/33/1/phonepe-logo-png_seeklogo-339867.png" alt="PhonePe" width="34" height="34">
+              <span>PhonePe</span>
+            </div>
+          <div class="wallet-box" onclick="selectUpiApp('Paytm', this)">
+              <img src="https://images.seeklogo.com/logo-png/30/1/paytm-logo-png_seeklogo-305549.png" alt="Paytm" width="34" height="34">
+              <span>Paytm</span>
+          </div>
+          <div class="wallet-box" onclick="selectUpiApp('BHIM UPI', this)">
+            <img src="https://images.seeklogo.com/logo-png/33/2/unified-payment-interface-upi-logo-png_seeklogo-333088.png" alt="BHIM UPI" width="34" height="34">
+            <span>BHIM UPI</span>
+        </div>
+        <p style="margin-top:18px;font-size:12px;color:var(--ink-soft);text-align:center;">
+            Scan the QR code, tap an app above, or enter your UPI ID.
+        </p>
+    </div>
+</div>
+
+  <div class="summary">
+    <h3>Order Summary</h3>
+    <div></div>
+
+    <div class="totals">
+      <div class="total-row"><span>Subtotal</span><span id="sumSubtotal">₹0</span></div>
+      <div class="total-row"><span>Shipping (Standard)</span><span id="sumShipping">₹0</span></div>
+      <div class="total-row discount" id="discountRow" style="display:none;"><span>Combo Discount</span><span id="sumDiscount">-₹0</span></div>
+      <div class="total-row grand"><span>Total</span><span id="sumTotal">₹0</span></div>
+    </div>
+
+    <button class="confirm-btn" id="confirmBtn" onclick="confirmPayment()">Buy Now</button>
+    <div class="trust-row">🛡 256-bit SSL encrypted payment</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function getCart(){ return JSON.parse(localStorage.getItem('anistock_cart') || '[]'); }
+function saveCart(c){ localStorage.setItem('anistock_cart', JSON.stringify(c)); }
+
+const CATALOG = [
+  {id:'qa1', name:'Rosewood Jhumka Earrings', price:2400, img:'images/jewellery-earrings-1.jpg'},
+  {id:'qa2', name:'Ivory Pearl Clutch', price:3200, img:'images/bags-clutch-1.jpg'},
+  {id:'qa3', name:'Maroon Silk Dupatta', price:1800, img:'images/apparel-dupatta-1.jpg'},
+  {id:'qa4', name:'Gold-Plated Bangle Set', price:2950, img:'images/jewellery-bangles-1.jpg'}
+];
+
+function renderQuickAdd(){
+  const grid = document.getElementById('quickAddGrid');
+  const cart = getCart();
+  grid.innerHTML = CATALOG.map(p=>{
+    const inCart = cart.find(x=>x.id===p.id);
+    return `
+    <div class="qa-card">
+      <div class="qa-thumb"><img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;" onerror="imgFallback(this,'${p.name}')"></div>
+      <div class="qa-name">${p.name}</div>
+      <div class="qa-price">₹${p.price.toLocaleString('en-IN')}</div>
+      <button class="qa-add ${inCart?'added':''}" onclick="addToCart('${p.id}')">${inCart ? '✓ Added · Qty ' + inCart.qty : '+ Add to Bag'}</button>
+    </div>`;
+  }).join('');
+}
+
+function addToCart(id){
+  const product = CATALOG.find(p=>p.id===id);
+  if(!product) return;
+  let cart = getCart();
+  const existing = cart.find(x=>x.id===id);
+  if(existing){ existing.qty += 1; }
+  else { cart.push({id:product.id, name:product.name, price:product.price, qty:1, img:product.img}); }
+  saveCart(cart);
+  renderCart();
+  renderQuickAdd();
+  showToast(product.name + ' added to bag');
+}
+
+function selectPay(opt){
+  ['card','upi','wallet'].forEach(o=>{
+    const el = document.getElementById('opt-'+o);
+    if(el) el.classList.toggle('selected', o===opt);
+  });
+}
+
+let qrInstance = null;
+function renderQR(amount){
+  const box = document.getElementById('qrcode');
+  const amountEl = document.getElementById('qrAmount');
+  if(!box) return;
+  amountEl.textContent = `₹${Math.max(0,Math.round(amount)).toLocaleString('en-IN')}`;
+  const upiString = `upi://pay?pa=VloMa@upi&pn=VloMa&am=${Math.max(1,Math.round(amount))}&cu=INR&tn=Order%20Payment`;
+  box.innerHTML = '';
+  if(typeof QRCode !== 'undefined'){
+    qrInstance = new QRCode(box, { text: upiString, width: 140, height: 140, colorDark: '#222222', colorLight: '#ffffff' });
+  } else {
+    box.innerHTML = '<div class="ph" style="border-radius:4px;">QR Code</div>';
+  }
+}
+
+function selectUpiApp(appName, el){
+  document.querySelectorAll('#upiAppGrid .wallet-box').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('upiId').placeholder = `yourname@${appName.toLowerCase().replace(/\s/g,'')}`;
+  showToast('Opening ' + appName + '…');
+}
+
+function imgFallback(el, label){
+  const box = document.createElement('div');
+  box.className = 'ph';
+  box.textContent = label;
+  el.replaceWith(box);
+}
+
+function renderCart(){
+  const cart = getCart();
+  const wrap = document.getElementById('cartItems');
+  if(cart.length===0){
+    wrap.innerHTML = `<div class="empty-cart">Your bag is empty. <a href="shop.html" style="color:var(--maroon);">Browse the shop →</a></div>`;
+  } else {
+    wrap.innerHTML = cart.map(item=>`
+      <div class="sum-item">
+        <div class="sum-thumb"><img src="${item.img}" alt="${item.name}" onerror="imgFallback(this,'${item.name}')"></div>
+        <div class="sum-mid">
+          <div class="sum-name">${item.name.toUpperCase()}</div>
+          <div class="sum-meta">Qty: ${item.qty}
+            <a href="#" style="color:var(--maroon); margin-left:8px;" onclick="changeQty('${item.id}',1);return false;">+</a>
+            <a href="#" style="color:var(--maroon); margin-left:4px;" onclick="changeQty('${item.id}',-1);return false;">−</a>
+            <a href="#" style="color:var(--error); margin-left:8px;" onclick="removeItem('${item.id}');return false;">Remove</a>
+          </div>
+        </div>
+        <div class="sum-price">₹${(item.price*item.qty).toLocaleString('en-IN')}</div>
+      </div>
+    `).join('');
+  }
+  computeTotals(cart);
+}
+function changeQty(id, delta){
+  let cart = getCart();
+  const item = cart.find(x=>x.id===id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty<=0) cart = cart.filter(x=>x.id!==id);
+  saveCart(cart);
+  renderCart();
+}
+function removeItem(id){
+  let cart = getCart().filter(x=>x.id!==id);
+  saveCart(cart);
+  renderCart();
+  showToast('Item removed from bag');
+}
+
+function computeTotals(cart){
+  const subtotal = cart.reduce((a,c)=>a+c.price*c.qty,0);
+  const shipping = cart.length ? 150 : 0;
+  const comboThreshold = 5500;
+  const level = subtotal >= comboThreshold ? 2 : subtotal >= 3000 ? 1 : 0;
+  const discount = level>=1 ? Math.round(subtotal*0.10) : 0;
+  const pct = Math.min(100, Math.round((subtotal/comboThreshold)*100));
+
+  document.getElementById('comboLabel').textContent = level>=2 ? 'Level 2 Reached!' : level===1 ? 'Level 1 Reached' : 'Level 0';
+  document.getElementById('comboFill').style.width = pct + '%';
+  const remaining = Math.max(0, comboThreshold - subtotal);
+  document.getElementById('comboNote').textContent = remaining>0
+    ? `Add ₹${remaining.toLocaleString('en-IN')} more for free express shipping & a complimentary gift box.`
+    : `You've unlocked free express shipping & a complimentary gift box!`;
+
+  document.getElementById('sumSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+  document.getElementById('sumShipping').textContent = level>=2 ? 'FREE' : `₹${shipping}`;
+  const discountRow = document.getElementById('discountRow');
+  if(discount>0){
+    discountRow.style.display='flex';
+    document.getElementById('sumDiscount').textContent = `-₹${discount.toLocaleString('en-IN')}`;
+  } else {
+    discountRow.style.display='none';
+  }
+  const total = subtotal + (level>=2?0:shipping) - discount;
+  document.getElementById('sumTotal').textContent = `₹${Math.max(0,total).toLocaleString('en-IN')}`;
+  document.getElementById('confirmBtn').disabled = cart.length===0;
+  renderQR(Math.max(0,total));
+}
+
+function formatCard(input){
+  let v = input.value.replace(/\D/g,'').slice(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExpiry(input){
+  let v = input.value.replace(/\D/g,'').slice(0,4);
+  if(v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+  input.value = v;
+}
+
+function validateCard(){
+  let ok = true;
+  const num = document.getElementById('cardNumber');
+  const name = document.getElementById('cardName');
+  const exp = document.getElementById('cardExpiry');
+  const cvc = document.getElementById('cardCvc');
+  const numDigits = num.value.replace(/\s/g,'');
+  if(numDigits.length !== 16){ num.classList.add('err'); document.getElementById('cardNumberErr').classList.add('show'); ok=false; }
+  else { num.classList.remove('err'); document.getElementById('cardNumberErr').classList.remove('show'); }
+  if(!name.value.trim()){ name.classList.add('err'); document.getElementById('cardNameErr').classList.add('show'); ok=false; }
+  else { name.classList.remove('err'); document.getElementById('cardNameErr').classList.remove('show'); }
+  if(!/^\d{2}\/\d{2}$/.test(exp.value)){ exp.classList.add('err'); document.getElementById('cardExpiryErr').classList.add('show'); ok=false; }
+  else { exp.classList.remove('err'); document.getElementById('cardExpiryErr').classList.remove('show'); }
+  if(cvc.value.length < 3){ cvc.classList.add('err'); document.getElementById('cardCvcErr').classList.add('show'); ok=false; }
+  else { cvc.classList.remove('err'); document.getElementById('cardCvcErr').classList.remove('show'); }
+  return ok;
+}
+
+async function confirmPayment(){
+
+    const response=await fetch("/create-order",{
+        method:"POST"
+    });
+    const data=await response.json();
+
+    var options={
+        key:data.key,
+        amount:data.amount,
+        currency:"INR",
+        order_id:data.order_id,
+        name:"AniStock",
+        description:"Order Payment",
+        handler:function(response){
+            fetch("/payment-success",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(response)
+            })
+            .then(()=>{
+                window.location.href="/confirmation";
+            });
+        }
+    };
+    var rzp=new Razorpay(options);
+    rzp.open();
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* seed demo cart if empty, so page isn't blank on first visit — replace img paths with your own photos */
+(function seed(){
+  const cart = getCart();
+  if(cart.length===0){
+    saveCart([
+      {id:'ck1', name:'Kundan Bloom Necklace Set', price:8500, qty:1, img:'images/jewellery-necklace-1.jpg'},
+      {id:'ck2', name:'Champagne Block Heels', price:2600, qty:1, img:'images/footwear-heels-1.jpg'}
+    ]);
+  }
+})();
+renderCart();
+renderQuickAdd();
+
+(function initTheme(){
+  if (localStorage.getItem('anistock_theme') === 'dark') document.body.classList.add('dark-mode');
+})();
+
+</script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>

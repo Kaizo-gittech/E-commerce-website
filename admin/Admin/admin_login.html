@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — VloMa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+    --maroon:#2F2F2F;
+    --maroon-dark:#1A1A1A;
+    --gold:#B08D57;
+    --gold-light:#D4C2A1;
+    --ink:#222222;
+    --ink-soft:#6D6D6D;
+    --bg:#F6F6F5;
+    --border:#E8E8E8;
+    --error:#D14343;
+    --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans:'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode{
+    --maroon:#D4C2A1;
+    --maroon-dark:#B08D57;
+    --gold:#D4C2A1;
+    --gold-light:#E8DCC4;
+    --ink:#EDEDED;
+    --ink-soft:#A8A8A8;
+    --bg:#161616;
+    --border:#333333;
+}
+body.dark-mode .card{ background:#1E1E1E; }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+    font-family:var(--sans);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:var(--bg);
+}
+
+a{ color:var(--maroon); text-decoration:none; }
+
+.card{
+    width:100%;
+    max-width:440px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(20,5,10,.18);
+}
+
+.form-side{
+    padding:44px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    background:#fff;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:28px;
+}
+
+.header .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:var(--maroon);
+    color:#fff;
+    font-size:20px;
+    margin-bottom:14px;
+}
+
+.header h1{
+    font-family:var(--serif);
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:.5px;
+    color:var(--maroon);
+    margin-bottom:6px;
+}
+
+.header p{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    letter-spacing:.3px;
+}
+
+.field{ margin-bottom:18px; }
+.field-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:10.5px;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    text-transform:uppercase;
+}
+.field-label a{ font-size:11px; }
+
+.input-wrap{ position:relative; display:flex; align-items:center; }
+.input-wrap input{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:4px;
+    font-size:14px;
+    outline:none;
+    transition:border-color .15s;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+}
+
+.input-wrap input:focus{ border-color:var(--maroon); }
+.input-wrap input.err{ border-color:var(--error); }
+
+.input-wrap .pw-toggle{
+    position:absolute;
+    right:14px;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:14px;
+}
+
+.err-msg{ font-size:11.5px; color:var(--error); margin-top:5px; display:none; }
+.err-msg.show{ display:block; }
+
+.btn-main{
+    width:100%;
+    padding:14px;
+    background:var(--maroon);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:6px;
+    transition:background .15s;
+}
+.btn-main:hover{ background:var(--maroon-dark); }
+.btn-main:disabled{ opacity:.7; cursor:not-allowed; }
+
+.terms{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:22px; line-height:1.7; }
+
+.home-link{
+    text-align:center;
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+}
+.home-link a:hover{ color:var(--maroon); }
+
+.flash{
+    padding:10px 14px;
+    border-radius:6px;
+    font-size:13px;
+    margin-bottom:16px;
+}
+.flash.success{ background:#e4f7ea; color:#1c7a3d; }
+.flash.danger, .flash.error{ background:#fbe7e7; color:var(--error); }
+.flash.warning{ background:#fff5e0; color:#8a6100; }
+
+@media (max-width:576px){
+    body{ padding:10px; }
+    .card{ border-radius:8px; }
+    .form-side{ padding:26px 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="form-side">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="header">
+            <div class="badge"><i class="fa-solid fa-user-shield"></i></div>
+            <h1>Admin Login</h1>
+            <p>Sign in to access the VloMa admin panel</p>
+        </div>
+
+        <!-- ADMIN LOGIN FORM -->
+        <form id="adminLoginForm" action="/admin/login" method="POST" novalidate>
+            <div class="field">
+                <label class="field-label">Email</label>
+                <div class="input-wrap">
+                    <input type="email" id="adminEmail" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="err-msg" id="adminEmailErr">Please enter a valid email address.</div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Password <a href="#" onclick="alert('Password reset link sent (demo).'); return false;">Forgot?</a></label>
+                <div class="input-wrap">
+                    <input type="password" id="adminPassword" name="password" placeholder="Enter your password" required>
+                    <button type="button" class="pw-toggle" onclick="togglePw('adminPassword', this)"><i class="fa-solid fa-eye"></i></button>
+                </div>
+                <div class="err-msg" id="adminPasswordErr">Password is required.</div>
+            </div>
+
+            <button type="submit" class="btn-main" id="adminLoginBtn">Login →</button>
+        </form>
+
+        <div class="terms">
+            This area is restricted to authorized administrators only.
+        </div>
+
+        <div class="home-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePw(id, btn){
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    } else {
+        input.type = 'password';
+        if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+    }
+}
+
+// Simple client-side validation so users get instant feedback
+// before the form ever hits the server (server still validates too).
+const adminForm = document.getElementById('adminLoginForm');
+const emailInput = document.getElementById('adminEmail');
+const passwordInput = document.getElementById('adminPassword');
+const emailErr = document.getElementById('adminEmailErr');
+const passwordErr = document.getElementById('adminPasswordErr');
+
+function isValidEmail(value){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+adminForm.addEventListener('submit', function(e){
+    let valid = true;
+
+    if (!isValidEmail(emailInput.value.trim())){
+        emailInput.classList.add('err');
+        emailErr.classList.add('show');
+        valid = false;
+    } else {
+        emailInput.classList.remove('err');
+        emailErr.classList.remove('show');
+    }
+
+    if (!passwordInput.value){
+        passwordInput.classList.add('err');
+        passwordErr.classList.add('show');
+        valid = false;
+    } else {
+        passwordInput.classList.remove('err');
+        passwordErr.classList.remove('show');
+    }
+
+    if (!valid){
+        e.preventDefault();
+        return;
+    }
+
+    const btn = document.getElementById('adminLoginBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Signing in…';
+});
+
+[emailInput, passwordInput].forEach(function(input){
+    input.addEventListener('input', function(){
+        input.classList.remove('err');
+        const errEl = document.getElementById(input.id + 'Err');
+        if (errEl) errEl.classList.remove('show');
+    });
+});
+</script>
+</body>
+</html>

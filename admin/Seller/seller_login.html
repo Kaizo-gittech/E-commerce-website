@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seller Portal — VloMa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+    --maroon:#2F2F2F;
+    --maroon-dark:#1A1A1A;
+    --gold:#B08D57;
+    --gold-light:#D4C2A1;
+    --ink:#222222;
+    --ink-soft:#6D6D6D;
+    --bg:#F6F6F5;
+    --border:#E8E8E8;
+    --error:#D14343;
+    --serif:'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans:'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode{
+    --maroon:#D4C2A1;
+    --maroon-dark:#B08D57;
+    --gold:#D4C2A1;
+    --gold-light:#E8DCC4;
+    --ink:#EDEDED;
+    --ink-soft:#A8A8A8;
+    --bg:#161616;
+    --border:#333333;
+}
+body.dark-mode .card, body.dark-mode .social-btn{ background:#1E1E1E; }
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+    font-family:var(--sans);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:var(--bg);
+}
+
+a{ color:var(--maroon); text-decoration:none; }
+
+.card{
+    width:100%;
+    max-width:480px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(20,5,10,.18);
+}
+
+.form-side{
+    padding:44px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    background:#fff;
+}
+
+.tabs{ display:flex; gap:30px; border-bottom:1px solid var(--border); margin-bottom:26px; }
+.tab{
+    font-family:var(--serif);
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:.5px;
+    padding-bottom:13px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    border-bottom:2px solid transparent;
+    position:relative;
+    top:1px;
+    transition:color .15s, border-color .15s;
+}
+.tab:hover{ color:var(--maroon); }
+.tab.active{ color:var(--maroon); border-bottom-color:var(--gold); }
+
+.field{ margin-bottom:18px; }
+.field-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:10.5px;
+    letter-spacing:1px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    text-transform:uppercase;
+}
+.box{
+    border:1px solid var(--border);
+    padding:12px;
+    border-radius:6px;
+    text-align:center;
+    justify-content:center;
+    font-weight:bold;
+}
+.field-label a{ font-size:11px; }
+
+.input-wrap{ position:relative; display:flex; align-items:center; }
+.input-wrap input,
+.input-wrap select,
+.input-wrap textarea{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:4px;
+    font-size:14px;
+    outline:none;
+    transition:border-color .15s;
+    font-family:inherit;
+    color:var(--ink);
+    background:#fff;
+}
+
+.input-wrap input:focus,
+.input-wrap select:focus,
+.input-wrap textarea:focus{ border-color:var(--maroon); }
+.input-wrap input.err,
+.input-wrap select.err{ border-color:var(--error); }
+
+.input-wrap select{
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    cursor:pointer;
+}
+.input-wrap:has(select)::after{
+    content:"▾";
+    font-size:12px;
+    color:var(--ink-soft);
+    position:absolute;
+    right:15px;
+    pointer-events:none;
+}
+
+.input-wrap .pw-toggle{
+    position:absolute;
+    right:14px;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-size:14px;
+}
+
+.upload-box label{
+    display:flex;
+    font-weight:600;
+    align-content: center;
+    justify-content: center;
+}
+
+label .drop-area{
+    height: 100px;
+    padding: 15px;
+}
+
+.upload-box h3,p{
+    margin:0;
+    text-align:center;
+}
+
+.upload-box{
+    margin:15px 0;
+}
+
+.drop-area{
+    width:100%;
+    min-height:90px;
+    border:2px dashed #cfcfcf;
+    border-radius:8px;
+    background:#fafafa;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    padding:10px;
+    transition:.3s;
+}
+
+.drop-area:hover{
+    border-color:#000;
+    background:#f5f5f5;
+}
+
+.drop-area h3{
+    margin:0;
+    font-size:16px;
+}
+
+.drop-area p{
+    margin:4px 0;
+    font-size:12px;
+    color:#666;
+}
+
+.drop-area small{
+    font-size:10px;
+    color:#999;
+}
+
+.file-picked{
+    font-size:11px;
+    color:var(--maroon);
+    margin-top:4px;
+    text-align:center;
+    display:none;
+}
+
+.err-msg{ font-size:11.5px; color:var(--error); margin-top:5px; display:none; }
+.err-msg.show{ display:block; }
+
+.btn-main{
+    width:100%;
+    padding:14px;
+    background:var(--maroon);
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:6px;
+    transition:background .15s;
+}
+.btn-main:hover{ background:var(--maroon-dark); }
+
+.terms{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:22px; line-height:1.7; }
+
+.home-link{
+    text-align:center;
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+}
+.home-link a:hover{ color:var(--maroon); }
+
+.flash{
+    padding:10px 14px;
+    border-radius:6px;
+    font-size:13px;
+    margin-bottom:16px;
+}
+.flash.success{ background:#e4f7ea; color:#1c7a3d; }
+.flash.danger, .flash.error{ background:#fbe7e7; color:var(--error); }
+.flash.warning{ background:#fff5e0; color:#8a6100; }
+
+@media (max-width:576px){
+    body{ padding:10px; }
+    .card{ border-radius:8px; }
+    .form-side{ padding:26px 18px; }
+    .tabs{ gap:20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="form-side">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="tabs">
+            <div class="tab active" id="tabLogin" onclick="switchTab('login')">Login</div>
+            <div class="tab" id="tabRegister" onclick="switchTab('register')">Register</div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" action="/seller/login" method="POST">
+            <div class="field">
+                <label class="field-label">Email</label>
+                <div class="input-wrap">
+                    <input type="email" id="loginEmail" name="email" placeholder="Enter your email" required>
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label">Password <a href="#" onclick="alert('Password reset link sent (demo).'); return false;">Forgot?</a></label>
+                <div class="input-wrap">
+                    <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                    <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)"><i class="fa-solid fa-eye"></i></button>
+                </div>
+            </div>
+            <button type="submit" class="btn-main">Login →</button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" action="/seller/register" method="POST" enctype="multipart/form-data" style="display:none;">
+
+            <div class="field">
+                <label class="field-label">Shop Name</label>
+                <div class="input-wrap">
+                    <input type="text" id="shopName" name="shop_name" placeholder="Shop Name" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Owner Name</label>
+                <div class="input-wrap">
+                    <input type="text" name="owner_name" id="regOwnerName" placeholder="Owner Name" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Email</label>
+                <div class="input-wrap">
+                    <input type="email" name="email" id="regEmail" placeholder="Enter Your Email" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Phone Number</label>
+                <div class="input-wrap">
+                    <input type="text" id="regPhone" name="phone" placeholder="Phone Number" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Category</label>
+                <div class="input-wrap">
+                    <select id="regCategory" name="category" required>
+                        <option value="">Select Category</option>
+                        <option>Cosmetics</option>
+                        <option>Jewellery</option>
+                        <option>Footwear</option>
+                        <option>Perfume</option>
+                        <option>Bags</option>
+                        <option>Accessories</option>
+                        <option>Others</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Address</label>
+                <div class="input-wrap">
+                    <textarea name="address" id="regAddress" rows="2" placeholder="Shop Address" required></textarea>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">City</label>
+                <div class="input-wrap">
+                    <input type="text" name="city" id="regCity" placeholder="City" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">State</label>
+                <div class="input-wrap">
+                    <input type="text" name="state" id="regState" placeholder="State" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Pincode</label>
+                <div class="input-wrap">
+                    <input type="text" name="pincode" id="regPincode" maxlength="10" placeholder="Pincode" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="regPassword" name="password" placeholder="Minimum 6 characters" minlength="6" required>
+                    <button type="button" class="pw-toggle" onclick="togglePw('regPassword', this)"><i class="fa-solid fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="field-label">Confirm Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
+                </div>
+            </div>
+
+            <div class="box"> SHOP LOGO
+                <div class="upload-box">
+                    <input type="file" id="shopLogo" name="shop_logo" accept=".png,.jpg,.jpeg" hidden>
+                    <label for="shopLogo" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="shopLogoPicked"></div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="box"> GST DETAILS
+                <div class="field">
+                    <label class="field-label">GST Number</label>
+                    <div class="input-wrap">
+                        <input type="text" id="gstNo" name="gst_no" placeholder="GST Number" required>
+                    </div>
+                </div>
+                <div class="upload-box">
+                    <label for="regGst">GST Certificate *</label>
+                    <input type="file" name="gst_certificate" id="regGst" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <label for="regGst" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="regGstPicked"></div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="box"> PAN DETAILS
+                <div class="field">
+                    <label class="field-label">PAN Number</label>
+                    <div class="input-wrap">
+                        <input type="text" id="panNo" name="pan_no" placeholder="PAN Number" required>
+                    </div>
+                </div>
+                <div class="upload-box">
+                    <label for="regPan">PAN Document *</label>
+                    <input type="file" id="regPan" name="pan_document" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <label for="regPan" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="regPanPicked"></div>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="box"> PRODUCT IMAGES
+                <div class="upload-box">
+                    <label for="regProductImg1">Product Image 1 *</label>
+                    <input type="file" id="regProductImg1" name="product_image_1" accept=".jpg,.jpeg,.png" hidden>
+                    <label for="regProductImg1" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="regProductImg1Picked"></div>
+                </div>
+
+                <div class="upload-box">
+                    <label for="regProductImg2">Product Image 2 *</label>
+                    <input type="file" id="regProductImg2" name="product_image_2" accept=".jpg,.jpeg,.png" hidden>
+                    <label for="regProductImg2" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="regProductImg2Picked"></div>
+                </div>
+
+                <div class="upload-box">
+                    <label for="regProductImg3">Product Image 3 *</label>
+                    <input type="file" id="regProductImg3" name="product_image_3" accept=".jpg,.jpeg,.png" hidden>
+                    <label for="regProductImg3" class="drop-area">
+                        <h3>Browse Files</h3>
+                        <p>Drag &amp; Drop or Click Here</p>
+                    </label>
+                    <div class="file-picked" id="regProductImg3Picked"></div>
+                </div>
+            </div>
+
+            <br>
+            <button type="submit" class="btn-main">Submit→</button>
+        </form>
+
+        <div class="terms">
+            By connecting, you agree to our
+            <a href="#">Terms</a> &amp;
+            <a href="#">Privacy Policy</a>.
+        </div>
+
+        <div class="home-link">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePw(id, btn){
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    } else {
+        input.type = 'password';
+        if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+    }
+}
+
+function switchTab(tab){
+    const isLogin = tab === 'login';
+    document.getElementById('tabLogin').classList.toggle('active', isLogin);
+    document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+    document.getElementById('loginForm').style.display = isLogin ? '' : 'none';
+    document.getElementById('registerForm').style.display = isLogin ? 'none' : '';
+}
+
+// Show the picked filename under each upload box so users get feedback.
+document.querySelectorAll('.upload-box input[type="file"]').forEach(function(input){
+    input.addEventListener('change', function(){
+        const pickedEl = document.getElementById(input.id + 'Picked');
+        if (!pickedEl) return;
+        if (input.files && input.files.length){
+            pickedEl.textContent = input.files[0].name;
+            pickedEl.style.display = 'block';
+        } else {
+            pickedEl.style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VloMa — Seller Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EE; --surface:#FFFFFF; --sidebar:#FBF9F4; --border:#E7E2D6; --text:#1C1A16; --muted:#7A7466;
+  --accent:#8A6D1E; --accent-dark:#6E5717; --accent-soft:#F3EAD3; --ink:#14120F;
+  --success:#2E7D4E; --success-bg:#E6F3E9; --warn:#A97A11; --warn-bg:#FBF0D8;
+  --danger:#B5392B; --danger-bg:#FBEAE7; --info:#4A5A8A; --info-bg:#EAEDF6;
+  --radius:2px; --shadow:0 1px 2px rgba(20,18,15,.04), 0 8px 24px -12px rgba(20,18,15,.10);
+}
+body.dark{
+  --bg:#15130F; --surface:#1D1B16; --sidebar:#19170F; --border:#312C21; --text:#EDE8DC; --muted:#9A9284;
+  --accent:#D3AE52; --accent-dark:#E9C978; --accent-soft:#2B2718; --ink:#F3EFE4;
+  --success:#6FBF8B; --success-bg:#1C2B21; --warn:#E2B34A; --warn-bg:#2E2717;
+  --danger:#E27C6E; --danger-bg:#301F1C; --info:#93A5E0; --info-bg:#1E2233;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);transition:background .25s,color .25s;min-height:100vh;}
+h1,h2,h3,.serif{font-family:'Playfair Display',serif;}
+a{color:inherit;text-decoration:none;} button{font-family:inherit;cursor:pointer;}
+
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+.sidebar{background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:32px 24px;position:sticky;top:0;height:100vh;}
+.brand .wordmark{font-size:28px;font-weight:700;}
+.brand .sub{font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.nav{margin-top:36px;display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--radius);color:var(--muted);font-size:14.5px;font-weight:500;border-left:2px solid transparent;transition:.15s;}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.85;}
+.nav-item:hover{color:var(--text);background:var(--accent-soft);}
+.nav-item.active{color:var(--accent-dark);background:var(--accent-soft);border-left-color:var(--accent);font-weight:600;}
+body.dark .nav-item.active{color:var(--accent);}
+.sidebar-footer{border-top:1px solid var(--border);padding-top:16px;margin-top:16px;display:flex;align-items:center;gap:10px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.sidebar-footer .name{font-size:13.5px;font-weight:600;}
+.sidebar-footer .role{font-size:11.5px;color:var(--muted);}
+
+.main{padding:28px 40px 60px;max-width:1300px;}
+.topbar{display:flex;align-items:center;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.search{flex:0 0 auto;width:230px;margin-right:auto;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--muted);transition:width .15s ease;}
+.search:focus-within{width:270px;border-color:var(--accent);}
+.search svg{width:15px;height:15px;flex-shrink:0;}
+.search input{border:none;outline:none;background:transparent;font-size:12.5px;color:var(--text);width:100%;font-family:inherit;}
+@media(max-width:1200px){.search{width:180px;} .search:focus-within{width:210px;}}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;}
+.icon-btn svg{width:17px;height:17px;}
+.dot{position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--danger);}
+.profile-chip{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding-left:8px;border-left:1px solid var(--border);}
+
+.section{display:none;} .section.active{display:block;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;gap:20px;flex-wrap:wrap;}
+.page-head h1{font-size:30px;font-weight:600;} .page-head p{color:var(--muted);font-size:14px;margin-top:6px;}
+.head-actions{display:flex;gap:10px;flex-shrink:0;}
+
+.btn{border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:600;letter-spacing:.3px;border:1px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:.15s;}
+.btn-dark{background:var(--ink);color:var(--bg);} .btn-dark:hover{background:var(--accent-dark);}
+.btn-gold{background:var(--accent);color:#fff;} .btn-gold:hover{background:var(--accent-dark);}
+.btn-outline{background:var(--surface);color:var(--text);border-color:var(--border);} .btn-outline:hover{border-color:var(--accent);color:var(--accent-dark);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-danger-outline{background:var(--surface);color:var(--danger);border-color:var(--danger);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.grid{display:grid;gap:18px;} .cols-4{grid-template-columns:repeat(4,1fr);} .cols-3{grid-template-columns:repeat(3,1fr);} .cols-2{grid-template-columns:2fr 1fr;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.stat-value{font-size:28px;font-weight:700;margin-top:10px;font-family:'Playfair Display',serif;}
+.stat-trend{font-size:12.5px;margin-top:10px;color:var(--muted);}
+.trend-up{color:var(--success);font-weight:600;} .stat-warn{color:var(--warn);font-weight:600;}
+.section-title{font-size:17px;font-weight:600;font-family:'Playfair Display',serif;}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.link-accent{color:var(--accent-dark);font-size:13px;font-weight:600;} body.dark .link-accent{color:var(--accent);}
+
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;}
+tbody td{padding:14px 12px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;} tbody tr:hover{background:var(--accent-soft);}
+.table-wrap{overflow-x:auto;}
+
+.pill{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600;letter-spacing:.3px;}
+.pill-success{background:var(--success-bg);color:var(--success);} .pill-warn{background:var(--warn-bg);color:var(--warn);}
+.pill-danger{background:var(--danger-bg);color:var(--danger);} .pill-info{background:var(--info-bg);color:var(--info);}
+
+.chip{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.row-name{display:flex;align-items:center;gap:10px;} .row-name .sub{font-size:12px;color:var(--muted);}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-size:11.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
+.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+
+.tabs{display:flex;gap:26px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.tab{padding-bottom:12px;font-size:14px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;cursor:pointer;}
+.tab.active{color:var(--accent-dark);border-color:var(--accent);font-weight:600;} body.dark .tab.active{color:var(--accent);}
+
+.progress{height:6px;border-radius:3px;background:var(--border);overflow:hidden;} .progress > div{height:100%;background:var(--accent);}
+.bar-chart{display:flex;align-items:flex-end;gap:14px;height:200px;padding-top:10px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;}
+.bar{width:100%;max-width:38px;background:var(--accent);border-radius:3px 3px 0 0;transition:height .6s ease;}
+.bar-col .lbl{font-size:11px;color:var(--muted);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(20,18,15,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:19px;} .modal-body{padding:24px;}
+.modal-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface);font-size:16px;}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+
+.toast-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+.toast{background:var(--ink);color:var(--bg);padding:13px 18px;border-radius:var(--radius);font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;align-items:center;gap:10px;animation:slidein .25s ease;min-width:220px;}
+@keyframes slidein{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
+.toast .dotok{width:7px;height:7px;border-radius:50%;background:var(--success);flex-shrink:0;}
+
+.switch{position:relative;width:38px;height:20px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.slider-tg{position:absolute;inset:0;background:var(--border);border-radius:20px;transition:.2s;cursor:pointer;}
+.slider-tg:before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+input:checked + .slider-tg{background:var(--accent);} input:checked + .slider-tg:before{transform:translateX(18px);}
+
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty .big{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.footer-note{text-align:center;color:var(--muted);font-size:12px;padding-top:40px;}
+
+.upload-box{border:1.5px dashed var(--border);border-radius:var(--radius);padding:26px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;}
+.upload-box:hover{border-color:var(--accent);color:var(--accent-dark);}
+
+.ticket{border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.ticket + .ticket{margin-top:12px;}
+
+@media(max-width:1000px){
+  .app{grid-template-columns:1fr;} .sidebar{display:none;}
+  .cols-4{grid-template-columns:1fr 1fr;} .cols-2{grid-template-columns:1fr;} .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="wordmark serif">VloMa</div><div class="sub">Seller Panel</div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-footer">
+      <div class="avatar">EG</div>
+      <div><div class="name">Ethnic Grace</div><div class="role">Ananya Mishra · Verified</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Search your products, orders…">
+      </div>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <div class="profile-chip"><div class="avatar" style="width:30px;height:30px;font-size:11px;">EG</div>Ethnic Grace</div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="section active" id="sec-dashboard">
+      <div class="page-head"><div><h1>Seller Dashboard</h1><p>Welcome back, Ananya. Here's how Ethnic Grace is performing.</p></div>
+        <button class="btn btn-dark" onclick="go('add-product')">+ Add Product</button>
+      </div>
+      <div class="grid cols-4" id="dashStats"></div>
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="card"><div class="card-head"><h3 class="section-title">Sales Over Time</h3><span class="link-accent">This month</span></div>
+          <div class="bar-chart" id="salesChart"></div></div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Wallet Summary</h3></div>
+          <div class="stat-label">Available Balance</div>
+          <div class="stat-value" id="walletBalanceDash"></div>
+          <div class="progress" style="margin-top:14px;"><div style="width:70%;"></div></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px;">70% liquid · 30% pending clearance</div>
+          <button class="btn btn-gold" style="margin-top:16px;width:100%;justify-content:center;" onclick="go('payout')">Request Payout</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">Recent Orders</h3><span class="link-accent" onclick="go('orders')" style="cursor:pointer;">View all</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="recentOrdersBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ADD PRODUCT -->
+    <section class="section" id="sec-add-product">
+      <div class="page-head"><div><h1>Add Product</h1><p>List a new item for admin review before it goes live.</p></div></div>
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="field"><label>Product Name</label><input id="np-name" placeholder="Product Name"></div>
+          <div class="form-grid">
+            <div class="field"><label>Category</label><select id="np-cat">
+              <option>Select a Category</option>
+              <option>Cosmetics</option>
+              <option>Footwear</option>
+              <option>Jewellery</option>
+              <option>Bags</option>
+              <option>Perfume</option>
+            </select></div>
+            <div class="field"><label>SKU</label><input id="np-sku" placeholder="Auto-generated if left blank"></div>
+            <div class="field"><label>Price (₹)</label><input id="np-price" type="number" value="0"></div>
+            <div class="field"><label>Stock (units)</label><input id="np-stock" type="number" value="0"></div>
+          </div>
+          <div class="field"><label>Description</label><textarea id="np-desc" rows="3" placeholder="Fabric, craft, care instructions…"></textarea></div>
+          <div class="field"><label>Product Images</label>
+            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
+            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
+            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
+          </div>
+          <button class="btn btn-dark" onclick="submitProduct()">Submit for Approval</button>
+        </div>
+        <div class="card" style="background:var(--accent-soft);border:none;height:fit-content;">
+          <h3 class="section-title" style="margin-bottom:10px;">Listing Guidelines</h3>
+          <ul style="font-size:13px;color:var(--text);line-height:1.9;padding-left:18px;">
+            <li>All listings require Admin approval before going live.</li>
+            <li>Use natural light photography on a neutral background.</li>
+            <li>Stock below 10 units triggers a low-stock alert.</li>
+            <li>Pricing should be inclusive of applicable GST.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANAGE PRODUCTS -->
+    <section class="section" id="sec-manage-products">
+      <div class="page-head"><div><h1>Manage Products</h1><p>Edit pricing, stock, and visibility for your live catalog.</p></div>
+        <button class="btn btn-dark" onclick="go('add-product')">+ Add Product</button>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="section-title">Your Catalog</h3><span style="font-size:13px;color:var(--muted);" id="myProductCount"></span></div>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Status</th><th>Stock</th><th>Price</th><th></th></tr></thead>
+        <tbody id="myProductsBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="section" id="sec-orders">
+      <div class="page-head"><div><h1>Orders</h1><p>Process and fulfil orders placed for your storefront.</p></div></div>
+      <div class="grid cols-4" id="orderStats"></div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">All Orders</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Product</th><th>Buyer</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="ordersBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section class="section" id="sec-inventory">
+      <div class="page-head"><div><h1>Inventory</h1><p>Track stock levels across your live product catalog.</p></div></div>
+      <div class="card">
+        <div class="card-head"><h3 class="section-title">Stock Levels</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Stock</th><th></th><th>Update</th></tr></thead>
+        <tbody id="inventoryBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- EARNINGS -->
+    <section class="section" id="sec-earnings">
+      <div class="page-head"><div><h1>Earnings</h1><p>Track your gross sales, commission deductions, and net earnings.</p></div></div>
+      <div class="grid cols-3" id="earningsStats"></div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">Settlement History</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Gross Amount</th><th>Commission</th><th>Net Payout</th><th>Status</th></tr></thead>
+        <tbody id="earningsBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- PAYOUT -->
+    <section class="section" id="sec-payout">
+      <div class="page-head"><div><h1>Payout</h1><p>Withdraw your available wallet balance to your bank account.</p></div></div>
+      <div class="grid cols-2">
+        <div class="card" style="background:var(--ink);color:var(--bg);">
+          <div class="stat-label" style="color:#C9BE9E;">Available Balance</div>
+          <h3 class="serif" style="font-size:34px;margin-top:8px;" id="walletBalancePayout"></h3>
+          <div class="field" style="margin-top:20px;">
+            <label style="color:#C9BE9E;">Withdrawal Amount (₹)</label>
+            <input id="payoutAmount" type="number" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:#fff;">
+          </div>
+          <button class="btn btn-gold" onclick="requestPayout()">Request Payout</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Payout History</h3></div>
+          <div id="payoutHistory" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORE PROFILE -->
+    <section class="section" id="sec-profile">
+      <div class="page-head"><div><h1>Store Profile</h1><p>Manage how your storefront appears to customers.</p></div></div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="field"><label>Shop Name</label><input value="Ethnic Grace"></div>
+          <div class="field"><label>Owner Name</label><input value="Ananya Mishra"></div>
+          <div class="field"><label>Contact Email</label><input value="hello@ethnicgrace.in"></div>
+          <div class="field"><label>Phone</label><input value="+91 98XXXXXX10"></div>
+          <div class="field"><label>GSTIN</label><input value="27ETHGR1234F1Z9"></div>
+          <div class="field"><label>Commission Rate</label><input value="15.0%" disabled></div>
+        </div>
+        <div class="field"><label>Store Description</label><textarea rows="3">Curated ethnic wear crafted by heritage weaving communities across India.</textarea></div>
+        <button class="btn btn-dark" onclick="toast('Store profile updated')">Save Changes</button>
+      </div>
+    </section>
+
+    <!-- SUPPORT -->
+    <section class="section" id="sec-support">
+      <div class="page-head"><div><h1>Support Tickets</h1><p>Get help from the VloMa Admin team.</p></div>
+        <button class="btn btn-dark" onclick="openModal('modal-ticket')">+ Raise Ticket</button>
+      </div>
+      <div id="ticketsList"></div>
+    </section>
+
+    <p class="footer-note">© 2023 VloMa Multi-Vendor Ecosystem. Seller Portal.</p>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-ticket">
+  <div class="modal">
+    <div class="modal-head"><h3 class="serif">Raise Support Ticket</h3><button class="modal-close" onclick="closeModal('modal-ticket')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Subject</label><input id="t-subject" placeholder="Briefly describe the issue"></div>
+      <div class="field"><label>Details</label><textarea id="t-details" rows="4" placeholder="Add any relevant order IDs or details"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('modal-ticket')">Cancel</button><button class="btn btn-dark" onclick="raiseTicket()">Submit Ticket</button></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const NAV_ITEMS = [
+  {id:'dashboard', label:'Dashboard', icon:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'},
+  {id:'add-product', label:'Add Product', icon:'M12 5v14M5 12h14'},
+  {id:'manage-products', label:'Manage Products', icon:'M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z'},
+  {id:'orders', label:'Orders', icon:'M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4M3 6h18M16 10a4 4 0 01-8 0'},
+  {id:'inventory', label:'Inventory', icon:'M21 8V5a2 2 0 00-2-2H5a2 2 0 00-2 2v3M3 8h18M3 8v11a2 2 0 002 2h14a2 2 0 002-2V8'},
+  {id:'earnings', label:'Earnings', icon:'M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6'},
+  {id:'payout', label:'Payout', icon:'M2 7h20v13H2zM2 7l3-4h14l3 4M8 14a2 2 0 104 0 2 2 0 00-4 0z'},
+  {id:'profile', label:'Store Profile', icon:'M3 21h18M5 21V7l8-4v18M19 21V11l-6-4'},
+  {id:'support', label:'Support Tickets', icon:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'},
+];
+
+let state = {
+  products: [
+    {id:1,name:'Midnight Silk Shawl',status:'live',stock:85,price:12499},
+    {id:2,name:'Chanderi Cotton Kurti',status:'live',stock:6,price:2899},
+    {id:3,name:'Zari Border Dupatta',status:'pending',stock:30,price:1899},
+    {id:4,name:'Handloom Cotton Saree',status:'live',stock:18,price:3499},
+  ],
+  orders: [
+    {id:'#VL-9021',product:'Midnight Silk Shawl',buyer:'Ananya Mishra',date:'Oct 24, 2023',total:12400,status:'Shipped'},
+    {id:'#VL-9026',product:'Chanderi Cotton Kurti',buyer:'Kabir Singh',date:'Oct 24, 2023',total:2899,status:'Pending'},
+    {id:'#VL-9030',product:'Handloom Cotton Saree',buyer:'Divya Rao',date:'Oct 23, 2023',total:3499,status:'Delivered'},
+    {id:'#VL-9034',product:'Midnight Silk Shawl',buyer:'Farah Khan',date:'Oct 22, 2023',total:12499,status:'Returned'},
+  ],
+  wallet: 124500,
+  payoutHistory: [
+    {ref:'#PAY-90421',amount:82400,date:'24 Mar 2024',status:'Transferred'},
+    {ref:'#PAY-90382',amount:34120,date:'22 Mar 2024',status:'Transferred'},
+    {ref:'#PAY-90311',amount:5000,date:'Processing',status:'Pending'},
+  ],
+  tickets: [
+    {id:'#ST-441',subject:'Payout delay for March settlement',status:'Open',time:'2h ago'},
+    {id:'#ST-438',subject:'Bulk product upload not working',status:'Resolved',time:'3d ago'},
+  ],
+};
+
+const money = n => '₹' + Number(n).toLocaleString('en-IN');
+const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+
+function buildNav(){
+  document.getElementById('nav').innerHTML = NAV_ITEMS.map(n=>`
+    <a class="nav-item ${n.id==='dashboard'?'active':''}" data-target="${n.id}" onclick="go('${n.id}')">${svg(n.icon)}<span>${n.label}</span></a>`).join('');
+}
+function go(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.target===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div'); t.className='toast'; t.innerHTML = `<span class="dotok"></span>${msg}`;
+  wrap.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},2600);
+}
+function openModal(id){document.getElementById(id).classList.add('active');}
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('active'); }));
+
+function statCard(s){
+  return `<div class="card"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div>
+  <div class="stat-trend ${s.warnTrend?'stat-warn':(s.up?'trend-up':'')}">${s.up?'↗ ':''}${s.trend}</div></div>`;
+}
+function statusPill(status){
+  const map = {live:['pill-success','Live'],pending:['pill-warn','Pending Review'],
+    Shipped:['pill-warn','Shipped'],Pending:['pill-info','Pending'],Delivered:['pill-success','Delivered'],Returned:['pill-danger','Returned'],
+    Transferred:['pill-success','Transferred'],Open:['pill-warn','Open'],Resolved:['pill-success','Resolved']};
+  const m = map[status] || ['pill-info', status];
+  return `<span class="pill ${m[0]}">${m[1]}</span>`;
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const live = state.products.filter(p=>p.status==='live').length;
+  const pendingOrders = state.orders.filter(o=>o.status==='Pending').length;
+  document.getElementById('dashStats').innerHTML = [
+    {label:'Wallet Balance', value:money(state.wallet), trend:'Across settled orders'},
+    {label:'Total Orders', value:state.orders.length, trend:pendingOrders+' need action', warnTrend:pendingOrders>0},
+    {label:'Live Products', value:live, trend:(state.products.length-live)+' pending review'},
+    {label:'Low Stock', value:state.products.filter(p=>p.stock<10).length, trend:'below 10 units', warnTrend:state.products.some(p=>p.stock<10)},
+  ].map(statCard).join('');
+  document.getElementById('walletBalanceDash').textContent = money(state.wallet);
+
+  const weeks=[18,26,22,34];
+  document.getElementById('salesChart').innerHTML = weeks.map((v,i)=>`<div class="bar-col"><div class="bar" style="height:${v*3.5}px"></div><div class="lbl">Week ${i+1}</div></div>`).join('');
+
+  document.getElementById('recentOrdersBody').innerHTML = state.orders.slice(0,4).map(o=>`
+    <tr><td>${o.id}</td><td>${o.product}</td><td>${o.buyer}</td><td>${money(o.total)}</td><td>${statusPill(o.status)}</td></tr>`).join('');
+}
+
+/* ---------- ADD PRODUCT ---------- */
+function submitProduct(){
+  const name=document.getElementById('np-name').value.trim();
+  if(!name){toast('Please enter a product name');return;}
+  const price=parseInt(document.getElementById('np-price').value)||0;
+  const stock=parseInt(document.getElementById('np-stock').value)||0;
+  state.products.unshift({id:Date.now(),name,status:'pending',stock,price});
+  toast(`"${name}" submitted for admin approval`);
+  document.getElementById('np-name').value=''; document.getElementById('np-desc').value='';
+  renderManageProducts(); renderInventory(); renderDashboard();
+  go('manage-products');
+}
+
+/* ---------- MANAGE PRODUCTS ---------- */
+function renderManageProducts(){
+  document.getElementById('myProductCount').textContent = state.products.length + ' products';
+  document.getElementById('myProductsBody').innerHTML = state.products.map(p=>`
+    <tr><td style="font-weight:600;">${p.name}</td><td>${statusPill(p.status)}</td>
+    <td style="${p.stock<10?'color:var(--danger);font-weight:600;':''}">${p.stock} units</td><td>${money(p.price)}</td>
+    <td><button class="btn btn-sm btn-danger-outline" onclick="deleteProduct(${p.id})">Delete</button></td></tr>`).join('');
+}
+function deleteProduct(id){
+  const p=state.products.find(x=>x.id===id); state.products=state.products.filter(x=>x.id!==id);
+  toast(`"${p.name}" removed from catalog`); renderManageProducts(); renderInventory(); renderDashboard();
+}
+
+/* ---------- ORDERS ---------- */
+const ORDER_STATUSES=['Pending','Shipped','Delivered','Returned'];
+function renderOrders(){
+  const pending=state.orders.filter(o=>o.status==='Pending').length;
+  const shipped=state.orders.filter(o=>o.status==='Shipped').length;
+  const revenue=state.orders.reduce((a,o)=>a+o.total,0);
+  document.getElementById('orderStats').innerHTML = [
+    {label:'Total Orders', value:state.orders.length, trend:'All time'},
+    {label:'Pending Fulfillment', value:pending, trend:'Needs shipping', warnTrend:pending>0},
+    {label:'In Transit', value:shipped, trend:'Currently shipped'},
+    {label:'Total Order Value', value:money(revenue), trend:'Gross this period'},
+  ].map(statCard).join('');
+  document.getElementById('ordersBody').innerHTML = state.orders.map(o=>`
+    <tr><td>${o.id}</td><td>${o.product}</td><td>${o.buyer}</td><td>${o.date}</td><td>${money(o.total)}</td>
+    <td><select onchange="updateOrderStatus('${o.id}',this.value)" style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12.5px;background:var(--surface);color:var(--text);">
+      ${ORDER_STATUSES.map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td></tr>`).join('');
+}
+function updateOrderStatus(id,status){
+  const o=state.orders.find(x=>x.id===id); o.status=status;
+  toast(`${id} marked as ${status}`); renderOrders(); renderDashboard();
+}
+
+/* ---------- INVENTORY ---------- */
+function renderInventory(){
+  document.getElementById('inventoryBody').innerHTML = state.products.map(p=>`
+    <tr><td style="font-weight:600;">${p.name}</td>
+    <td style="${p.stock<10?'color:var(--danger);font-weight:600;':''}">${p.stock} units ${p.stock<10?'⚠':''}</td>
+    <td style="width:160px;"><div class="progress"><div style="width:${Math.min(p.stock,100)}%;background:${p.stock<10?'var(--danger)':'var(--accent)'};"></div></div></td>
+    <td style="display:flex;gap:6px;">
+      <button class="btn btn-sm btn-outline" onclick="adjustStock(${p.id},10)">+10</button>
+      <button class="btn btn-sm btn-outline" onclick="adjustStock(${p.id},-10)">-10</button>
+    </td></tr>`).join('');
+}
+function adjustStock(id,delta){
+  const p=state.products.find(x=>x.id===id); p.stock=Math.max(0,p.stock+delta);
+  toast(`${p.name} stock updated to ${p.stock}`); renderInventory(); renderManageProducts(); renderDashboard();
+}
+
+/* ---------- EARNINGS ---------- */
+function renderEarnings(){
+  const gross = state.orders.reduce((a,o)=>a+o.total,0);
+  const commission = Math.round(gross*0.15);
+  const net = gross-commission;
+  document.getElementById('earningsStats').innerHTML = [
+    {label:'Gross Sales', value:money(gross), trend:'Before commission'},
+    {label:'Platform Commission (15%)', value:money(commission), trend:'Deducted automatically'},
+    {label:'Net Earnings', value:money(net), trend:'Added to wallet', up:true},
+  ].map(statCard).join('');
+  document.getElementById('earningsBody').innerHTML = state.orders.map(o=>{
+    const comm=Math.round(o.total*0.15);
+    return `<tr><td>${o.id}</td><td>${money(o.total)}</td><td>${money(comm)}</td><td>${money(o.total-comm)}</td><td>${statusPill(o.status==='Delivered'?'Transferred':o.status)}</td></tr>`;
+  }).join('');
+}
+
+/* ---------- PAYOUT ---------- */
+function renderPayout(){
+  document.getElementById('walletBalancePayout').textContent = money(state.wallet);
+  document.getElementById('payoutHistory').innerHTML = state.payoutHistory.map(p=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:2px;padding:12px 14px;">
+      <div><div style="font-weight:600;font-size:13.5px;">${p.ref}</div><div style="font-size:12px;color:var(--muted);">${p.date}</div></div>
+      <div style="text-align:right;"><div style="font-weight:700;">${money(p.amount)}</div>${statusPill(p.status)}</div>
+    </div>`).join('');
+}
+function requestPayout(){
+  const amt = parseInt(document.getElementById('payoutAmount').value);
+  if(!amt || amt<=0){toast('Enter a valid amount');return;}
+  if(amt > state.wallet){toast('Amount exceeds available balance');return;}
+  state.wallet -= amt;
+  state.payoutHistory.unshift({ref:'#PAY-'+Math.floor(90000+Math.random()*9999),amount:amt,date:'Processing',status:'Pending'});
+  toast(`Payout of ${money(amt)} requested`);
+  document.getElementById('payoutAmount').value='';
+  renderPayout(); renderDashboard();
+}
+
+/* ---------- SUPPORT ---------- */
+function renderTickets(){
+  document.getElementById('ticketsList').innerHTML = state.tickets.map(t=>`
+    <div class="ticket">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><span style="font-weight:700;font-size:11.5px;color:var(--accent-dark);">${t.id}</span>
+        <span style="font-size:13px;font-weight:600;margin-left:10px;">${t.subject}</span></div>
+        ${statusPill(t.status)}
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">${t.time}</div>
+    </div>`).join('') || `<div class="empty"><div class="big">No tickets yet</div>Raise a ticket if you need help from the Admin team.</div>`;
+}
+function raiseTicket(){
+  const subject=document.getElementById('t-subject').value.trim();
+  if(!subject){toast('Please enter a subject');return;}
+  state.tickets.unshift({id:'#ST-'+Math.floor(400+Math.random()*99),subject,status:'Open',time:'Just now'});
+  closeModal('modal-ticket'); toast('Support ticket raised'); renderTickets();
+  document.getElementById('t-subject').value=''; document.getElementById('t-details').value='';
+}
+
+/* ---------- THEME ---------- */
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  document.body.classList.toggle('dark');
+  toast(document.body.classList.contains('dark') ? 'Dark mode enabled' : 'Light mode enabled');
+});
+
+/* ---------- INIT ---------- */
+function renderAll(){
+  renderDashboard(); renderManageProducts(); renderOrders(); renderInventory();
+  renderEarnings(); renderPayout(); renderTickets();
+}
+buildNav();
+renderAll();
+</script>
+</body>
+</html>
