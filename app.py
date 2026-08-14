@@ -36,10 +36,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(
     __name__,
-    template_folder="admin",
+    template_folder="templates",
     static_folder="static"
 )
-
 print("Template folder:", app.template_folder)
 
 UPLOAD_FOLDER = "static/uploads"
@@ -72,6 +71,49 @@ app.config["MAIL_DEFAULT_SENDER"] = config.MAIL_DEFAULT_SENDER
 mysql.init_app(app)
 mail.init_app(app)
 
+@app.route("/")
+def index():
+    return redirect("/login")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT
+                id,
+                full_name,
+                password
+            FROM users
+            WHERE email=%s
+        """, (email,))
+
+        user = cur.fetchone()
+        cur.close()
+        if user:
+
+            if check_password_hash(user[2], password):
+                session["user_id"] = user[0]
+                session["user_name"] = user[1]
+                flash("Login Successful!", "success")
+                return redirect("/home")
+
+            else:
+                flash("Incorrect Password!", "danger")
+        else:
+            flash("Email not found!", "danger")
+    return render_template("login.html")
+
+@app.route("/home")
+def home():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    return render_template("home.html")
 
 def save_upload(file_obj, folder, url_prefix):
     """Save an uploaded file if present and return its stored relative path, else None."""
@@ -544,7 +586,7 @@ def payment_success():
 @app.route("/confirmation")
 def confirmation():
 
-    return render_template("templates/confirmation.html")
+    return render_template("confirmation.html")
 
 
 @app.route("/api/products")
@@ -637,8 +679,11 @@ def api_products():
 
 @app.route("/shop")
 def shop():
-    print("SHOP TEMPLATE LOADED")
-    return render_template("templates/shop.html")
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    return render_template("shop.html")
 
 
 #add to cart
