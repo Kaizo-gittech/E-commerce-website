@@ -88,7 +88,34 @@ tbody tr:last-child td{border-bottom:none;} tbody tr:hover{background:var(--acce
 
 .chip{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
 .row-name{display:flex;align-items:center;gap:10px;} .row-name .sub{font-size:12px;color:var(--muted);}
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 25px;
+    background:#ffffff;
+    box-shadow:0 2px 10px rgba(84, 82, 82, 0.08);
+}
 
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logout-btn{
+    background:#342f2f;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    transition:.3s;
+}
+
+.logout-btn:hover{
+    background:hsl(0, 0%, 33%);
+}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
 .field label{font-size:11.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
@@ -141,6 +168,17 @@ input:checked + .slider-tg{background:var(--accent);} input:checked + .slider-tg
 </style>
 </head>
 <body>
+<div class="top-bar">
+    <h2>Seller Dashboard</h2>
+
+    <div class="top-actions">
+        <span>Welcome, {{ session.seller_name }}</span>
+
+        <a href="{{ url_for('seller_logout') }}" class="logout-btn">
+            Logout
+        </a>
+    </div>
+</div>
 
 <div class="app">
   <aside class="sidebar">
@@ -193,56 +231,177 @@ input:checked + .slider-tg{background:var(--accent);} input:checked + .slider-tg
       </div>
     </section>
 
-    <!-- ADD PRODUCT -->
-    <section class="section" id="sec-add-product">
-      <div class="page-head"><div><h1>Add Product</h1><p>List a new item for admin review before it goes live.</p></div></div>
-      <div class="grid cols-2">
-        <div class="card">
-          <div class="field"><label>Product Name</label><input id="np-name" placeholder="Product Name"></div>
-          <div class="form-grid">
-            <div class="field"><label>Category</label><select id="np-cat">
-              <option>Select a Category</option>
-              <option>Cosmetics</option>
-              <option>Footwear</option>
-              <option>Jewellery</option>
-              <option>Bags</option>
-              <option>Perfume</option>
-            </select></div>
-            <div class="field"><label>SKU</label><input id="np-sku" placeholder="Auto-generated if left blank"></div>
-            <div class="field"><label>Price (₹)</label><input id="np-price" type="number" value="0"></div>
-            <div class="field"><label>Stock (units)</label><input id="np-stock" type="number" value="0"></div>
-          </div>
-          <div class="field"><label>Description</label><textarea id="np-desc" rows="3" placeholder="Fabric, craft, care instructions…"></textarea></div>
-          <div class="field"><label>Product Images</label>
-            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
-            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
-            <div class="upload-box">📷 Click to upload — PNG, JPG up to 5MB</div>
-          </div>
-          <button class="btn btn-dark" onclick="submitProduct()">Submit for Approval</button>
+   <!-- ADD PRODUCT -->
+<section class="section" id="sec-add-product">
+  <div class="page-head">
+    <div>
+      <h1>Add Product</h1>
+      <p>List a new item for admin review before it goes live.</p>
+    </div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="field">
+        <label>Product Name</label>
+        <input
+          id="product_name"
+          type="text"
+          placeholder="Product Name"
+        >
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Brand</label>
+          <input
+            id="brand"
+            type="text"
+            placeholder="Brand"
+          >
         </div>
-        <div class="card" style="background:var(--accent-soft);border:none;height:fit-content;">
-          <h3 class="section-title" style="margin-bottom:10px;">Listing Guidelines</h3>
-          <ul style="font-size:13px;color:var(--text);line-height:1.9;padding-left:18px;">
-            <li>All listings require Admin approval before going live.</li>
-            <li>Use natural light photography on a neutral background.</li>
-            <li>Stock below 10 units triggers a low-stock alert.</li>
-            <li>Pricing should be inclusive of applicable GST.</li>
-          </ul>
+        <div class="field">
+    <label>Category</label>
+
+    <select id="type_id" name="type_id">
+
+        <option value="">
+            Select Category
+        </option>
+        <option value="1">
+            Cosmetics
+        </option>
+        <option value="2">
+            Jewellery
+        </option>
+        <option value="3">
+            Footwear
+        </option>
+        <option value="4">
+            Bags
+        </option>
+        <option value="5">
+            Perfumes
+        </option>
+    </select>
+</div>
+        <div class="field">
+          <label>Material</label>
+          <input
+            id="material"
+            type="text"
+            placeholder="Material"
+          >
+        </div>
+        <div class="field">
+          <label>Price (₹)</label>
+          <input
+            id="price"
+            type="number"
+            min="0"
+            placeholder="Price"
+          >
+        </div>
+        <div class="field">
+          <label>Stock (units)</label>
+          <input
+            id="stock"
+            type="number"
+            min=""
+            placeholder="Stock"
+          >
         </div>
       </div>
-    </section>
+      <div class="field">
+        <label>Description</label>
+        <textarea
+          id="description"
+          rows="3"
+          placeholder="Fabric, craft, care instructions..."
+        ></textarea>
+      </div>
+      <div class="field">
+        <label>Product Images</label>
+        <input
+            type="file"
+            name="product_images"
+            id="product_image_1"
+            accept=".jpg,.jpeg,.png,.webp"
+        >
+
+        <input
+            type="file"
+            name="product_images"
+            id="product_image_2"
+            accept=".jpg,.jpeg,.png,.webp"
+            style="margin-top:10px;"
+        >
+
+        <input
+            type="file"
+            name="product_images"
+            id="product_image_3"
+            accept=".jpg,.jpeg,.png,.webp"
+            style="margin-top:10px;"
+        >
+      </div>
+      <button
+        class="btn btn-dark"
+        type="button"
+        onclick="addSellerProduct()"
+      >
+        Submit for Approval
+      </button>
+
+    </div>
+    <div
+      class="card"
+      style="background:var(--accent-soft);border:none;height:fit-content;"
+    >
+      <h3
+        class="section-title"
+        style="margin-bottom:10px;"
+      >
+        Listing Guidelines
+      </h3>
+      <ul
+        style="
+          font-size:13px;
+          color:var(--text);
+          line-height:1.9;
+          padding-left:18px;
+        "
+      >
+        <li>All listings require Admin approval before going live.</li>
+        <li>Use natural light photography on a neutral background.</li>
+        <li>Stock below 10 units triggers a low-stock alert.</li>
+        <li>Pricing should be inclusive of applicable GST.</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
     <!-- MANAGE PRODUCTS -->
-    <section class="section" id="sec-manage-products">
-      <div class="page-head"><div><h1>Manage Products</h1><p>Edit pricing, stock, and visibility for your live catalog.</p></div>
-        <button class="btn btn-dark" onclick="go('add-product')">+ Add Product</button>
+  <section class="section" id="sec-manage-products">
+
+    <div class="page-head">
+      <div>
+        <h1>My Products</h1>
+        <p>Products added by your store and their sales.</p>
       </div>
-      <div class="card">
-        <div class="card-head"><h3 class="section-title">Your Catalog</h3><span style="font-size:13px;color:var(--muted);" id="myProductCount"></span></div>
-        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Status</th><th>Stock</th><th>Price</th><th></th></tr></thead>
-        <tbody id="myProductsBody"></tbody></table></div>
-      </div>
-    </section>
+
+      <button
+        class="btn btn-dark"
+        onclick="go('add-product')">
+        + Add Product
+      </button>
+    </div>
+
+
+    <!-- PRODUCTS FROM MYSQL -->
+    <div id="productsContainer">
+
+    </div>
+
+  </section>
 
     <!-- ORDERS -->
     <section class="section" id="sec-orders">
@@ -351,33 +510,74 @@ const NAV_ITEMS = [
   {id:'support', label:'Support Tickets', icon:'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'},
 ];
 
-let state = {
-  products: [
-    {id:1,name:'Midnight Silk Shawl',status:'live',stock:85,price:12499},
-    {id:2,name:'Chanderi Cotton Kurti',status:'live',stock:6,price:2899},
-    {id:3,name:'Zari Border Dupatta',status:'pending',stock:30,price:1899},
-    {id:4,name:'Handloom Cotton Saree',status:'live',stock:18,price:3499},
-  ],
-  orders: [
-    {id:'#VL-9021',product:'Midnight Silk Shawl',buyer:'Ananya Mishra',date:'Oct 24, 2023',total:12400,status:'Shipped'},
-    {id:'#VL-9026',product:'Chanderi Cotton Kurti',buyer:'Kabir Singh',date:'Oct 24, 2023',total:2899,status:'Pending'},
-    {id:'#VL-9030',product:'Handloom Cotton Saree',buyer:'Divya Rao',date:'Oct 23, 2023',total:3499,status:'Delivered'},
-    {id:'#VL-9034',product:'Midnight Silk Shawl',buyer:'Farah Khan',date:'Oct 22, 2023',total:12499,status:'Returned'},
-  ],
-  wallet: 124500,
-  payoutHistory: [
-    {ref:'#PAY-90421',amount:82400,date:'24 Mar 2024',status:'Transferred'},
-    {ref:'#PAY-90382',amount:34120,date:'22 Mar 2024',status:'Transferred'},
-    {ref:'#PAY-90311',amount:5000,date:'Processing',status:'Pending'},
-  ],
-  tickets: [
-    {id:'#ST-441',subject:'Payout delay for March settlement',status:'Open',time:'2h ago'},
-    {id:'#ST-438',subject:'Bulk product upload not working',status:'Resolved',time:'3d ago'},
-  ],
-};
-
 const money = n => '₹' + Number(n).toLocaleString('en-IN');
 const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const state = {
+    products: [],
+    orders: [],
+    wallet: 0,
+    payoutHistory: [],
+    tickets: []
+};
+async function loadSellerProducts() {
+
+    try {
+
+        const response = await fetch("/seller/products");
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            toast(data.message || "Failed to load products");
+            return;
+        }
+
+        state.products = data.products || [];
+        state.orders = [];
+
+        data.products.forEach(product => {
+
+            (product.orders || []).forEach(order => {
+
+                state.orders.push({
+                    id: order.order_id,
+                    product: product.name,
+                    buyer: order.customer
+                        ? order.customer.name
+                        : "Unknown",
+                    buyer_id: order.customer
+                        ? order.customer.id
+                        : null,
+                    email: order.customer
+                        ? order.customer.email
+                        : "",
+                    phone: order.customer
+                        ? order.customer.phone
+                        : "",
+                    date: order.order_date,
+                    total: Number(order.total_amount || 0),
+                    commission_percent:
+                        Number(order.commission_percent || 0),
+                    commission:
+                        Number(order.commission_amount || 0),
+                    earning:
+                        Number(order.seller_earning || 0),
+                    status: order.order_status || "Pending",
+                    quantity: Number(order.quantity || 0)
+                });
+
+            });
+
+        });
+
+        renderAll();
+
+    } catch (error) {
+
+        console.error("LOAD SELLER PRODUCTS ERROR:", error);
+        toast("Failed to load products");
+
+    }
+}
 
 function buildNav(){
   document.getElementById('nav').innerHTML = NAV_ITEMS.map(n=>`
@@ -403,17 +603,39 @@ function statCard(s){
   return `<div class="card"><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div>
   <div class="stat-trend ${s.warnTrend?'stat-warn':(s.up?'trend-up':'')}">${s.up?'↗ ':''}${s.trend}</div></div>`;
 }
-function statusPill(status){
-  const map = {live:['pill-success','Live'],pending:['pill-warn','Pending Review'],
-    Shipped:['pill-warn','Shipped'],Pending:['pill-info','Pending'],Delivered:['pill-success','Delivered'],Returned:['pill-danger','Returned'],
-    Transferred:['pill-success','Transferred'],Open:['pill-warn','Open'],Resolved:['pill-success','Resolved']};
-  const m = map[status] || ['pill-info', status];
-  return `<span class="pill ${m[0]}">${m[1]}</span>`;
+function statusPill(status) {
+
+    const map = {
+
+        Approved: ['pill-success', 'Live'],
+        Pending: ['pill-info', 'Pending'],
+        Processing: ['pill-warn', 'Processing'],
+        Shipped: ['pill-warn', 'Shipped'],
+        Delivered: ['pill-success', 'Delivered'],
+        Cancelled: ['pill-danger', 'Cancelled'],
+
+        Transferred: ['pill-success', 'Transferred'],
+
+        Open: ['pill-warn', 'Open'],
+        Resolved: ['pill-success', 'Resolved']
+
+    };
+
+    const m = map[status] || ['pill-info', status];
+
+    return `
+        <span class="pill ${m[0]}">
+            ${m[1]}
+        </span>
+    `;
 }
 
 /* ---------- DASHBOARD ---------- */
 function renderDashboard(){
-  const live = state.products.filter(p=>p.status==='live').length;
+  const live = state.products.filter(
+    p => p.status === 'Approved'
+).length;
+
   const pendingOrders = state.orders.filter(o=>o.status==='Pending').length;
   document.getElementById('dashStats').innerHTML = [
     {label:'Wallet Balance', value:money(state.wallet), trend:'Across settled orders'},
@@ -431,51 +653,492 @@ function renderDashboard(){
 }
 
 /* ---------- ADD PRODUCT ---------- */
-function submitProduct(){
-  const name=document.getElementById('np-name').value.trim();
-  if(!name){toast('Please enter a product name');return;}
-  const price=parseInt(document.getElementById('np-price').value)||0;
-  const stock=parseInt(document.getElementById('np-stock').value)||0;
-  state.products.unshift({id:Date.now(),name,status:'pending',stock,price});
-  toast(`"${name}" submitted for admin approval`);
-  document.getElementById('np-name').value=''; document.getElementById('np-desc').value='';
-  renderManageProducts(); renderInventory(); renderDashboard();
-  go('manage-products');
+async function submitProduct() {
+
+    const productName = document.getElementById("np-name").value.trim();
+    const category = document.getElementById("np-cat").value;
+    const sku = document.getElementById("np-sku").value.trim();
+    const price = document.getElementById("np-price").value;
+    const stock = document.getElementById("np-stock").value;
+    const description = document.getElementById("np-desc").value.trim();
+
+    if (!productName || category === "Select a Category" || !price || !stock) {
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/seller/product/add", {
+            method: "POST",
+            body: JSON.stringify({
+
+                product_name: productName,
+                brand: "Seller Brand",
+                material: "Not specified",
+
+                price: price,
+                stock: stock,
+
+                type_id: 1,
+                material_id: null,
+
+                description: description
+
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            alert(data.message || "Failed to submit product.");
+            return;
+        }
+
+        // SUCCESS ALERT
+        alert("Product submitted successfully! Waiting for admin approval.");
+
+        // Clear form
+        document.getElementById("np-name").value = "";
+        document.getElementById("np-cat").value = "Select a Category";
+        document.getElementById("np-sku").value = "";
+        document.getElementById("np-price").value = "";
+        document.getElementById("np-stock").value = "";
+        document.getElementById("np-desc").value = "";
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Something went wrong while submitting the product.");
+
+    }
 }
 
 /* ---------- MANAGE PRODUCTS ---------- */
-function renderManageProducts(){
-  document.getElementById('myProductCount').textContent = state.products.length + ' products';
-  document.getElementById('myProductsBody').innerHTML = state.products.map(p=>`
-    <tr><td style="font-weight:600;">${p.name}</td><td>${statusPill(p.status)}</td>
-    <td style="${p.stock<10?'color:var(--danger);font-weight:600;':''}">${p.stock} units</td><td>${money(p.price)}</td>
-    <td><button class="btn btn-sm btn-danger-outline" onclick="deleteProduct(${p.id})">Delete</button></td></tr>`).join('');
+function renderManageProducts() {
+
+    const container = document.getElementById("productsContainer");
+
+    if (!container) return;
+
+    if (!state.products || state.products.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+                <div class="big">No products yet</div>
+                Add your first product to your store.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="card">
+
+            <div class="card-head">
+                <h3 class="section-title">My Products</h3>
+
+                <span class="link-accent">
+                    ${state.products.length} products
+                </span>
+            </div>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Orders</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        ${state.products.map(p => `
+
+                            <tr>
+
+                                <td style="font-weight:600;">
+                                    ${p.name || "-"}
+                                </td>
+
+                                <td>
+                                    ${p.brand || "-"}
+                                </td>
+
+                                <td>
+                                    ${money(p.price || 0)}
+                                </td>
+
+                                <td style="${
+                                    Number(p.stock) < 10
+                                    ? 'color:var(--danger);font-weight:600;'
+                                    : ''
+                                }">
+                                    ${p.stock ?? 0} units
+                                </td>
+
+                                <td>
+                                    ${statusPill(p.status)}
+                                </td>
+
+                                <td>
+                                    ${p.orders ? p.orders.length : 0}
+                                </td>
+
+                            </tr>
+
+                        `).join("")}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    `;
 }
 function deleteProduct(id){
   const p=state.products.find(x=>x.id===id); state.products=state.products.filter(x=>x.id!==id);
-  toast(`"${p.name}" removed from catalog`); renderManageProducts(); renderInventory(); renderDashboard();
+  toast(`"${p.name}" removed from catalog`); renderInventory(); renderDashboard();
+}
+
+async function addSellerProduct() {
+
+    const productName = document.getElementById("product_name").value.trim();
+    const brand = document.getElementById("brand").value.trim();
+    const typeId = document.getElementById("type_id").value;
+    const material = document.getElementById("material").value.trim();
+    const price = document.getElementById("price").value;
+    const stock = document.getElementById("stock").value;
+    const description = document.getElementById("description").value.trim();
+
+    const image1 = document.getElementById("product_image_1").files[0];
+    const image2 = document.getElementById("product_image_2").files[0];
+    const image3 = document.getElementById("product_image_3").files[0];
+
+
+    // ================= VALIDATION =================
+
+    if (!productName) {
+        toast("Product name is required");
+        return;
+    }
+
+    if (!brand) {
+        toast("Brand is required");
+        return;
+    }
+
+    if (!typeId) {
+        toast("Please select a category");
+        return;
+    }
+
+    if (!material) {
+        toast("Material is required");
+        return;
+    }
+
+    if (!price || Number(price) <= 0) {
+        toast("Enter a valid price");
+        return;
+    }
+
+    if (stock === "" || Number(stock) < 0) {
+        toast("Enter a valid stock quantity");
+        return;
+    }
+
+
+    // ================= FORM DATA =================
+
+    const formData = new FormData();
+
+    formData.append("product_name", productName);
+    formData.append("brand", brand);
+    formData.append("type_id", typeId);
+    formData.append("material", material);
+    formData.append("price", price);
+    formData.append("stock", stock);
+    formData.append("description", description);
+
+
+    // Add only selected images
+
+    if (image1) {
+        formData.append("product_images", image1);
+    }
+
+    if (image2) {
+        formData.append("product_images", image2);
+    }
+
+    if (image3) {
+        formData.append("product_images", image3);
+    }
+
+
+    // ================= SEND TO FLASK =================
+
+    try {
+
+        const response = await fetch(
+            "/seller/product/add",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+
+        const result = await response.json();
+
+
+        if (!response.ok || !result.success) {
+
+            toast(
+                result.message || "Failed to add product"
+            );
+
+            return;
+        }
+
+
+        toast(
+            "Product submitted for admin approval"
+        );
+
+
+        // Clear form
+
+        document.getElementById("product_name").value = "";
+        document.getElementById("brand").value = "";
+        document.getElementById("type_id").value = "";
+        document.getElementById("material").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("stock").value = "";
+        document.getElementById("description").value = "";
+
+        document.getElementById("product_image_1").value = "";
+        document.getElementById("product_image_2").value = "";
+        document.getElementById("product_image_3").value = "";
+
+
+    } catch (error) {
+
+        console.error(
+            "ADD PRODUCT ERROR:",
+            error
+        );
+
+        toast(
+            "Something went wrong while submitting product"
+        );
+    }
 }
 
 /* ---------- ORDERS ---------- */
-const ORDER_STATUSES=['Pending','Shipped','Delivered','Returned'];
-function renderOrders(){
-  const pending=state.orders.filter(o=>o.status==='Pending').length;
-  const shipped=state.orders.filter(o=>o.status==='Shipped').length;
-  const revenue=state.orders.reduce((a,o)=>a+o.total,0);
-  document.getElementById('orderStats').innerHTML = [
-    {label:'Total Orders', value:state.orders.length, trend:'All time'},
-    {label:'Pending Fulfillment', value:pending, trend:'Needs shipping', warnTrend:pending>0},
-    {label:'In Transit', value:shipped, trend:'Currently shipped'},
-    {label:'Total Order Value', value:money(revenue), trend:'Gross this period'},
-  ].map(statCard).join('');
-  document.getElementById('ordersBody').innerHTML = state.orders.map(o=>`
-    <tr><td>${o.id}</td><td>${o.product}</td><td>${o.buyer}</td><td>${o.date}</td><td>${money(o.total)}</td>
-    <td><select onchange="updateOrderStatus('${o.id}',this.value)" style="border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12.5px;background:var(--surface);color:var(--text);">
-      ${ORDER_STATUSES.map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select></td></tr>`).join('');
+const ORDER_STATUSES = [
+    'Pending',
+    'Processing',
+    'Shipped',
+    'Delivered',
+    'Cancelled'
+];
+
+function renderOrders() {
+
+    const pending = state.orders.filter(
+        o => o.status === 'Pending'
+    ).length;
+
+    const shipped = state.orders.filter(
+        o => o.status === 'Shipped'
+    ).length;
+
+    const revenue = state.orders.reduce(
+        (total, o) => total + Number(o.total || 0),
+        0
+    );
+
+    document.getElementById('orderStats').innerHTML = [
+
+        {
+            label: 'Total Orders',
+            value: state.orders.length,
+            trend: 'All orders'
+        },
+
+        {
+            label: 'Pending Fulfillment',
+            value: pending,
+            trend: 'Needs shipping',
+            warnTrend: pending > 0
+        },
+
+        {
+            label: 'In Transit',
+            value: shipped,
+            trend: 'Currently shipped'
+        },
+
+        {
+            label: 'Total Order Value',
+            value: money(revenue),
+            trend: 'Gross order value'
+        }
+
+    ].map(statCard).join('');
+
+
+    const body = document.getElementById('ordersBody');
+
+    if (!body) return;
+
+
+    if (!state.orders.length) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;padding:30px;">
+                    No orders found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML = state.orders.map(o => `
+
+        <tr>
+
+            <td>
+                <strong>#${o.id}</strong>
+            </td>
+
+            <td>
+                ${o.product}
+                <div style="font-size:11px;color:var(--muted);">
+                    Qty: ${o.quantity}
+                </div>
+            </td>
+
+            <td>
+                ${o.buyer}
+
+                <div style="font-size:11px;color:var(--muted);">
+                    ${o.email || ''}
+                </div>
+            </td>
+
+            <td>
+                ${o.date}
+            </td>
+
+            <td>
+                ${money(o.total)}
+            </td>
+
+            <td>
+
+                <select
+                    onchange="updateOrderStatus('${o.id}', this.value)"
+                    style="
+                        border:1px solid var(--border);
+                        border-radius:4px;
+                        padding:5px 8px;
+                        font-size:12.5px;
+                        background:var(--surface);
+                        color:var(--text);
+                    "
+                >
+
+                    ${ORDER_STATUSES.map(status => `
+                        <option
+                            value="${status}"
+                            ${o.status === status ? 'selected' : ''}
+                        >
+                            ${status}
+                        </option>
+                    `).join('')}
+
+                </select>
+
+            </td>
+
+        </tr>
+
+    `).join('');
 }
-function updateOrderStatus(id,status){
-  const o=state.orders.find(x=>x.id===id); o.status=status;
-  toast(`${id} marked as ${status}`); renderOrders(); renderDashboard();
+async function updateOrderStatus(id, status) {
+
+    const order = state.orders.find(o => o.id == id);
+
+    if (!order) {
+        toast("Order not found");
+        return;
+    }
+
+    const oldStatus = order.status;
+
+    try {
+
+        const response = await fetch(
+            `/seller/order/${id}/status`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    status: status
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+
+            order.status = oldStatus;
+
+            toast(data.message || "Failed to update order");
+
+            renderOrders();
+            renderDashboard();
+
+            return;
+        }
+
+        order.status = status;
+
+        toast(`Order #${id} marked as ${status}`);
+
+        renderOrders();
+        renderDashboard();
+
+    } catch (error) {
+
+        console.error("UPDATE ORDER STATUS ERROR:", error);
+
+        order.status = oldStatus;
+
+        renderOrders();
+        renderDashboard();
+
+        toast("Could not update order status");
+    }
 }
 
 /* ---------- INVENTORY ---------- */
@@ -495,21 +1158,72 @@ function adjustStock(id,delta){
 }
 
 /* ---------- EARNINGS ---------- */
-function renderEarnings(){
-  const gross = state.orders.reduce((a,o)=>a+o.total,0);
-  const commission = Math.round(gross*0.15);
-  const net = gross-commission;
-  document.getElementById('earningsStats').innerHTML = [
-    {label:'Gross Sales', value:money(gross), trend:'Before commission'},
-    {label:'Platform Commission (15%)', value:money(commission), trend:'Deducted automatically'},
-    {label:'Net Earnings', value:money(net), trend:'Added to wallet', up:true},
-  ].map(statCard).join('');
-  document.getElementById('earningsBody').innerHTML = state.orders.map(o=>{
-    const comm=Math.round(o.total*0.15);
-    return `<tr><td>${o.id}</td><td>${money(o.total)}</td><td>${money(comm)}</td><td>${money(o.total-comm)}</td><td>${statusPill(o.status==='Delivered'?'Transferred':o.status)}</td></tr>`;
-  }).join('');
-}
+function renderEarnings() {
 
+    const gross = state.orders.reduce(
+        (sum, order) => sum + order.total,
+        0
+    );
+
+    const commission = state.orders.reduce(
+        (sum, order) => sum + order.commission,
+        0
+    );
+
+    const net = state.orders.reduce(
+        (sum, order) => sum + order.earning,
+        0
+    );
+
+    document.getElementById('earningsStats').innerHTML = [
+
+        {
+            label: 'Gross Sales',
+            value: money(gross),
+            trend: 'Before commission'
+        },
+
+        {
+            label: 'Platform Commission',
+            value: money(commission),
+            trend: 'Deducted automatically'
+        },
+
+        {
+            label: 'Net Earnings',
+            value: money(net),
+            trend: 'Seller earnings',
+            up: true
+        }
+
+    ].map(statCard).join('');
+
+
+    document.getElementById('earningsBody').innerHTML =
+        state.orders.map(order => `
+
+            <tr>
+
+                <td>#${order.id}</td>
+
+                <td>${money(order.total)}</td>
+
+                <td>${money(order.commission)}</td>
+
+                <td>${money(order.earning)}</td>
+
+                <td>
+                    ${statusPill(
+                        order.status === 'Delivered'
+                            ? 'Transferred'
+                            : order.status
+                    )}
+                </td>
+
+            </tr>
+
+        `).join('');
+}
 /* ---------- PAYOUT ---------- */
 function renderPayout(){
   document.getElementById('walletBalancePayout').textContent = money(state.wallet);
@@ -562,7 +1276,7 @@ function renderAll(){
   renderEarnings(); renderPayout(); renderTickets();
 }
 buildNav();
-renderAll();
+loadSellerProducts();
 </script>
 </body>
 </html>

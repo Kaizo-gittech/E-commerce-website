@@ -1,4 +1,3 @@
-import razorpay
 import os
 import random
 from flask import (
@@ -11,37 +10,61 @@ from flask import (
     url_for,
     jsonify
 )
-
-from flask import url_for
 from werkzeug.security import (
     generate_password_hash,
     check_password_hash
 )
-import os
 from werkzeug.utils import secure_filename
-from database import mysql
+from database import get_connection
 from mail import mail, send_seller_status_email
 import config
 
-client = razorpay.Client(
-    auth=(
-        config.RAZORPAY_KEY_ID,
-        config.RAZORPAY_KEY_SECRET
-    )
-)
-
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 app = Flask(
     __name__,
     template_folder="templates",
     static_folder="static"
 )
+
+app.jinja_loader = ChoiceLoader([
+    FileSystemLoader("templates"),
+    FileSystemLoader("Admin"),
+    FileSystemLoader("Seller")
+])
+import os
+
+print("Root Path:", app.root_path)
+print("Template Folder:", app.template_folder)
+print("Admin Login Exists:",
+      os.path.exists(
+          os.path.join(app.root_path, "templates", "Admin", "admin_login.html")
+      ))
 print("Template folder:", app.template_folder)
 
-UPLOAD_FOLDER = "static/uploads"
+# PRODUCT IMAGE UPLOAD CONFIGURATION
+UPLOAD_FOLDER = os.path.join(
+    app.static_folder,
+    "uploads",
+    "products"
+)
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_IMAGE_EXTENSIONS = {
+    "jpg",
+    "jpeg",
+    "png",
+    "webp"
+}
+
+
+def allowed_image(filename):
+    return (
+        "." in filename
+        and filename.rsplit(".", 1)[1].lower()
+        in ALLOWED_IMAGE_EXTENSIONS
+    )
 
 SHOP_LOGO_FOLDER = os.path.join(UPLOAD_FOLDER, "shop_logos")
 GST_FOLDER = os.path.join(UPLOAD_FOLDER, "gst")
@@ -55,12 +78,6 @@ os.makedirs(PRODUCT_FOLDER, exist_ok=True)
 
 app.secret_key = config.SECRET_KEY
 
-app.config["MYSQL_HOST"] = config.MYSQL_HOST
-app.config["MYSQL_USER"] = config.MYSQL_USER
-app.config["MYSQL_PASSWORD"] = config.MYSQL_PASSWORD
-app.config["MYSQL_DB"] = config.MYSQL_DB
-
-# --- Mail config ---
 app.config["MAIL_SERVER"] = config.MAIL_SERVER
 app.config["MAIL_PORT"] = config.MAIL_PORT
 app.config["MAIL_USE_TLS"] = config.MAIL_USE_TLS
@@ -68,20 +85,375 @@ app.config["MAIL_USERNAME"] = config.MAIL_USERNAME
 app.config["MAIL_PASSWORD"] = config.MAIL_PASSWORD
 app.config["MAIL_DEFAULT_SENDER"] = config.MAIL_DEFAULT_SENDER
 
-mysql.init_app(app)
 mail.init_app(app)
+
 
 @app.route("/")
 def index():
-    return redirect("/login")
+    return render_template("index.html")
+
+
+@app.route("/checkout")
+def checkout():
+
+    if "user_id" not in session:
+        return redirect(url_for("login", next="/checkout"))
+
+    return render_template(
+        "checkout.html",
+        user_id=session["user_id"],
+        user_name=session.get("user_name")
+    )
+
+
+@app.route("/account")
+def account():
+
+    if "user_id" not in session:
+        return redirect(url_for("login", next="/account"))
+
+    conn = get_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT
+            id,
+            full_name,
+            email,
+            phone,
+            profile_image,
+            gender,
+            address,
+            landmark,
+            pincode
+        FROM users
+        WHERE id = %s
+    """, (session["user_id"],))
+
+    user = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not user:
+        session.clear()
+        return redirect(url_for("login"))
+
+    return render_template(
+        "account.html",
+        user=user
+    )
+
+@app.route("/api/account/profile", methods=["POST"])
+def update_profile():
+
+    if "user_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Please login first."
+        }), 401
+
+    data = request.get_json()
+
+    full_name = data.get("full_name", "").strip()
+    email = data.get("email", "").strip()
+
+    if not full_name or not email:
+        return jsonify({
+            "success": False,
+            "message": "Name and email are required."
+        }), 400
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    try:
+
+        cur.execute("""
+            UPDATE users
+            SET full_name = %s,
+                email = %s
+            WHERE id = %s
+        """, (
+            full_name,
+            email,
+            session["user_id"]
+        ))
+
+        conn.commit()
+
+        session["user_name"] = full_name
+
+        return jsonify({
+            "success": True,
+            "message": "Profile updated successfully."
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("PROFILE UPDATE ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+        cur.close()
+        conn.close()
+
+@app.route("/api/account/details", methods=["POST"])
+def update_details():
+
+    if "user_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Please login first."
+        }), 401
+
+    data = request.get_json()
+
+    phone = data.get("phone", "").strip()
+    gender = data.get("gender", "").strip()
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    try:
+
+        cur.execute("""
+            UPDATE users
+            SET phone = %s,
+                gender = %s
+            WHERE id = %s
+        """, (
+            phone,
+            gender,
+            session["user_id"]
+        ))
+
+        conn.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Details updated successfully."
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("DETAIL UPDATE ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+        cur.close()
+        conn.close()
+
+@app.route("/api/account/address", methods=["POST"])
+def update_address():
+
+    if "user_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Please login first."
+        }), 401
+
+    data = request.get_json()
+
+    address = data.get("address", "").strip()
+    landmark = data.get("landmark", "").strip()
+    pincode = data.get("pincode", "").strip()
+
+    if not address or not landmark or not pincode:
+        return jsonify({
+            "success": False,
+            "message": "All address fields are required."
+        }), 400
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    try:
+
+        cur.execute("""
+            UPDATE users
+            SET address = %s,
+                landmark = %s,
+                pincode = %s
+            WHERE id = %s
+        """, (
+            address,
+            landmark,
+            pincode,
+            session["user_id"]
+        ))
+
+        conn.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Address updated successfully."
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("ADDRESS UPDATE ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+        cur.close()
+        conn.close()
+
+
+@app.route("/confirmation")
+def confirmation():
+
+    if "user_id" not in session:
+        return redirect(
+            url_for("login", next="/confirmation")
+        )
+
+    order_ids = session.get("last_order_ids", [])
+
+    if not order_ids:
+        return render_template(
+            "confirmation.html",
+            orders=[],
+            user_id=session["user_id"],
+            user_name=session.get("user_name")
+        )
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+
+        placeholders = ",".join(
+            ["%s"] * len(order_ids)
+        )
+
+        query = f"""
+            SELECT
+                o.order_id,
+                o.product_id,
+                o.quantity,
+                o.product_price,
+                o.total_amount,
+                o.order_status,
+                o.order_date,
+
+                p.product_name,
+                p.brand,
+
+                (
+                    SELECT pi.image_path
+                    FROM product_images pi
+                    WHERE pi.product_id = p.product_id
+                    ORDER BY
+                        pi.is_primary DESC,
+                        pi.display_order ASC,
+                        pi.image_id ASC
+                    LIMIT 1
+                ) AS image
+
+            FROM orders o
+
+            JOIN products p
+                ON o.product_id = p.product_id
+
+            WHERE o.customer_id = %s
+            AND o.order_id IN ({placeholders})
+
+            ORDER BY o.order_id ASC
+        """
+
+        cursor.execute(
+            query,
+            [session["user_id"]] + order_ids
+        )
+
+        orders = cursor.fetchall()
+
+        for order in orders:
+
+            order["product_price"] = float(
+                order["product_price"] or 0
+            )
+
+            order["total_amount"] = float(
+                order["total_amount"] or 0
+            )
+
+            if order["order_date"]:
+
+                order["order_date"] = (
+                    order["order_date"]
+                    .strftime("%Y-%m-%d %H:%M:%S")
+                )
+
+        # Calculate complete checkout total
+        grand_total = sum(
+            order["total_amount"]
+            for order in orders
+        )
+
+        return render_template(
+            "confirmation.html",
+            orders=orders,
+            grand_total=grand_total,
+            user_id=session["user_id"],
+            user_name=session.get("user_name")
+        )
+
+    except Exception as e:
+
+        print("CONFIRMATION ERROR:", e)
+
+        return render_template(
+            "confirmation.html",
+            orders=[],
+            grand_total=0,
+            user_id=session["user_id"],
+            user_name=session.get("user_name")
+        )
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
+    next_page = request.args.get("next", "")
+
     if request.method == "POST":
-        email = request.form["email"]
-        password = request.form["password"]
-        cur = mysql.connection.cursor()
+
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        # Get the page user originally wanted
+        next_page = request.form.get("next", "")
+
+        print("Email:", email)
+        print("Next page:", next_page)
+
+        conn = get_connection()
+        cur = conn.cursor()
+
         cur.execute("""
             SELECT
                 id,
@@ -92,28 +464,156 @@ def login():
         """, (email,))
 
         user = cur.fetchone()
+
         cur.close()
-        if user:
+        conn.close()
 
-            if check_password_hash(user[2], password):
-                session["user_id"] = user[0]
-                session["user_name"] = user[1]
-                flash("Login Successful!", "success")
-                return redirect("/home")
+        # =========================
+        # CHECK LOGIN
+        # =========================
 
-            else:
-                flash("Incorrect Password!", "danger")
+        if user and check_password_hash(user[2], password):
+
+            print("LOGIN SUCCESS")
+
+            # Save user information in Flask session
+            session["user_id"] = user[0]
+            session["user_name"] = user[1]
+
+            print("SESSION:", dict(session))
+
+            # If user originally wanted /account
+            if next_page and next_page.startswith("/"):
+                return redirect(next_page)
+
+            # Normal login
+            return redirect(url_for("account"))
+
         else:
-            flash("Email not found!", "danger")
-    return render_template("login.html")
+            flash("Incorrect email or password.", "danger")
 
-@app.route("/home")
-def home():
+    return render_template(
+        "login.html",
+        next_page=next_page
+    )
 
-    if "user_id" not in session:
-        return redirect("/login")
+@app.route("/shop")
+def shop():
 
-    return render_template("home.html")
+    category = request.args.get("cat")
+    type_id = request.args.get("type_id")
+    sort = request.args.get("sort")
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+
+        query = """
+            SELECT
+                p.product_id,
+                p.product_name,
+                p.brand,
+                p.price,
+                p.stock,
+                p.rating,
+                p.total_reviews,
+                p.badge,
+                p.status,
+                p.seller_id,
+                p.type_id,
+                p.material,
+                p.description,
+                pt.category_id,
+                pt.category_name,
+                pt.subcategory_name,
+
+                (
+                    SELECT pi.image_path
+                    FROM product_images pi
+                    WHERE pi.product_id = p.product_id
+                    ORDER BY
+                        pi.is_primary DESC,
+                        pi.display_order ASC,
+                        pi.image_id ASC
+                    LIMIT 1
+                ) AS primary_image
+
+            FROM products p
+
+            LEFT JOIN product_types pt
+                ON p.type_id = pt.id
+
+            WHERE p.status = 'Approved'
+        """
+
+        params = []
+
+        if type_id:
+
+            query += """
+                AND p.type_id = %s
+            """
+
+            params.append(int(type_id))
+
+        elif category:
+
+            category_map = {
+                "cosmetics": 1,
+                "jewellery": 2,
+                "footwear": 3,
+                "bags": 4,
+                "perfumes": 5
+            }
+
+            category_id = category_map.get(
+                category.lower()
+            )
+
+            if category_id:
+
+                query += """
+                    AND pt.category_id = %s
+                """
+
+                params.append(category_id)
+
+        if sort == "new":
+
+            query += """
+                ORDER BY p.created_at DESC
+            """
+
+        elif sort == "best":
+
+            query += """
+                ORDER BY p.rating DESC,
+                         p.total_reviews DESC
+            """
+
+        else:
+
+            query += """
+                ORDER BY p.product_id DESC
+            """
+
+        cursor.execute(
+            query,
+            params
+        )
+
+        products = cursor.fetchall()
+
+        return render_template(
+            "shop.html",
+            products=products
+        )
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 def save_upload(file_obj, folder, url_prefix):
     """Save an uploaded file if present and return its stored relative path, else None."""
@@ -143,6 +643,9 @@ def seller_register():
         state = request.form.get("state", "").strip()
         pincode = request.form.get("pincode", "").strip()
         category = request.form.get("category", "").strip()
+
+        print(email)
+        print(password)
 
         # Basic required-field check so we fail with a friendly flash
         # instead of a raw KeyError/500 if something is missing.
@@ -181,7 +684,8 @@ def seller_register():
         product_image_3 = request.files.get("product_image_3")
 
         # Check if email or phone exists
-        cur = mysql.connection.cursor()
+        conn = get_connection()
+        cur = conn.cursor()
 
         cur.execute(
             "SELECT seller_id FROM sellers WHERE email=%s OR phone=%s",
@@ -192,11 +696,13 @@ def seller_register():
 
         if existing:
             cur.close()
+            conn.close()
             flash("Email or Phone already exists!", "danger")
             return redirect("/seller/register")
 
         # Hash password
         hashed_password = generate_password_hash(password)
+        print(request.form)
 
         # Save uploaded files (all optional at the DB level, but you can
         # add required-file checks above if you want to enforce them).
@@ -267,8 +773,9 @@ def seller_register():
             "Pending"
             ))
 
-        mysql.connection.commit()
+        conn.commit()
         cur.close()
+        conn.close()
 
         flash(
             "Registration submitted successfully! Your account is under "
@@ -277,7 +784,7 @@ def seller_register():
         )
         return redirect("/seller/login")
 
-    return render_template("Seller/seller_login.html")
+    return render_template("seller_login.html")
 
 
 # seller login route
@@ -287,7 +794,8 @@ def seller_login():
         email = request.form["email"]
         password = request.form["password"]
 
-        cur = mysql.connection.cursor()
+        conn = get_connection()
+        cur = conn.cursor()
         cur.execute("""
                     SELECT
                     seller_id,
@@ -301,6 +809,7 @@ def seller_login():
 
         seller = cur.fetchone()
         cur.close()
+        conn.close()
 
         if seller:
 
@@ -342,18 +851,152 @@ def seller_login():
 
     return render_template("Seller/seller_login.html")
 
+@app.route("/seller/dashboard")
+def seller_dashboard():
 
+    if "seller_id" not in session:
+        return redirect(url_for("seller_login"))
+
+    return render_template("Seller/seller_index.html")
+
+@app.route("/seller/products")
+def seller_products():
+
+    # Seller must be logged in
+    if "seller_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Seller login required"
+        }), 401
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                p.product_id,
+                p.product_name,
+                p.brand,
+                p.price,
+                p.stock,
+                p.status,
+
+                p.seller_id,
+                s.shop_name,
+
+                o.order_id,
+                o.customer_id,
+                o.quantity,
+                o.product_price,
+                o.total_amount,
+                o.order_status,
+                o.order_date,
+
+                u.full_name,
+                u.email,
+                u.phone
+
+            FROM products p
+
+            LEFT JOIN sellers s
+                ON p.seller_id = s.seller_id
+
+            LEFT JOIN orders o
+                ON p.product_id = o.product_id
+                AND o.seller_id = p.seller_id
+
+            LEFT JOIN users u
+                ON o.customer_id = u.id
+
+            ORDER BY
+                p.product_id DESC,
+                o.order_date DESC
+        """)
+
+        rows = cursor.fetchall()
+
+        products = {}
+
+        for row in rows:
+
+            product_id = row[0]
+
+            # Create product only once
+            if product_id not in products:
+                products[product_id] = {
+                    "id": row[0],
+                    "name": row[1],
+                    "brand": row[2],
+                    "price": float(row[3]),
+                    "stock": row[4],
+                    "status": row[5],
+
+                    "seller_id": row[6],
+                    "shop_name": row[7],
+
+                    "orders": []
+                }
+
+            # Add order information if product has an order
+            if row[8] is not None:
+
+                products[product_id]["orders"].append({
+
+                    "order_id": row[8],
+                    "customer_id": row[9],
+                    "quantity": row[10],
+
+                    "product_price": float(row[11]),
+                    "total_amount": float(row[12]),
+
+                    "order_status": row[13],
+
+                    "order_date": (
+                        row[14].strftime("%Y-%m-%d %H:%M:%S")
+                        if row[14]
+                        else None
+                    ),
+
+                    "customer": {
+                        "id": row[9],
+                        "name": row[15],
+                        "email": row[16],
+                        "phone": row[17]
+                    }
+                })
+
+        return jsonify({
+            "success": True,
+            "products": list(products.values())
+        })
+
+    except Exception as e:
+
+        print("SELLER PRODUCTS ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()
 # admin login route
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
+    
     if request.method == "POST":
 
-        email = request.form["email"]
-        password = request.form["password"]
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-        print("Email entered:", email)
+        print("Admin Email:", email)
+        print("Admin Password:", password)
 
-        cur = mysql.connection.cursor()
+        conn = get_connection()
+        cur = conn.cursor()
 
         cur.execute("""
             SELECT admin_id, admin_name, email, password, role
@@ -364,8 +1007,9 @@ def admin_login():
         admin = cur.fetchone()
 
         print("Database Result:", admin)
-
+        print(admin)
         cur.close()
+        conn.close()
 
         if admin:
 
@@ -394,117 +1038,1290 @@ def admin_login():
 
     return render_template("Admin/admin_login.html")
 
+@app.route("/register", methods=["POST"])
+def user_register():
+
+    print("===== REGISTER ROUTE CALLED =====")
+    print(request.form.to_dict())
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+
+    full_name = f"{first_name} {last_name}"
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+    phone = request.form.get("phone")
+    gender = request.form.get("gender")
+    address = request.form.get("address")
+    landmark = request.form.get("landmark")
+    pincode = request.form.get("pincode")
+
+    print("Full Name:", full_name)
+    print("Email:", email)
+    print("Password:", password)
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT id FROM users WHERE email=%s", (email,))
+    existing = cur.fetchone()
+
+    if existing:
+        flash("Email already exists.", "danger")
+        cur.close()
+        conn.close()
+        return redirect(url_for("login"))
+
+    hashed_password = generate_password_hash(password)
+
+    cur.execute("""
+        INSERT INTO users
+        (full_name, email, phone, password, gender, address, landmark, pincode)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        full_name,
+        email,
+        phone,
+        hashed_password,
+        gender,
+        address,
+        landmark,
+        pincode
+    ))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    flash("Account created successfully!", "success")
+    return redirect(url_for("login"))
 
 # dashboard protected
-
-# 1. Sellers
-@app.route("/seller/dashboard")
-def seller_dashboard():
-
-    if "seller_id" not in session:
-        return redirect("/seller/login")
-
-    return render_template("Seller/index.html")
-
-
-# 2. Admin
 @app.route("/admin/dashboard")
 def admin_dashboard():
 
     if "admin_id" not in session:
-        return redirect("/admin/login")
+        return redirect(url_for("admin_login"))
 
-    cur = mysql.connection.cursor()
-    print("=== NEW ADMIN DASHBOARD RUNNING ===")
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # SELLERS
+
     cur.execute("""
-    SELECT
-        seller_id,
-        shop_name,
-        owner_name,
-        email,
-        phone,
-        status,
-        shop_logo,
-        gst_certificate,
-        pan_document,
-        product_image_1,
-        product_image_2,
-        product_image_3
-    FROM sellers
-    ORDER BY FIELD(status,'Pending','Approved','Rejected','Suspended'),
-             seller_id DESC
-""")
+        SELECT
+            seller_id,
+            shop_name,
+            owner_name,
+            email,
+            phone,
+            status,
+            shop_logo,
+            gst_certificate,
+            pan_document,
+            product_image_1,
+            product_image_2,
+            product_image_3
+        FROM sellers
+        ORDER BY FIELD(
+            status,
+            'Pending',
+            'Approved',
+            'Rejected',
+            'Suspended'
+        ),
+        seller_id DESC
+    """)
 
     sellers = cur.fetchall()
 
-    print("Total sellers:", len(sellers))
-    for seller in sellers:
-        print(seller)
+    # PRODUCTS
+    cur.execute("""
+        SELECT
+            p.product_id,
+            p.product_name,
+            p.brand,
+            p.price,
+            p.stock,
+            p.rating,
+            p.total_reviews,
+            p.badge,
+            p.status,
+            p.seller_id,
+            s.shop_name,
+            pt.category_name,
+            pt.subcategory_name,
+
+            (
+                SELECT pi.image_path
+                FROM product_images pi
+                WHERE pi.product_id = p.product_id
+                ORDER BY
+                    pi.is_primary DESC,
+                    pi.display_order ASC,
+                    pi.image_id ASC
+                LIMIT 1
+            ) AS primary_image
+
+        FROM products p
+
+        LEFT JOIN sellers s
+            ON p.seller_id = s.seller_id
+
+        LEFT JOIN product_types pt
+            ON p.type_id = pt.id
+
+        ORDER BY
+            FIELD(
+                p.status,
+                'Pending',
+                'Approved',
+                'Rejected'
+            ),
+            p.product_id DESC
+    """)
+
+    
+    products = cur.fetchall()
+    print("ADMIN PRODUCTS:")
+    for product in products:
+        print(product)
+
+
+    # CUSTOMERS
+    cur.execute("""
+        SELECT
+            id,
+            full_name,
+            email,
+            phone,
+            created_at
+        FROM users
+        ORDER BY id DESC
+    """)
+
+    customers = cur.fetchall()
+
+
+    # BASIC COUNTS
+    total_sellers = len(sellers)
+    total_products = len(products)
+    total_customers = len(customers)
+
+
+    # SELLER STATUS COUNTS
+    pending_sellers = sum(
+        1 for seller in sellers
+        if seller[5] == "Pending"
+    )
+
+    approved_sellers = sum(
+        1 for seller in sellers
+        if seller[5] == "Approved"
+    )
+
+    suspended_sellers = sum(
+        1 for seller in sellers
+        if seller[5] == "Suspended"
+    )
+
+    # ORDERS
+    cur.execute("""
+        SELECT
+            order_id,
+            customer_id,
+            seller_id,
+            product_id,
+            quantity,
+            product_price,
+            total_amount,
+            commission_percent,
+            commission_amount,
+            seller_earning,
+            order_status,
+            order_date
+        FROM orders
+        ORDER BY order_date DESC
+    """)
+
+    orders = cur.fetchall()
+
+
+    # ORDER STATISTICS
+    total_orders = len(orders)
+
+    total_revenue = sum(
+        float(order[6] or 0)
+        for order in orders
+        if order[10] != "Cancelled"
+    )
+
+    pending_orders = sum(
+        1 for order in orders
+        if order[10] == "Pending"
+    )
+
+    cancelled_orders = sum(
+    1 for order in orders
+    if order[10] == "Cancelled"
+    )
+
+    # COUPONS
+    cur.execute("""
+        SELECT
+            id,
+            code,
+            discount,
+            expiry_date,
+            active
+        FROM coupons
+        ORDER BY id DESC
+    """)
+
+    coupons = cur.fetchall()
+
+
+    # COMMISSION
+    total_commission = sum(
+        float(order[8] or 0)
+        for order in orders
+    )
+
 
     cur.close()
+    conn.close()
 
-    return render_template("Admin/index.html", sellers=sellers)
+
+    return render_template(
+        "Admin/admin_index.html",
+
+        sellers=sellers,
+        products=products,
+        customers=customers,
+        orders=orders,
+        coupons=coupons,
+
+        total_sellers=total_sellers,
+        total_products=total_products,
+        total_customers=total_customers,
+        total_orders=total_orders,
+
+        pending_sellers=pending_sellers,
+        approved_sellers=approved_sellers,
+        suspended_sellers=suspended_sellers,
+
+        total_revenue=total_revenue,
+        pending_orders=pending_orders,
+        cancelled_orders=cancelled_orders,
+        total_commission=total_commission
+)
+
+@app.route("/admin/order/<int:order_id>/status", methods=["POST"])
+def admin_update_order_status(order_id):
+
+    if "admin_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    data = request.get_json(silent=True) or {}
+
+    status = data.get("status")
+
+    allowed_statuses = [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled"
+    ]
+
+    if status not in allowed_statuses:
+        return jsonify({
+            "success": False,
+            "message": "Invalid order status"
+        }), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE orders
+            SET order_status = %s
+            WHERE order_id = %s
+        """, (
+            status,
+            order_id
+        ))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+                "success": False,
+                "message": "Order not found"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Order status updated successfully"
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("ORDER STATUS ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Database error"
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route(
+    "/admin/product/<int:product_id>/approve",
+    methods=["POST"]
+)
+def approve_product(product_id):
+
+    if "admin_id" not in session:
+
+        return jsonify({
+            "success": False,
+            "message": "Admin login required"
+        }), 401
+
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE products
+            SET status = 'Approved'
+            WHERE product_id = %s
+            AND status = 'Pending'
+        """, (product_id,))
+
+        if cursor.rowcount == 0:
+
+            conn.rollback()
+
+            return jsonify({
+                "success": False,
+                "message": (
+                    "Product not found or "
+                    "already processed"
+                )
+            }), 400
+
+
+        conn.commit()
+
+
+        return jsonify({
+            "success": True,
+            "message": "Product approved successfully"
+        })
+
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print(
+            "APPROVE PRODUCT ERROR:",
+            e
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Failed to approve product"
+        }), 500
+
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route(
+    "/admin/product/<int:product_id>/reject",
+    methods=["POST"]
+)
+def reject_product(product_id):
+
+    if "admin_id" not in session:
+
+        return jsonify({
+            "success": False,
+            "message": "Admin login required"
+        }), 401
+
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE products
+            SET status = 'Rejected'
+            WHERE product_id = %s
+            AND status = 'Pending'
+        """, (product_id,))
+
+
+        if cursor.rowcount == 0:
+
+            conn.rollback()
+
+            return jsonify({
+                "success": False,
+                "message": (
+                    "Product not found or "
+                    "already processed"
+                )
+            }), 400
+
+
+        conn.commit()
+
+
+        return jsonify({
+            "success": True,
+            "message": "Product rejected successfully"
+        })
+
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print(
+            "REJECT PRODUCT ERROR:",
+            e
+        )
+
+        return jsonify({
+            "success": False,
+            "message": "Failed to reject product"
+        }), 500
+
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route("/admin/product/<int:product_id>/delete", methods=["POST"])
+def admin_delete_product(product_id):
+
+    if "admin_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            DELETE FROM products
+            WHERE product_id = %s
+        """, (product_id,))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+                "success": False,
+                "message": "Product not found"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Product deleted successfully"
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("PRODUCT DELETE ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route("/admin/product/add", methods=["POST"])
+def admin_add_product():
+
+    if "admin_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    data = request.get_json(silent=True) or {}
+
+    product_name = data.get("product_name", "").strip()
+    brand = data.get("brand", "").strip()
+    price = data.get("price", 0)
+    stock = data.get("stock", 0)
+    type_id = data.get("type_id")
+
+    if not product_name:
+        return jsonify({
+            "success": False,
+            "message": "Product name is required"
+        }), 400
+
+    if not brand:
+        return jsonify({
+            "success": False,
+            "message": "Brand is required"
+        }), 400
+
+    if not type_id:
+        return jsonify({
+            "success": False,
+            "message": "Product type is required"
+        }), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            INSERT INTO products
+            (
+                type_id,
+                product_name,
+                brand,
+                material,
+                price,
+                stock,
+                rating,
+                total_reviews
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                0.0,
+                0
+            )
+        """, (
+            type_id,
+            product_name,
+            brand,
+            "Not Specified",
+            price,
+            stock
+        ))
+
+        conn.commit()
+
+        product_id = cursor.lastrowid
+
+        return jsonify({
+            "success": True,
+            "message": "Product added successfully",
+            "product_id": product_id
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("PRODUCT ADD ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route("/seller/product/add", methods=["POST"])
+def seller_add_product():
+
+    # ================= SELLER LOGIN CHECK =================
+
+    if "seller_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Seller login required"
+        }), 401
+
+
+    # ================= GET FORM DATA =================
+
+    product_name = request.form.get(
+        "product_name",
+        ""
+    ).strip()
+
+    brand = request.form.get(
+        "brand",
+        ""
+    ).strip()
+
+    material = request.form.get(
+        "material",
+        ""
+    ).strip()
+
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
+
+    # Main category selected by seller
+    category_id = request.form.get("type_id")
+
+    price = request.form.get("price")
+
+    stock = request.form.get("stock")
+
+
+    # ================= VALIDATION =================
+
+    if not product_name:
+        return jsonify({
+            "success": False,
+            "message": "Product name is required"
+        }), 400
+
+
+    if not brand:
+        return jsonify({
+            "success": False,
+            "message": "Brand is required"
+        }), 400
+
+
+    if not material:
+        return jsonify({
+            "success": False,
+            "message": "Material is required"
+        }), 400
+
+
+    if not category_id:
+        return jsonify({
+            "success": False,
+            "message": "Category is required"
+        }), 400
+
+
+    if price is None or price == "":
+        return jsonify({
+            "success": False,
+            "message": "Price is required"
+        }), 400
+
+
+    if stock is None or stock == "":
+        return jsonify({
+            "success": False,
+            "message": "Stock is required"
+        }), 400
+
+
+    # ================= CONVERT DATA =================
+
+    try:
+
+        price = float(price)
+
+        stock = int(stock)
+
+        category_id = int(category_id)
+
+    except (ValueError, TypeError):
+
+        return jsonify({
+            "success": False,
+            "message": "Invalid price, stock or category"
+        }), 400
+
+    category_map = {
+
+        1: 101,   
+        2: 201,   
+        3: 301,   
+        4: 401,   
+        5: 501    
+
+    }
+    type_id = category_map.get(category_id)
+    if not type_id:
+
+        return jsonify({
+            "success": False,
+            "message": "Invalid category"
+        }), 400
+
+    if price <= 0:
+
+        return jsonify({
+            "success": False,
+            "message": "Price must be greater than 0"
+        }), 400
+
+
+    if stock < 0:
+
+        return jsonify({
+            "success": False,
+            "message": "Stock cannot be negative"
+        }), 400
+
+    images = request.files.getlist("product_images")
+
+
+
+    if len(images) > 3:
+
+        return jsonify({
+            "success": False,
+            "message": "You can upload maximum 3 images"
+        }), 400
+
+
+    allowed_extensions = {
+        "jpg",
+        "jpeg",
+        "png",
+        "webp"
+    }
+
+    for image in images:
+        if not image or image.filename == "":
+            continue
+
+
+        extension = (
+            image.filename
+            .rsplit(".", 1)[-1]
+            .lower()
+        )
+
+        if extension not in allowed_extensions:
+            return jsonify({
+                "success": False,
+                "message": (
+                    "Only JPG, JPEG, PNG and WEBP "
+                    "images are allowed"
+                )
+            }), 400
+
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            INSERT INTO products
+            (
+                seller_id,
+                type_id,
+                product_name,
+                brand,
+                material,
+                price,
+                rating,
+                total_reviews,
+                badge,
+                stock,
+                description,
+                status
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                0.0,
+                0,
+                NULL,
+                %s,
+                %s,
+                'Pending'
+            )
+        """, (
+            session["seller_id"],
+            type_id,
+            product_name,
+            brand,
+            material,
+            price,
+            stock,
+            description
+        ))
+
+        print("PRODUCT INSERT EXECUTED")
+
+        product_id = cursor.lastrowid
+
+        print("NEW PRODUCT ID:", product_id)
+
+        
+        upload_folder = os.path.join(
+            app.root_path,
+            "static",
+            "uploads",
+            "products"
+        )
+
+        os.makedirs(
+
+            upload_folder,
+
+            exist_ok=True
+
+        )
+
+        image_number = 0
+        for image in images:
+
+            if not image or image.filename == "":
+                continue
+
+            image_number += 1
+
+            original_name = secure_filename(
+                image.filename
+            )
+
+            extension = (
+                original_name
+                .rsplit(".", 1)[-1]
+                .lower()
+            )
+
+            filename = (
+                f"product_{product_id}_"
+                f"{image_number}.{extension}"
+            )
+
+            file_path = os.path.join(
+                upload_folder,
+                filename
+
+            )
+
+            image.save(file_path)
+
+            image_path = (
+                f"uploads/products/{filename}"
+            )
+
+            is_primary = (
+                1 if image_number == 1 else 0
+            )
+            cursor.execute("""
+                INSERT INTO product_images
+                (
+                    product_id,
+                    image_path,
+                    is_primary,
+                    display_order
+                )
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
+            """, (
+                product_id,
+                image_path,
+                is_primary,
+                image_number
+            ))
+        conn.commit()
+        return jsonify({
+            "success": True,
+            "message": (
+                "Product submitted for admin approval"
+            ),
+            "product_id": product_id
+        })
+    except Exception as e:
+
+        conn.rollback()
+        print(
+            "SELLER PRODUCT ERROR:",
+            e
+        )
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/admin/product/<int:product_id>/approve", methods=["POST"])
+def admin_approve_product(product_id):
+
+    if "admin_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE products
+            SET status = 'Approved'
+            WHERE product_id = %s
+            AND status = 'Pending'
+        """, (product_id,))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+                "success": False,
+                "message": "Product not found or already reviewed"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Product approved successfully"
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("APPROVE PRODUCT ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route("/admin/product/<int:product_id>/reject", methods=["POST"])
+def admin_reject_product(product_id):
+
+    if "admin_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE products
+            SET status = 'Rejected'
+            WHERE product_id = %s
+            AND status = 'Pending'
+        """, (product_id,))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+                "success": False,
+                "message": "Product not found or already reviewed"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Product rejected"
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("REJECT PRODUCT ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
+@app.route("/cart")
+def cart():
+
+    if "user_id" not in session:
+        return redirect(url_for("login", next="/cart"))
+
+    return render_template("cart.html")
+
 # admin approves/rejects/suspends a seller - this is what actually
 # unlocks seller login, and triggers the notification email.
 @app.route("/admin/seller/<int:seller_id>/status", methods=["POST"])
 def update_seller_status(seller_id):
 
     if "admin_id" not in session:
-        return redirect("/admin/login")
+        return jsonify({
+            "success": False,
+            "message": "Unauthorized"
+        }), 401
 
     new_status = request.form.get("status")
-    if new_status not in ("Approved", "Rejected", "Suspended", "Pending"):
-        flash("Invalid status.", "danger")
-        return redirect("/admin/dashboard")
 
-    cur = mysql.connection.cursor()
-    cur.execute(
-        "SELECT shop_name, owner_name, email FROM sellers WHERE seller_id=%s",
-        (seller_id,)
-    )
-    seller = cur.fetchone()
+    allowed_statuses = [
+        "Approved",
+        "Rejected",
+        "Suspended",
+        "Pending"
+    ]
 
-    if not seller:
-        cur.close()
-        flash("Seller not found.", "danger")
-        return redirect("/admin/dashboard")
+    if new_status not in allowed_statuses:
 
-    cur.execute(
-        "UPDATE sellers SET status=%s WHERE seller_id=%s",
-        (new_status, seller_id)
-    )
-    mysql.connection.commit()
-    cur.close()
+        return jsonify({
+            "success": False,
+            "message": "Invalid status"
+        }), 400
 
-    shop_name, owner_name, seller_email = seller
 
-    # Email the seller so they know they can now log in (or why they can't).
+    conn = get_connection()
+    cur = conn.cursor()
+
     try:
-        send_seller_status_email(shop_name, owner_name, seller_email, new_status)
+
+        cur.execute("""
+            SELECT
+                shop_name,
+                owner_name,
+                email
+            FROM sellers
+            WHERE seller_id = %s
+        """, (seller_id,))
+
+        seller = cur.fetchone()
+
+        if not seller:
+
+            return jsonify({
+                "success": False,
+                "message": "Seller not found"
+            }), 404
+
+
+        cur.execute("""
+            UPDATE sellers
+            SET status = %s
+            WHERE seller_id = %s
+        """, (
+            new_status,
+            seller_id
+        ))
+
+        conn.commit()
+
+        shop_name, owner_name, seller_email = seller
+
+
+        try:
+
+            send_seller_status_email(
+                shop_name,
+                owner_name,
+                seller_email,
+                new_status
+            )
+
+        except Exception as email_error:
+
+            print(
+                "SELLER EMAIL ERROR:",
+                email_error
+            )
+
+
+        return jsonify({
+            "success": True,
+            "message":
+                f"{shop_name} marked as {new_status}"
+        })
+
+
     except Exception as e:
-        # Don't block the admin action if email sending fails - just warn.
-        flash(f"Status updated, but the notification email failed to send: {e}", "warning")
-        return redirect("/admin/dashboard")
 
-    flash(f"{shop_name} marked as {new_status}. Notification email sent.", "success")
-    return redirect("/admin/dashboard")
+        conn.rollback()
+
+        print(
+            "SELLER STATUS ERROR:",
+            e
+        )
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
 
 
-# seller logout
+    finally:
+
+        cur.close()
+        conn.close()
+
+
+# SELLER LOGOUT
 @app.route("/seller/logout")
 def seller_logout():
+
     session.pop("seller_id", None)
     session.pop("shop_name", None)
     session.pop("owner_name", None)
-    return redirect("/seller/login")
 
-#admin logout
+    flash("Seller logged out successfully!", "success")
+
+    return redirect(url_for("seller_login"))
+
+# ADMIN LOGOUT
 @app.route("/admin/logout")
 def admin_logout():
+
     session.pop("admin_id", None)
     session.pop("admin_name", None)
     session.pop("role", None)
-    return redirect("/admin/login")
+
+    session.modified = True
+
+    response = redirect(url_for("admin_login"))
+
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response
+
+# user logout
+@app.route("/logout")
+def logout():
+
+    session.pop("user_id", None)
+    session.pop("user_name", None)
+
+    flash("Logged out successfully!", "success")
+
+    return redirect("/login")
+
+@app.route("/delete-account", methods=["POST"])
+def delete_account():
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({
+            "success": False,
+            "message": "You are not logged in."
+        }), 401
+
+    conn = None
+    cursor = None
+
+    try:
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "DELETE FROM users WHERE id = %s",
+            (user_id,)
+        )
+
+        if cursor.rowcount == 0:
+            conn.rollback()
+
+            return jsonify({
+                "success": False,
+                "message": "User account not found."
+            }), 404
+
+        conn.commit()
+
+        session.clear()
+
+        return jsonify({
+            "success": True,
+            "message": "Account deleted successfully."
+        })
+
+    except Exception as e:
+
+        if conn:
+            conn.rollback()
+
+        print("DELETE ACCOUNT ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Could not delete account."
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if conn:
+            conn.close()
+    
 
 
 @app.route("/create-order", methods=["POST"])
@@ -547,7 +2364,8 @@ def payment_success():
 
         client.utility.verify_payment_signature(params)
 
-        cursor = mysql.connection.cursor()
+        conn = get_connection()
+        cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO orders
@@ -568,8 +2386,9 @@ def payment_success():
             "Paid"
         ))
 
-        mysql.connection.commit()
+        conn.commit()
         cursor.close()
+        conn.close()
 
         return jsonify({"success": True})
 
@@ -582,110 +2401,69 @@ def payment_success():
             "message": str(e)
         }), 400
 
-#confirmation route
-@app.route("/confirmation")
-def confirmation():
-
-    return render_template("confirmation.html")
-
-
 @app.route("/api/products")
 def api_products():
 
-    cursor = mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            p.product_id,
-            p.product_name,
-            p.brand,
-            p.description,
-            p.price,
-            p.stock,
-            p.rating,
-            p.total_reviews,
-            p.badge,
-            pt.category_name,
-            pt.subcategory_name
+    try:
+        cursor.execute("SELECT DATABASE() AS db")
+        db = cursor.fetchone()
 
-        FROM products p
+        cursor.execute("SELECT COUNT(*) AS total FROM products")
+        count = cursor.fetchone()
 
-        JOIN product_types pt
-            ON p.type_id = pt.id
-    """)
+        print("DATABASE USED:", db["db"])
+        print("PRODUCT COUNT:", count["total"])
 
-    rows = cursor.fetchall()
-    cursor.close()
+        cursor.execute("""
+            SELECT
+                p.product_id,
+                p.product_name,
+                p.brand,
+                p.price,
+                p.stock,
+                p.status,
+                p.seller_id
+            FROM products p
+            ORDER BY p.product_id DESC
+        """)
 
-    products = []
+        rows = cursor.fetchall()
 
-    for row in rows:
+        products = []
 
-        # Convert category to folder name
-        category = row[9].strip().lower()
+        for p in rows:
+            products.append({
+                "product_id": p["product_id"],
+                "product_name": p["product_name"],
+                "brand": p["brand"],
+                "price": float(p["price"] or 0),
+                "stock": p["stock"],
+                "status": p["status"],
+                "seller_id": p["seller_id"]
+            })
 
-        # Optional mapping if your DB names differ from folder names
-        folder_map = {
-            "cosmetics": "cosmetics",
-            "jewellery": "jewellery",
-            "footwear": "footwear",
-            "bags": "bags",
-            "perfume": "perfume"
-        }
+        print("TOTAL PRODUCTS FROM DATABASE:", len(products))
 
-        folder_name = folder_map.get(category, "cosmetics")
-
-        folder = os.path.join(
-            app.static_folder,
-            "uploads",
-            folder_name
-        )
-
-        image_path = ""
-
-        if os.path.exists(folder):
-
-            images = [
-                img for img in os.listdir(folder)
-                if img.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
-            ]
-
-            if images:
-                image_path = url_for(
-                    "static",
-                    filename=f"uploads/{folder_name}/{random.choice(images)}"
-                )
-
-        print("Category:", category)
-        print("Folder:", folder)
-        print("Image:", image_path)
-
-        products.append({
-            "product_id": row[0],
-            "product_name": row[1],
-            "brand": row[2],
-            "description": row[3],
-            "price": float(row[4]),
-            "stock": row[5],
-            "rating": float(row[6]),
-            "total_reviews": row[7],
-            "badge": row[8],
-            "category_name": row[9],
-            "catLabel": row[10],
-            "image1": image_path
+        return jsonify({
+            "success": True,
+            "products": products
         })
 
-    return jsonify(products)
+    except Exception as e:
+        print("API PRODUCTS ERROR:", e)
 
-@app.route("/shop")
-def shop():
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
 
-    if "user_id" not in session:
-        return redirect("/login")
-
-    return render_template("shop.html")
-
-
+    finally:
+        cursor.close()
+        conn.close()
+        
 #add to cart
 @app.route("/api/cart/add", methods=["POST"])
 def add_to_cart():
@@ -698,7 +2476,8 @@ def add_to_cart():
     product_id = data["product_id"]
     quantity = data.get("quantity", 1)
 
-    cursor = mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT id
@@ -725,8 +2504,9 @@ def add_to_cart():
             VALUES(%s,%s,%s)
         """, (session["user_id"], product_id, quantity))
 
-    mysql.connection.commit()
+    conn.commit()
     cursor.close()
+    conn.close()
 
     return jsonify({"success": True})
 
@@ -737,7 +2517,8 @@ def get_cart():
     if "user_id" not in session:
         return jsonify([])
 
-    cursor = mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         SELECT
@@ -746,7 +2527,7 @@ def get_cart():
             c.quantity,
 
             p.product_id,
-            p.name,
+            p.product_name,
             p.price,
 
             COALESCE(pi.image_url,'no-image.jpg')
@@ -766,6 +2547,7 @@ def get_cart():
     rows = cursor.fetchall()
 
     cursor.close()
+    conn.close()
 
     cart=[]
 
@@ -790,50 +2572,53 @@ def get_cart():
 def remove_cart_item(cart_id):
 
     if "user_id" not in session:
-        return jsonify({"success":False}),401
+        return jsonify({"success": False}), 401
 
-    cursor=mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         DELETE FROM cart
         WHERE id=%s
         AND user_id=%s
-    """,(cart_id,session["user_id"]))
+    """, (cart_id, session["user_id"]))
 
-    mysql.connection.commit()
+    conn.commit()
 
     cursor.close()
+    conn.close()
 
-    return jsonify({"success":True})
+    return jsonify({"success": True})
 
 #Update Quantity
 @app.route("/api/cart/update", methods=["POST"])
 def update_cart():
 
     if "user_id" not in session:
-        return jsonify({"success":False}),401
+        return jsonify({"success": False}), 401
 
-    data=request.get_json()
+    data = request.get_json()
 
-    cursor=mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
         UPDATE cart
         SET quantity=%s
         WHERE id=%s
         AND user_id=%s
-    """,
-    (
+    """, (
         data["quantity"],
         data["cart_id"],
         session["user_id"]
     ))
 
-    mysql.connection.commit()
+    conn.commit()
 
     cursor.close()
+    conn.close()
 
-    return jsonify({"success":True})
+    return jsonify({"success": True})
 
 
 #add to wishlist
@@ -846,9 +2631,8 @@ def add_to_wishlist():
     data=request.get_json()
 
     product_id=data["product_id"]
-
-    cursor=mysql.connection.cursor()
-
+    conn = get_connection()
+    cursor = conn.cursor()
     cursor.execute("""
         SELECT id
         FROM wishlist
@@ -865,9 +2649,10 @@ def add_to_wishlist():
             VALUES(%s,%s)
         """,(session["user_id"],product_id))
 
-        mysql.connection.commit()
+        conn.commit()
 
     cursor.close()
+    conn.close()
 
     return jsonify({"success":True})
 
@@ -879,7 +2664,8 @@ def get_wishlist():
     if "user_id" not in session:
         return jsonify([])
 
-    cursor=mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
     cursor.execute("""
 
@@ -888,10 +2674,10 @@ def get_wishlist():
         w.id,
 
         p.product_id,
-        p.name,
+        p.product_name,
         p.price,
 
-        COALESCE(pi.image_url,'no-image.jpg')
+        COALESCE(pi.image_path,'no-image.jpg')
 
     FROM wishlist w
 
@@ -909,6 +2695,7 @@ def get_wishlist():
     rows=cursor.fetchall()
 
     cursor.close()
+    conn.close()
 
     wishlist=[]
 
@@ -926,6 +2713,75 @@ def get_wishlist():
 
     return jsonify(wishlist)
 
+@app.route("/seller/order/<int:order_id>/status", methods=["POST"])
+def seller_update_order_status(order_id):
+
+    if "seller_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Seller login required"
+        }), 401
+
+    data = request.get_json(silent=True) or {}
+    status = data.get("status")
+
+    allowed_statuses = [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled"
+    ]
+
+    if status not in allowed_statuses:
+        return jsonify({
+            "success": False,
+            "message": "Invalid order status"
+        }), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute("""
+            UPDATE orders
+            SET order_status = %s
+            WHERE order_id = %s
+            AND seller_id = %s
+        """, (
+            status,
+            order_id,
+            session["seller_id"]
+        ))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({
+                "success": False,
+                "message": "Order not found"
+            }), 404
+
+        return jsonify({
+            "success": True
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("SELLER STATUS ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Database error"
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 #remove from wishlist
 @app.route("/api/wishlist/remove/<int:wishlist_id>",methods=["DELETE"])
@@ -933,15 +2789,17 @@ def remove_wishlist(wishlist_id):
 
     if "user_id" not in session:
         return jsonify({"success":False}),401
-    cursor=mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
     cursor.execute("""
     DELETE FROM wishlist
     WHERE id=%s
     AND user_id=%s
 
     """,(wishlist_id,session["user_id"]))
-    mysql.connection.commit()
+    conn.commit()
     cursor.close()
+    conn.close()
     return jsonify({"success":True})
 
 #admin approval
@@ -951,17 +2809,23 @@ def approve_seller(seller_id):
     if "admin_id" not in session:
         return redirect("/admin/login")
 
-    cur = mysql.connection.cursor()
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    cur.execute(
-        "UPDATE sellers SET status='Approved' WHERE seller_id=%s",
-        (seller_id,)
-    )
+    cursor.execute(
+    "UPDATE sellers SET status='Approved' WHERE seller_id=%s",
+    (seller_id,)
+)
 
-    mysql.connection.commit()
-    cur.close()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return redirect("/admin/dashboard")
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return "Page not found", 404
 
 #admin reject 
 @app.route("/admin/reject_seller/<int:seller_id>")
@@ -970,21 +2834,235 @@ def reject_seller(seller_id):
     if "admin_id" not in session:
         return redirect("/admin/login")
 
-    cur = mysql.connection.cursor()
+    conn = get_connection()
+    cur = conn.cursor()
 
     cur.execute(
         "UPDATE sellers SET status='Rejected' WHERE seller_id=%s",
         (seller_id,)
     )
 
-    mysql.connection.commit()
+    conn.commit()
     cur.close()
+    conn.close()
 
     return redirect("/admin/dashboard")
-    
+
+@app.route("/place-order", methods=["POST"])
+def place_order():
+
+    if "user_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Please login first."
+        }), 401
+
+    data = request.get_json(silent=True) or {}
+    cart = data.get("cart", [])
+
+    if not cart:
+        return jsonify({
+            "success": False,
+            "message": "Your cart is empty."
+        }), 400
+
+    conn = None
+    cursor = None
+
+    try:
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        user_id = session["user_id"]
+
+        for item in cart:
+
+            product_id = item.get("id") or item.get("product_id")
+            quantity = int(item.get("qty", 1))
+            price = float(item.get("price", 0))
+
+            if not product_id:
+                continue
+
+            # Get seller from the actual product
+            cursor.execute("""
+                SELECT seller_id, price
+                FROM products
+                WHERE product_id = %s
+            """, (product_id,))
+
+            product = cursor.fetchone()
+
+            if not product:
+                raise Exception(
+                    f"Product {product_id} was not found."
+                )
+
+            seller_id = product[0]
+
+            # Use database price rather than trusting browser price
+            price = float(product[1])
+
+            total_amount = price * quantity
+
+            # Temporary commission calculation
+            commission_percent = 10
+            commission_amount = (
+                total_amount * commission_percent / 100
+            )
+
+            seller_earning = (
+                total_amount - commission_amount
+            )
+
+            cursor.execute("""
+                INSERT INTO orders
+                (
+                    customer_id,
+                    seller_id,
+                    product_id,
+                    quantity,
+                    product_price,
+                    total_amount,
+                    commission_percent,
+                    commission_amount,
+                    seller_earning,
+                    order_status,
+                    order_date
+                )
+                VALUES
+                (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, NOW()
+                )
+            """, (
+                user_id,
+                seller_id,
+                product_id,
+                quantity,
+                price,
+                total_amount,
+                commission_percent,
+                commission_amount,
+                seller_earning,
+                "Pending"
+            ))
+
+        conn.commit()
+
+        print("ORDER CREATED SUCCESSFULLY")
+
+        return jsonify({
+            "success": True,
+            "message": "Order placed successfully."
+        })
+
+    except Exception as e:
+
+        if conn:
+            conn.rollback()
+
+        print("PLACE ORDER ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if conn:
+            conn.close()
+
+@app.route("/api/account/orders")
+def account_orders():
+
+    if "user_id" not in session:
+        return jsonify({
+            "success": False,
+            "message": "Please login first."
+        }), 401
+
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+
+        cursor.execute("""
+            SELECT
+                o.order_id,
+                o.product_id,
+                o.quantity,
+                o.product_price,
+                o.total_amount,
+                o.order_status,
+                o.order_date,
+
+                p.product_name,
+                p.brand,
+
+                (
+                    SELECT pi.image_path
+                    FROM product_images pi
+                    WHERE pi.product_id = p.product_id
+                    ORDER BY
+                        pi.is_primary DESC,
+                        pi.display_order ASC,
+                        pi.image_id ASC
+                    LIMIT 1
+                ) AS image
+
+            FROM orders o
+
+            JOIN products p
+                ON o.product_id = p.product_id
+
+            WHERE o.customer_id = %s
+
+            ORDER BY o.order_date DESC
+        """, (session["user_id"],))
+
+        orders = cursor.fetchall()
+
+        for order in orders:
+
+            order["product_price"] = float(
+                order["product_price"] or 0
+            )
+
+            order["total_amount"] = float(
+                order["total_amount"] or 0
+            )
+
+            if order["order_date"]:
+                order["order_date"] = (
+                    order["order_date"]
+                    .strftime("%Y-%m-%d %H:%M:%S")
+                )
+
+        return jsonify({
+            "success": True,
+            "orders": orders
+        })
+
+    except Exception as e:
+
+        print("ACCOUNT ORDERS ERROR:", e)
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        cursor.close()
+        conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-

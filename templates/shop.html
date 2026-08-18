@@ -401,26 +401,63 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 
 <div class="sidebar-overlay"id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<aside class="sidebar"id="sidebar">
+<aside class="sidebar" id="sidebar">
+
   <div class="side-logo">VloMa</div>
+
   <nav>
-    <a href="index.html">Home</a>
-    <a href="shop.html">Shop All</a>
-    
-    <a href="shop.html?sort=new">New Arrivals</a>
-    <a href="shop.html?sort=best">Best Sellers</a>
-    <a href="shop.html?cat=jewellery">Jewellery</a>
-    <a href="shop.html?cat=footwear">Footwear</a>
-    <a href="shop.html?cat=perfume">Perfume</a>
-    <a href="shop.html?cat=cosmetics">Cosmetics</a>
+
+    <a href="{{ url_for('index') }}">Home</a>
+
+    <a href="{{ url_for('shop') }}">Shop All</a>
+
+    <a href="{{ url_for('shop') }}?sort=new">
+      New Arrivals
+    </a>
+
+    <a href="{{ url_for('shop') }}?sort=best">
+      Best Sellers
+    </a>
+
+    <a href="{{ url_for('shop') }}?cat=jewellery">
+      Jewellery
+    </a>
+
+    <a href="{{ url_for('shop') }}?cat=footwear">
+      Footwear
+    </a>
+
+    <a href="{{ url_for('shop') }}?cat=perfumes">
+      Perfumes
+    </a>
+
+    <a href="{{ url_for('shop') }}?cat=cosmetics">
+      Cosmetics
+    </a>
+
   </nav>
+
   <div class="side-bottom">
-    <a href="account.html">Account</a>
-    <a href="checkout.html">Cart</a>
-    <a href="shop.html">Wishlist</a>
-    <a href="#" onclick="openSettings(event)">Settings</a>
+
+    <a href="{{ url_for('account') }}">
+      Account
+    </a>
+
+    <a href="{{ url_for('cart') }}">
+      Cart
+    </a>
+
+    <a href="{{ url_for('shop') }}">
+      Wishlist
+    </a>
+
+    <a href="#" onclick="openSettings(event)">
+      Settings
+    </a>
+
   </div>
-</aside> 
+
+</aside>
 
 
 <header class="navbar">
@@ -431,144 +468,140 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
 <img src="{{ url_for('static', filename='uploads/shop_logos/vloma.png') }}"
      alt="Vloma Logo"
      style="width:40px; height:40px; margin-right:8px; border-radius:5px;">
-       <a href="index.html" class="nav-logo">VloMa<small>THE WOMEN'S ONLY </small></a>
-  </div>
+<a href="{{ url_for('index') }}" class="nav-logo">
+    VloMa
+    <small>THE WOMEN'S ONLY</small>
+</a>  </div>
 
   <!-- Cosmetics -->
 <div class="nav-item">
-  <a href="shop.html?cat=cosmetics">Cosmetics</a>
-  <div class="mega-menu">
+<a href="{{ url_for('shop') }}?cat=cosmetics">
+    Cosmetics
+</a>  <div class="mega-menu">
     <div class="mega-col">
       <h4>Makeup</h4>
-      <a href="shop.html?cat=cosmetics">Lipsticks, Glosses &amp; Lip Liners</a>
-      <a href="shop.html?cat=cosmetics">Foundations, Concealers &amp; Compacts</a>
-      <a href="shop.html?cat=cosmetics">Eyeliners, Kajal &amp; Mascara</a>
-      <a href="shop.html?cat=cosmetics">Highlighters, Blushes &amp; Eyeshadows</a>
+      <a href="{{ url_for('shop') }}?type_id=101">Lipsticks, Glosses &amp; Lip Liners</a>
+      <a href="{{ url_for('shop') }}?type_id=102">Foundations, Concealers &amp; Compacts</a>
+      <a href="{{ url_for('shop') }}?type_id=103">Eyeliners, Kajal &amp; Mascara</a>
+      <a href="{{ url_for('shop') }}?type_id=104">Highlighters, Blushes &amp; Eyeshadows</a>
     </div>
     <div class="mega-col">
       <h4>Skincare</h4>
-      <a href="shop.html?cat=cosmetics">Serums &amp; Face Oils</a>
-      <a href="shop.html?cat=cosmetics">Moisturisers &amp; Night Creams</a>
-      <a href="shop.html?cat=cosmetics">Sunscreen &amp; UV Protection</a>
-      <a href="shop.html?cat=cosmetics">Face Washes &amp; Cleansers</a>
+      <a href="{{ url_for('shop') }}?type_id=105">Serums &amp; Face Oils</a>
+      <a href="{{ url_for('shop') }}?type_id=106">Moisturisers &amp; Night Creams</a>
+      <a href="{{ url_for('shop') }}?type_id=107">Sunscreen &amp; UV Protection</a>
+      <a href="{{ url_for('shop') }}?type_id=108">Face Washes &amp; Cleansers</a>
     </div>
     <div class="mega-col">
       <h4>Haircare &amp; Body Care</h4>
-      <a href="shop.html?cat=cosmetics">Shampoos &amp; Conditioners</a>
-      <a href="shop.html?cat=cosmetics">Hair Serums &amp; Masks</a>
-      <a href="shop.html?cat=cosmetics">Body Lotions, Washes &amp; Scrubs</a>
+      <a href="{{ url_for('shop') }}?type_id=109">Shampoos &amp; Conditioners</a>
+      <a href="{{ url_for('shop') }}?type_id=110">Hair Serums &amp; Masks</a>
+      <a href="{{ url_for('shop') }}?type_id=111">Body Lotions, Washes &amp; Scrubs</a>
     </div>
   </div>
 </div>
 
 <!-- Jewellery -->
 <div class="nav-item">
-  <a href="shop.html?cat=jewellery">Jewellery</a>
+<a href="{{ url_for('shop') }}?cat=jewellery">
+    Jewellery
+</a>
   <div class="mega-menu">
     <div class="mega-col">
       <h4>Fine &amp; Precious Jewellery</h4>
-      <a href="shop.html?cat=jewellery">Gold, Diamond &amp; Silver Rings</a>
-      <a href="shop.html?cat=jewellery">Necklaces &amp; Pendants</a>
-      <a href="shop.html?cat=jewellery">Bracelets &amp; Bangles</a>
+      <a href="{{ url_for('shop') }}?type_id=201">Gold, Diamond &amp; Silver Rings</a>
+      <a href="{{ url_for('shop') }}?type_id=202">Necklaces &amp; Pendants</a>
+      <a href="{{ url_for('shop') }}?type_id=203">Bracelets &amp; Bangles</a>
     </div>
     <div class="mega-col">
       <h4>Fashion &amp; Costume Jewellery</h4>
-      <a href="shop.html?cat=jewellery">Statement Earrings &amp; Hoops</a>
-      <a href="shop.html?cat=jewellery">Chokers &amp; Layered Chains</a>
-      <a href="shop.html?cat=jewellery">Trendy Rings &amp; Cuffs</a>
+      <a href="{{ url_for('shop') }}?type_id=204">Statement Earrings &amp; Hoops</a>
+      <a href="{{ url_for('shop') }}?type_id=205">Chokers &amp; Layered Chains</a>
+      <a href="{{ url_for('shop') }}?type_id=206">Trendy Rings &amp; Cuffs</a>
     </div>
     <div class="mega-col">
       <h4>Traditional &amp; Bridal</h4>
-      <a href="shop.html?cat=jewellery">Temple &amp; Kundan Jewellery Sets</a>
-      <a href="shop.html?cat=jewellery">Maang Tikkas &amp; Matha Pattis</a>
-      <a href="shop.html?cat=jewellery">Anklets (Payal) &amp; Toe Rings</a>
-      <a href="shop.html?cat=jewellery">Nose Pins &amp; Naths</a>
+      <a href="{{ url_for('shop') }}?type_id=207">Temple &amp; Kundan Jewellery Sets</a>
+      <a href="{{ url_for('shop') }}?type_id=208">Maang Tikkas &amp; Matha Pattis</a>
+      <a href="{{ url_for('shop') }}?type_id=209">Anklets (Payal) &amp; Toe Rings</a>
+      <a href="{{ url_for('shop') }}?type_id=210">Nose Pins &amp; Naths</a>
     </div>
   </div>
 </div>
 
 <!-- Footwear -->
 <div class="nav-item">
-  <a href="shop.html?cat=footwear">Footwear</a>
+<a href="{{ url_for('shop') }}?cat=footwear">
+    Footwear
+</a>
   <div class="mega-menu">
     <div class="mega-col">
       <h4>Heels &amp; Wedges</h4>
-      <a href="shop.html?cat=footwear">Stilettos &amp; Pumps</a>
-      <a href="shop.html?cat=footwear">Block Heels &amp; Kitten Heels</a>
-      <a href="shop.html?cat=footwear">Platform Wedges</a>
+      <a href="{{ url_for('shop') }}?type_id=301">Stilettos &amp; Pumps</a>
+      <a href="{{ url_for('shop') }}?type_id=302">Block Heels &amp; Kitten Heels</a>
+      <a href="{{ url_for('shop') }}?type_id=303">Platform Wedges</a>
     </div>
     <div class="mega-col">
       <h4>Flats &amp; Ethnic</h4>
-      <a href="shop.html?cat=footwear">Juttis &amp; Mojris</a>
-      <a href="shop.html?cat=footwear">Ballerinas &amp; Loafers</a>
-      <a href="shop.html?cat=footwear">Kolhapuri Sandals &amp; Slides</a>
+      <a href="{{ url_for('shop') }}?type_id=304">Juttis &amp; Mojris</a>
+      <a href="{{ url_for('shop') }}?type_id=305">Ballerinas &amp; Loafers</a>
+      <a href="{{ url_for('shop') }}?type_id=306">Kolhapuri Sandals &amp; Slides</a>
     </div>
     <div class="mega-col">
       <h4>Casual &amp; Sports</h4>
-      <a href="shop.html?cat=footwear">Sneakers &amp; Slip-ons</a>
-      <a href="shop.html?cat=footwear">Running &amp; Walking Shoes</a>
-      <a href="shop.html?cat=footwear">Flip-flops &amp; Beach Slides</a>
+      <a href="{{ url_for('shop') }}?type_id=307">Sneakers &amp; Slip-ons</a>
+      <a href="{{ url_for('shop') }}?type_id=308">Running &amp; Walking Shoes</a>
+      <a href="{{ url_for('shop') }}?type_id=309">Flip-flops &amp; Beach Slides</a>
     </div>
   </div>
 </div>
 
 <!-- Bags & Accessories -->
 <div class="nav-item">
-  <a href="shop.html?cat=bags-accessories">Bags &amp; Accessories</a>
-  <div class="mega-menu">
+<a href="{{ url_for('shop') }}?cat=bags">
+    Bags &amp; Accessories
+</a>  <div class="mega-menu">
     <div class="mega-col">
       <h4>Handbags &amp; Everyday</h4>
-      <a href="shop.html?cat=bags-accessories">Tote Bags &amp; Shoulder Bags</a>
-      <a href="shop.html?cat=bags-accessories">Satchels &amp; Hobo Bags</a>
-      <a href="shop.html?cat=bags-accessories">Sling &amp; Crossbody Bags</a>
+      <a href="{{ url_for('shop') }}?type_id=401">Tote Bags &amp; Shoulder Bags</a>
+      <a href="{{ url_for('shop') }}?type_id=402">Satchels &amp; Hobo Bags</a>
+      <a href="{{ url_for('shop') }}?type_id=403">Sling &amp; Crossbody Bags</a>
     </div>
     <div class="mega-col">
       <h4>Evening &amp; Occasion</h4>
-      <a href="shop.html?cat=bags-accessories">Box Clutches &amp; Envelope Bags</a>
-      <a href="shop.html?cat=bags-accessories">Traditional Potli Bags</a>
-      <a href="shop.html?cat=bags-accessories">Party Pouches</a>
+      <a href="{{ url_for('shop') }}?type_id=404">Box Clutches &amp; Envelope Bags</a>
+      <a href="{{ url_for('shop') }}?type_id=405">Traditional Potli Bags</a>
+      <a href="{{ url_for('shop') }}?type_id=406">Party Pouches</a>
     </div>
     <div class="mega-col">
       <h4>Travel &amp; Utility</h4>
-      <a href="shop.html?cat=bags-accessories">Backpacks &amp; Mini Backpacks</a>
-      <a href="shop.html?cat=bags-accessories">Wallets &amp; Card Holders</a>
-      <a href="shop.html?cat=bags-accessories">Laptop Sleeves &amp; Travel Pouches</a>
+      <a href="{{ url_for('shop') }}?type_id=407">Backpacks &amp; Mini Backpacks</a>
+      <a href="{{ url_for('shop') }}?type_id=408">Wallets &amp; Card Holders</a>
+      <a href="{{ url_for('shop') }}?type_id=409">Laptop Sleeves &amp; Travel Pouches</a>
     </div>
   </div>
 </div>
 
 <!-- Perfumes -->
 <div class="nav-item">
-  <a href="shop.html?cat=perfumes">Perfumes</a>
-  <div class="mega-menu">
+<a href="{{ url_for('shop') }}?cat=perfumes">
+    Perfumes
+</a>  <div class="mega-menu">
     <div class="mega-col">
       <h4>Perfumes (Eau de Parfum / Eau de Toilette)</h4>
-      <a href="shop.html?cat=perfumes">Floral &amp; Fruity</a>
-      <a href="shop.html?cat=perfumes">Woody &amp; Oriental</a>
-      <a href="shop.html?cat=perfumes">Fresh &amp; Citrus</a>
+      <a href="{{ url_for('shop') }}?type_id=501">Floral &amp; Fruity</a>
+      <a href="{{ url_for('shop') }}?type_id=502">Woody &amp; Oriental</a>
+      <a href="{{ url_for('shop') }}?type_id=503">Fresh &amp; Citrus</a>
     </div>
     <div class="mega-col">
       <h4>Daily Wear &amp; Mists</h4>
-      <a href="shop.html?cat=perfumes">Body Sprays &amp; Deodorants</a>
-      <a href="shop.html?cat=perfumes">Scented Body Mists</a>
+      <a href="{{ url_for('shop') }}?type_id=504">Body Sprays &amp; Deodorants</a>
+      <a href="{{ url_for('shop') }}?type_id=505">Scented Body Mists</a>
     </div>
     <div class="mega-col">
       <h4>Gift Sets &amp; Minis</h4>
-      <a href="shop.html?cat=perfumes">Luxury Discovery Sets</a>
-      <a href="shop.html?cat=perfumes">Pocket Perfumes &amp; Travel Sprays</a>
-    </div>
-  </div>
-</div>
-
-<!-- New Arrivals -->
-<div class="nav-item">
-  <a href="shop.html?cat=new-arrivals">New Arrivals</a>
-  <div class="mega-menu">
-    <div class="mega-col">
-      <h4>Latest Collections</h4>
-      <a href="shop.html?cat=new-arrivals">Seasonal Collections (Festive, Summer, Winter)</a>
-      <a href="shop.html?cat=new-arrivals">Bestsellers &amp; Trending</a>
-      <a href="shop.html?cat=new-arrivals">Celebrity &amp; Designer Drops</a>
+      <a href="{{ url_for('shop') }}?type_id=506">Luxury Discovery Sets</a>
+      <a href="{{ url_for('shop') }}?type_id=507">Pocket Perfumes &amp; Travel Sprays</a>
     </div>
   </div>
 </div>
@@ -584,7 +617,7 @@ footer { background: var(--maroon-dark); color: #f1e6da; padding: 56px 44px 26px
     <a class="nav-icon-btn" href="shop.html" title="Wishlist">
       <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 20.3l8.8-8.6a5 5 0 0 0 0-7.1z"/></svg>
     </a>
-    <a class="nav-icon-btn" href="checkout.html" title="Cart">
+    <a class="nav-icon-btn" href="{{ url_for('cart') }}" title="Cart">
       <svg viewBox="0 0 24 24"><path d="M6 2l1.5 5h9L18 2"/><path d="M3.5 7h17l-1.5 13h-14z"/></svg>
       <span class="cart-count"id="cartCountSide">0</span>
     </a>
@@ -823,14 +856,53 @@ let PRODUCTS = [];
 
 async function loadProducts() {
 
-    const response = await fetch("/api/products");
+    try {
 
-    PRODUCTS = await response.json();
+        const response = await fetch("/api/products");
 
-    console.log("Products:", PRODUCTS.length);
-    console.log(PRODUCTS);
+        if (!response.ok) {
+            throw new Error("Failed to load products");
+        }
 
-    renderGrid();
+        const data = await response.json();
+
+        console.log("API PRODUCTS:", data);
+
+        // Handle both:
+        // [ {...}, {...} ]
+        // and
+        // { success:true, products:[...] }
+
+        if (Array.isArray(data)) {
+            PRODUCTS = data;
+        } else if (data.success && Array.isArray(data.products)) {
+            PRODUCTS = data.products;
+        } else {
+            throw new Error("Invalid products response");
+        }
+
+        console.log(
+            "TOTAL PRODUCTS FROM DATABASE:",
+            PRODUCTS.length
+        );
+
+        currentPage = 1;
+
+        renderGrid();
+
+    } catch (error) {
+
+        console.error(
+            "PRODUCT LOADING ERROR:",
+            error
+        );
+
+        document.getElementById("grid").innerHTML = `
+            <p style="color:red;">
+                Failed to load products.
+            </p>
+        `;
+    }
 }
 
 let activeBrand = [];
@@ -951,29 +1023,77 @@ document.querySelectorAll(".material-chip").forEach(chip => {
     });
 });
 
-function getCart(){ return JSON.parse(localStorage.getItem('anistock_cart') || '[]'); }
-function saveCart(c){ localStorage.setItem('anistock_cart', JSON.stringify(c)); updateCartCount(); }
-function addToCart(product_id){
-    const p = PRODUCTS.find(x => x.product_id == product_id);
-    if(!p) return;
+function getCart() {
+
+    return JSON.parse(
+        localStorage.getItem("anistock_cart") || "[]"
+    );
+
+}
+
+
+function saveCart(cart) {
+
+    localStorage.setItem(
+        "anistock_cart",
+        JSON.stringify(cart)
+    );
+
+}
+
+
+function updateCartCount() {
 
     const cart = getCart();
 
-    const existing = cart.find(x => x.product_id == product_id);
+    const count = cart.reduce(
+        (total, item) => total + Number(item.qty),
+        0
+    );
 
-    if(existing){
-        existing.qty++;
-    }else{
+    const cartCount = document.getElementById("cartCountSide");
+
+    if (cartCount) {
+        cartCount.textContent = count;
+    }
+
+}
+function addToCart(product_id) {
+
+    const p = PRODUCTS.find(x => x.product_id == product_id);
+
+    if (!p) {
+        console.log("Product not found:", product_id);
+        return;
+    }
+
+    const cart = getCart();
+
+    const existing = cart.find(
+        x => x.product_id == product_id
+    );
+
+    if (existing) {
+        existing.qty += 1;
+    } else {
+
         cart.push({
             product_id: p.product_id,
             name: p.product_name,
-            price: p.price,
-            img: p.image1,
+            price: Number(p.price),
+            img: p.image1 || "",
             qty: 1
         });
+
     }
 
     saveCart(cart);
+
+    updateCartCount();
+
+    console.log("Cart:", getCart());
+
+    showToast("Product added to cart");
 }
 function updateCartCount(){
   const cart = getCart();
@@ -1040,47 +1160,89 @@ function hideShopSuggestions(){ setTimeout(()=>document.getElementById('shopSugg
 function selectShopSuggestion(cat){ document.getElementById('searchInput').value = cat; document.getElementById('shopSuggestions').classList.remove('show'); currentPage = 1; renderGrid(); }
 function handleShopSearchKey(e){ if(e.key !== 'Enter') return; e.preventDefault(); document.getElementById('shopSuggestions').classList.remove('show'); currentPage = 1; renderGrid(); }
 
+const PRODUCTS_PER_PAGE = 12;
+
 function renderGrid(){
-  updateFilterStates();
-  
-  const list = filterProducts();
-  console.log("Filtered:", list.length);
-  console.log(list);
 
-  document.getElementById('resultCount').textContent = `Showing ${list.length} refined piece${list.length!==1?'s':''} for the modern woman.`;
-  const grid = document.getElementById('grid');
-  if(list.length===0){
-    grid.innerHTML = `<p style="grid-column:1/-1; color:var(--ink-soft); padding:40px 0;">No items match your filters. Try adjusting them.</p>`;
-    document.getElementById('pagination').innerHTML='';
-    return;
-  }
-grid.innerHTML = list.map(p => `
-<div style="border:1px solid #ccc;padding:10px;margin:10px;">
+    updateFilterStates();
 
-  <img
-    src="${p.image1}"
-    alt="${p.product_name}"
-    width="180"
-    height="180"
->
+    const list = filterProducts();
 
-    <h3>${p.product_name}</h3>
+    console.log("Filtered products:", list.length);
+    console.log(list);
 
-    <p>${p.brand}</p>
+    document.getElementById('resultCount').textContent =
+        `Showing ${list.length} refined piece${list.length !== 1 ? 's' : ''} for the modern woman.`;
 
-    <p>₹${p.price}</p>
+    const grid = document.getElementById('grid');
 
-    <button onclick="handleAdd(this,'${p.product_id}',event)">
-        Add to Cart
-    </button>
+    if(list.length === 0){
 
-    <button onclick="handleBuy('${p.product_id}',event)">
-        Buy Now
-    </button>
+        grid.innerHTML = `
+            <p style="grid-column:1/-1; color:var(--ink-soft); padding:40px 0;">
+                No items match your filters. Try adjusting them.
+            </p>
+        `;
 
-</div>
-`).join("");
-  renderPagination();
+        document.getElementById('pagination').innerHTML = '';
+
+        return;
+    }
+
+    const totalPages = Math.ceil(
+        list.length / PRODUCTS_PER_PAGE
+    );
+
+    if(currentPage > totalPages){
+        currentPage = totalPages;
+    }
+
+    const start =
+        (currentPage - 1) * PRODUCTS_PER_PAGE;
+
+    const end =
+        start + PRODUCTS_PER_PAGE;
+
+    const pageProducts =
+        list.slice(start, end);
+
+    grid.innerHTML = pageProducts.map(p => `
+
+        <div style="border:1px solid #ccc;padding:10px;margin:10px;">
+
+            <img
+                src="${p.image1 || ''}"
+                alt="${p.product_name}"
+                width="180"
+                height="180"
+                onerror="this.style.display='none'"
+            >
+
+            <h3>${p.product_name}</h3>
+
+            <p>${p.brand || ''}</p>
+
+            <p>₹${p.price}</p>
+
+            <p>Stock: ${p.stock}</p>
+
+            <p>Seller: ${p.shop_name || 'Unknown'}</p>
+
+            <button
+                onclick="handleAdd(this,'${p.product_id}',event)">
+                Add to Cart
+            </button>
+
+            <button
+                onclick="handleBuy('${p.product_id}',event)">
+                Buy Now
+            </button>
+
+        </div>
+
+    `).join("");
+
+    renderPagination(totalPages);
 }
 function handleAdd(btn, product_id, e){
     if(e) e.stopPropagation();
@@ -1099,15 +1261,60 @@ function handleBuy(product_id, e){
     addToCart(product_id);
     window.location.href = "/checkout";
 }
-function renderPagination(){
-  document.getElementById('pagination').innerHTML = `
-    <button onclick="goPage(1)" class="${currentPage===1?'active':''}">1</button>
-    <button onclick="goPage(2)" class="${currentPage===2?'active':''}">2</button>
-    <button onclick="goPage(3)" class="${currentPage===3?'active':''}">3</button>
-  `;
-}
-function goPage(p){ currentPage = p; showToast(`Showing page ${p}`); renderPagination(); window.scrollTo({top:0, behavior:'smooth'}); }
+function renderPagination(totalPages){
 
+    const pagination =
+        document.getElementById('pagination');
+
+    if(totalPages <= 1){
+        pagination.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    if(currentPage > 1){
+
+        html += `
+            <button onclick="goPage(${currentPage - 1})">
+                ‹
+            </button>
+        `;
+    }
+
+    for(let i = 1; i <= totalPages; i++){
+
+        html += `
+            <button
+                onclick="goPage(${i})"
+                class="${currentPage === i ? 'active' : ''}">
+                ${i}
+            </button>
+        `;
+    }
+
+    if(currentPage < totalPages){
+
+        html += `
+            <button onclick="goPage(${currentPage + 1})">
+                ›
+            </button>
+        `;
+    }
+
+    pagination.innerHTML = html;
+}
+function goPage(page){
+
+    currentPage = page;
+
+    renderGrid();
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
 function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('show'); }
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
 
@@ -1227,22 +1434,41 @@ function toggleSwitch(el, e){
 function handleSettingsAction(section, item, e){
   if (e && e.target.classList.contains('settings-toggle')) return;
 
-  if (item === 'Logout') { localStorage.removeItem('anistock_user'); window.location.href = 'login.html'; return; }
-
+if (item === "Logout") {
+    window.location.href = "/logout";
+    return;
+}
   if (item === 'Delete Account') {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       localStorage.removeItem('anistock_user');
       showToast('Your request has been submitted');
-      setTimeout(() => window.location.href = 'login.html', 1200);
-    }
+      setTimeout(() => window.location.href = '/login', 1200);    }
     return;
   }
 
-  if (['My Profile','Change Profile Picture','Change Username','Change Email','Change Phone Number','Change Password',
-       'Add New Address','Edit Address','Delete Address','View Saved Addresses',
-       'My Orders','Track Order','Buy Again','Return / Refund / Replace Item'].includes(item)) {
-    closeSettings(); window.location.href = 'account.html'; return;
-  }
+if([
+    'My Profile',
+    'Change Profile Picture',
+    'Change Username',
+    'Change Email',
+    'Change Phone Number',
+    'Change Password',
+    'Add New Address',
+    'Edit Address',
+    'Delete Address',
+    'View Saved Addresses',
+    'My Orders',
+    'Track Order',
+    'Buy Again',
+    'Return / Refund / Replace Item'
+  ].includes(item)) {
+
+    closeSettings();
+
+    window.location.href = "/account";
+
+    return;
+}
 
   showToast(`Opening: ${item}`);
 }

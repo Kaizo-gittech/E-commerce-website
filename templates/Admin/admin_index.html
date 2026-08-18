@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vloma — Super Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EE; --surface:#FFFFFF; --sidebar:#FBF9F4; --border:#E7E2D6; --text:#1C1A16; --muted:#7A7466;
+  --accent:#8A6D1E; --accent-dark:#6E5717; --accent-soft:#F3EAD3; --ink:#14120F;
+  --success:#2E7D4E; --success-bg:#E6F3E9; --warn:#A97A11; --warn-bg:#FBF0D8;
+  --danger:#B5392B; --danger-bg:#FBEAE7; --info:#4A5A8A; --info-bg:#EAEDF6;
+  --radius:2px; --shadow:0 1px 2px rgba(20,18,15,.04), 0 8px 24px -12px rgba(20,18,15,.10);
+}
+body.dark{
+  --bg:#15130F; --surface:#1D1B16; --sidebar:#19170F; --border:#312C21; --text:#EDE8DC; --muted:#9A9284;
+  --accent:#D3AE52; --accent-dark:#E9C978; --accent-soft:#2B2718; --ink:#F3EFE4;
+  --success:#6FBF8B; --success-bg:#1C2B21; --warn:#E2B34A; --warn-bg:#2E2717;
+  --danger:#E27C6E; --danger-bg:#301F1C; --info:#93A5E0; --info-bg:#1E2233;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);transition:background .25s,color .25s;min-height:100vh;}
+h1,h2,h3,.serif{font-family:'Playfair Display',serif;}
+a{color:inherit;text-decoration:none;} button{font-family:inherit;cursor:pointer;}
+::selection{background:var(--accent-soft);}
+
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+.sidebar{background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:32px 24px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{margin-bottom:6px;}
+.brand .wordmark{font-size:28px;font-weight:700;}
+.brand .sub{font-size:10.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.nav{margin-top:36px;display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--radius);color:var(--muted);font-size:14.5px;font-weight:500;border-left:2px solid transparent;transition:.15s;background:transparent;border-top:none;border-right:none;border-bottom:none;width:100%;text-align:left;}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.85;}
+.nav-item:hover{color:var(--text);background:var(--accent-soft);}
+.nav-item.active{color:var(--accent-dark);background:var(--accent-soft);border-left-color:var(--accent);font-weight:600;}
+body.dark .nav-item.active{color:var(--accent);}
+.sidebar-footer{border-top:1px solid var(--border);padding-top:16px;margin-top:16px;display:flex;align-items:center;gap:10px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.sidebar-footer .name{font-size:13.5px;font-weight:600;}
+.sidebar-footer .role{font-size:11.5px;color:var(--muted);}
+
+.main{padding:28px 40px 60px;max-width:1400px;}
+.topbar{display:flex;align-items:center;gap:16px;padding-bottom:22px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.search{flex:0 0 auto;width:280px;margin-right:auto;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--muted);transition:width .15s ease;}
+.search:focus-within{width:320px;border-color:var(--accent);}
+.search svg{width:15px;height:15px;flex-shrink:0;}
+.search input{border:none;outline:none;background:transparent;font-size:12.5px;color:var(--text);width:100%;font-family:inherit;}
+@media(max-width:1200px){.search{width:200px;} .search:focus-within{width:240px;}}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;}
+.icon-btn svg{width:17px;height:17px;}
+.dot{position:absolute;top:8px;right:9px;width:6px;height:6px;border-radius:50%;background:var(--danger);}
+.profile-chip{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding-left:8px;border-left:1px solid var(--border);}
+.profile-chip svg{width:14px;height:14px;color:var(--muted);}
+
+.section{display:none;} .section.active{display:block;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;gap:20px;flex-wrap:wrap;}
+.page-head h1{font-size:30px;font-weight:600;} .page-head p{color:var(--muted);font-size:14px;margin-top:6px;max-width:560px;}
+.head-actions{display:flex;gap:10px;flex-shrink:0;}
+
+.btn{border-radius:var(--radius);padding:10px 18px;font-size:13px;font-weight:600;letter-spacing:.3px;border:1px solid transparent;display:inline-flex;align-items:center;gap:8px;transition:.15s;}
+.btn-dark{background:var(--ink);color:var(--bg);} .btn-dark:hover{background:var(--accent-dark);}
+.btn-gold{background:var(--accent);color:#fff;} .btn-gold:hover{background:var(--accent-dark);}
+.btn-outline{background:var(--surface);color:var(--text);border-color:var(--border);} .btn-outline:hover{border-color:var(--accent);color:var(--accent-dark);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-danger-outline{background:var(--surface);color:var(--danger);border-color:var(--danger);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.grid{display:grid;gap:18px;} .cols-4{grid-template-columns:repeat(4,1fr);} .cols-3{grid-template-columns:repeat(3,1fr);} .cols-2{grid-template-columns:2fr 1fr;} .cols-2e{grid-template-columns:1fr 1fr;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+.stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.stat-value{font-size:28px;font-weight:700;margin-top:10px;font-family:'Playfair Display',serif;}
+.stat-trend{font-size:12.5px;margin-top:10px;color:var(--muted);}
+.trend-up{color:var(--success);font-weight:600;} .trend-down{color:var(--danger);font-weight:600;} .stat-warn{color:var(--warn);font-weight:600;}
+.section-title{font-size:17px;font-weight:600;font-family:'Playfair Display',serif;}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+.link-accent{color:var(--accent-dark);font-size:13px;font-weight:600;cursor:pointer;} body.dark .link-accent{color:var(--accent);}
+
+table{width:100%;border-collapse:collapse;}
+thead th{text-align:left;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;}
+tbody td{padding:14px 12px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;} tbody tr:hover{background:var(--accent-soft);}
+.table-wrap{overflow-x:auto;}
+
+.pill{display:inline-flex;align-items:center;padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600;letter-spacing:.3px;}
+.pill-success{background:var(--success-bg);color:var(--success);} .pill-warn{background:var(--warn-bg);color:var(--warn);}
+.pill-danger{background:var(--danger-bg);color:var(--danger);} .pill-info{background:var(--info-bg);color:var(--info);}
+
+.chip{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.row-name{display:flex;align-items:center;gap:10px;} .row-name .sub{font-size:12px;color:var(--muted);}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);}
+.field input,.field select,.field textarea{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field input:disabled{background:var(--accent-soft);color:var(--muted);}
+
+.tabs{display:flex;gap:26px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.tab{padding-bottom:12px;font-size:14px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;}
+.tab.active{color:var(--accent-dark);border-color:var(--accent);font-weight:600;} body.dark .tab.active{color:var(--accent);}
+
+.progress{height:6px;border-radius:3px;background:var(--border);overflow:hidden;} .progress > div{height:100%;background:var(--accent);}
+.bar-chart{display:flex;align-items:flex-end;gap:14px;height:200px;padding-top:10px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;}
+.bar{width:100%;max-width:38px;background:var(--accent);border-radius:3px 3px 0 0;transition:height .6s ease;}
+.bar-col .lbl{font-size:11px;color:var(--muted);}
+
+.catbar-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-top:16px;}
+.catbar-row .cname{font-weight:600;}
+.catbar-track{height:8px;border-radius:4px;background:var(--accent-soft);margin-top:6px;overflow:hidden;}
+.catbar-track > div{height:100%;background:var(--ink);border-radius:4px;}
+body.dark .catbar-track > div{background:var(--accent);}
+.sidebar-logout{
+    border-top:1px solid var(--border);
+    padding-top:12px;
+    margin-top:12px;
+}
+
+.logout-btn{
+    color:var(--danger);
+}
+
+.logout-btn:hover{
+    color:var(--danger);
+    background:var(--danger-bg);
+}
+.insight-box{background:var(--accent-soft);border-radius:var(--radius);padding:16px;margin-top:20px;font-size:13px;color:var(--text);display:flex;gap:10px;line-height:1.5;}
+
+.donut{width:64px;height:64px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink);}
+.wallet-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.wallet-row:last-of-type{border-bottom:none;}
+.wallet-row .wname{font-weight:600;font-size:14px;}
+.wallet-row .wsub{font-size:11.5px;color:var(--muted);}
+.wallet-row .wamt{font-weight:700;font-size:14px;text-align:right;}
+.logo-sq{width:36px;height:36px;border-radius:var(--radius);background:var(--accent-soft);flex-shrink:0;}
+
+.dark-card{background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:24px;}
+.dark-card h3,.dark-card .serif{color:var(--bg);}
+body.dark .dark-card{background:#0E0C08;}
+
+.ticket{border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.ticket + .ticket{margin-top:12px;}
+
+.upload-box{border:1.5px dashed var(--border);border-radius:var(--radius);padding:26px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.upload-box:hover{border-color:var(--accent);color:var(--accent-dark);}
+.upload-box svg{width:22px;height:22px;}
+
+.switch{position:relative;width:38px;height:20px;flex-shrink:0;display:inline-block;}
+.switch input{opacity:0;width:0;height:0;}
+.slider-tg{position:absolute;inset:0;background:var(--border);border-radius:20px;transition:.2s;cursor:pointer;}
+.slider-tg:before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+input:checked + .slider-tg{background:var(--accent);} input:checked + .slider-tg:before{transform:translateX(18px);}
+
+.empty{text-align:center;padding:50px 20px;color:var(--muted);}
+.empty .big{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.footer-note{text-align:center;color:var(--muted);font-size:12px;padding-top:40px;}
+
+.pagination{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:16px;}
+.page-btn{width:32px;height:32px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--muted);}
+.page-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+.approval-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;gap:12px;background:var(--surface);}
+.approval-card img{width:64px;height:64px;object-fit:cover;border-radius:var(--radius);background:var(--accent-soft);}
+.approval-card .cat{font-size:10.5px;letter-spacing:1px;color:var(--accent-dark);text-transform:uppercase;font-weight:700;}
+body.dark .approval-card .cat{color:var(--accent);}
+.approval-card .name{font-weight:600;font-size:14.5px;margin:2px 0;}
+.approval-card .by{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.approval-actions{display:flex;gap:8px;}
+.prod-thumb{width:44px;height:44px;border-radius:var(--radius);object-fit:cover;background:var(--accent-soft);flex-shrink:0;}
+
+.toast-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+.toast{background:var(--ink);color:var(--bg);padding:13px 18px;border-radius:var(--radius);font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;align-items:center;gap:10px;animation:slidein .25s ease;min-width:220px;}
+@keyframes slidein{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
+.toast .dotok{width:7px;height:7px;border-radius:50%;background:var(--success);flex-shrink:0;}
+
+.stock-bar{width:80px;height:6px;border-radius:3px;background:var(--border);overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px;}
+.stock-bar > div{height:100%;background:var(--accent);}
+.stock-low .stock-bar > div{background:var(--danger);}
+
+.qa-list{display:flex;flex-direction:column;}
+.qa-item{padding:12px 0;border-bottom:1px solid var(--border);font-size:13.5px;font-weight:500;cursor:pointer;}
+.qa-item:last-child{border-bottom:none;}
+.qa-item:hover{color:var(--accent-dark);}
+body.dark .qa-item:hover{color:var(--accent);}
+
+.promo-card{position:relative;border-radius:var(--radius);overflow:hidden;color:#fff;min-height:180px;display:flex;align-items:flex-end;padding:20px;background:linear-gradient(180deg,rgba(20,18,15,.1),rgba(20,18,15,.85)),
+  repeating-linear-gradient(135deg,#2a2620,#2a2620 12px,#231f1a 12px,#231f1a 24px);}
+.promo-card .tag{position:absolute;top:16px;left:16px;background:var(--accent);color:#fff;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:20px;font-weight:700;}
+.promo-card .cap .t{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;}
+.promo-card .cap .s{font-size:12.5px;opacity:.85;margin-top:4px;}
+
+@media(max-width:1000px){
+  .app{grid-template-columns:1fr;} .sidebar{display:none;}
+  .cols-4{grid-template-columns:1fr 1fr;} .cols-3{grid-template-columns:1fr 1fr;} .cols-2{grid-template-columns:1fr;} .cols-2e{grid-template-columns:1fr;} .form-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="wordmark serif">Veloura</div><div class="sub">Super Admin</div></div>
+    <nav class="nav" id="nav"></nav>
+
+<div class="sidebar-logout">
+    <button class="nav-item logout-btn" onclick="adminLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Logout</span>
+    </button>
+</div>
+    <div class="sidebar-footer">
+      <div class="avatar">VA</div>
+      <div><div class="name">Veloura Admin</div><div class="role">Super Admin</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="globalSearch" placeholder="Search orders, sellers, products…">
+      </div>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <div class="profile-chip">
+        <div class="avatar" style="width:30px;height:30px;font-size:11px;">VA</div>
+        Admin Profile
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="section active" id="sec-dashboard">
+      <div class="page-head">
+        <div><h1>Executive Dashboard</h1><p>Welcome back. Here is your overview for <strong>October 2023</strong>.</p></div>
+        <div class="head-actions">
+          <button class="btn btn-outline">Download Report</button>
+          <button class="btn btn-dark">Quick Action</button>
+        </div>
+      </div>
+      <div class="grid cols-4" id="dashStats"></div>
+      <div class="grid cols-4" id="dashStats2" style="margin-top:18px;"></div>
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Revenue Over Time</h3></div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:-10px;margin-bottom:6px;">Growth trajectory for the current quarter</p>
+          <div class="bar-chart" id="revenueChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Sales by Category</h3></div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:-10px;">Performance breakdown</p>
+          <div id="categoryBars"></div>
+          <div class="insight-box">💡 <div><strong>Insight:</strong> "Sarees" are outperforming "Western Wear" by 2.8x this month. Consider featuring premium collections.</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">Top Performing Sellers</h3><span class="link-accent" onclick="go('sellers')">View All Sellers</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Vendor</th><th>Location</th><th>Sales</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="topSellersBody"></tbody></table></div>
+      </div>
+      <div class="footer-note">© 2023 Veloura Multi-Vendor Ecosystem. All rights reserved.</div>
+    </section>
+
+    <!-- ================= SELLER MANAGEMENT ================= -->
+    <section class="section" id="sec-sellers">
+      <div class="page-head">
+        <div><h1>Seller Management</h1><p>Oversee vendor verification, performance, and financial status.</p></div>
+        <div class="head-actions"><button class="btn btn-dark" onclick="toast('Vendor onboarding form opened')">+ Onboard New Vendor</button></div>
+      </div>
+      <div class="grid cols-4" id="sellerStats">
+
+    <div class="card">
+
+        <div class="stat-label">
+            Total Sellers
+        </div>
+
+        <div class="stat-value">
+            {{ total_sellers }}
+        </div>
+
+        <div class="stat-trend">
+            Registered sellers
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Pending KYC
+        </div>
+
+        <div class="stat-value">
+            {{ pending_sellers }}
+        </div>
+
+        <div class="stat-trend">
+            <span class="stat-warn">
+                Requires attention
+            </span>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Approved Sellers
+        </div>
+
+        <div class="stat-value">
+            {{ approved_sellers }}
+        </div>
+
+        <div class="stat-trend">
+            <span class="trend-up">
+                Active vendors
+            </span>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Suspended Sellers
+        </div>
+
+        <div class="stat-value">
+            {{ suspended_sellers }}
+        </div>
+
+        <div class="stat-trend">
+            Sellers currently suspended
+        </div>
+
+    </div>
+
+</div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">All Active &amp; Pending Vendors</h3>
+          <div style="display:flex;gap:10px;"><button class="btn btn-outline btn-sm">Export CSV</button><button class="btn btn-outline btn-sm">Filters</button></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Seller Name</th><th>Shop Name</th><th>Status</th><th>Commission %</th><th>Wallet Balance</th><th>Actions</th></tr></thead>
+        <tbody id="sellersBody">
+
+{% for seller in sellers %}
+
+<tr>
+
+    <td>
+        <div class="row-name">
+
+            <div class="chip">
+                {{ seller[2][:2]|upper }}
+            </div>
+
+            <div>
+                <div style="font-weight:600;">
+                    {{ seller[2] }}
+                </div>
+
+                <div class="sub">
+                    {{ seller[3] }}
+                </div>
+            </div>
+
+        </div>
+    </td>
+
+    <td>
+        <em>{{ seller[1] }}</em>
+    </td>
+
+    <td>
+
+        {% if seller[5] == 'Approved' %}
+            <span class="pill pill-success">
+                Approved
+            </span>
+
+        {% elif seller[5] == 'Pending' %}
+            <span class="pill pill-warn">
+                Pending
+            </span>
+
+        {% elif seller[5] == 'Rejected' %}
+            <span class="pill pill-danger">
+                Rejected
+            </span>
+
+        {% elif seller[5] == 'Suspended' %}
+            <span class="pill pill-danger">
+                Suspended
+            </span>
+
+        {% else %}
+            <span class="pill pill-info">
+                {{ seller[5] }}
+            </span>
+        {% endif %}
+
+    </td>
+
+    <td>
+        15%
+    </td>
+
+    <td>
+        ₹0
+    </td>
+
+    <td>
+
+        {% if seller[5] == 'Pending' %}
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+
+            <button
+                class="btn btn-gold btn-sm"
+                onclick="updateSellerStatus({{ seller[0] }}, 'Approved')">
+                Approve
+            </button>
+
+            <button
+                class="btn btn-danger-outline btn-sm"
+                onclick="updateSellerStatus({{ seller[0] }}, 'Rejected')">
+                Reject
+            </button>
+
+        </div>
+
+        {% elif seller[5] == 'Approved' %}
+
+        <button
+            class="btn btn-outline btn-sm"
+            onclick="updateSellerStatus({{ seller[0] }}, 'Suspended')">
+            Suspend
+        </button>
+
+        {% elif seller[5] == 'Suspended' %}
+
+        <button
+            class="btn btn-gold btn-sm"
+            onclick="updateSellerStatus({{ seller[0] }}, 'Approved')">
+            Reactivate
+        </button>
+
+        {% elif seller[5] == 'Rejected' %}
+
+        <button
+            class="btn btn-outline btn-sm"
+            onclick="updateSellerStatus({{ seller[0] }}, 'Approved')">
+            Approve
+        </button>
+
+        {% endif %}
+
+    </td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+    <td colspan="6">
+
+        <div class="empty">
+
+            <div class="big">
+                No sellers found
+            </div>
+
+            <div>
+                No seller registrations are available.
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+    </table></div>
+      </div>
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Recent Platform Payouts</h3><span class="link-accent">View All</span></div>
+          <div id="sellerPayoutsList"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Action Log</h3></div>
+          <div id="actionLogList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRODUCT MANAGEMENT ================= -->
+    <section class="section" id="sec-products">
+      <div class="page-head">
+        <div><h1>Product Management</h1><p>Review and manage high-fashion catalog approvals and inventory control.</p></div>
+        <div class="head-actions"><button class="btn btn-dark" onclick="toast('Add product form opened')">Add New Product</button></div>
+      </div>
+      <div class="card-head" style="margin-bottom:14px;">
+        <h3 class="section-title" style="display:flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Approval Queue
+        </h3>
+        <span class="link-accent">View All Requests</span>
+      </div>
+      <div class="grid cols-3" id="approvalQueue"></div>
+      <div class="card" style="margin-top:22px;">
+        <div class="card-head" style="flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <select class="field-select" style="border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;background:var(--surface);color:var(--text);"><option>All Categories</option></select>
+            <select style="border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;background:var(--surface);color:var(--text);"><option>All Brands</option></select>
+            <select style="border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;background:var(--surface);color:var(--text);"><option>Stock Status</option></select>
+          </div>
+          <span style="font-size:13px;color:var(--muted);" id="productCount">
+    Showing {{ products|length }} products
+</span>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Product Name</th><th>Category</th><th>Brand</th><th>Stock Level</th><th>Price</th><th>Featured</th><th></th></tr></thead>
+        <tbody id="productsBody">
+
+{% for product in products %}
+
+<tr>
+
+    <td>
+
+    <div class="row-name">
+
+        {% if product[13] %}
+
+            <img
+                src="{{ url_for('static', filename=product[13]) }}"
+                class="prod-thumb"
+                style="object-fit:cover;"
+                alt="{{ product[1] }}"
+            >
+
+        {% else %}
+
+            <div class="prod-thumb"></div>
+
+        {% endif %}
+
+        <div>
+
+            <div style="font-weight:600;">
+                {{ product[1] }}
+            </div>
+
+            <div class="sub">
+                Product ID: #{{ product[0] }}
+            </div>
+
+        </div>
+
+    </div>
+
+</td>
+
+
+    <td>
+
+        {% if product[11] %}
+
+        <span class="pill pill-info">
+            {{ product[11] }}
+        </span>
+
+        {% else %}
+
+        <span class="pill pill-info">
+            Uncategorized
+        </span>
+
+        {% endif %}
+
+    </td>
+
+
+    <td>
+        {{ product[2] or '—' }}
+    </td>
+
+
+    <td class="{% if (product[4] or 0) < 10 %}stock-low{% endif %}">
+
+        <span class="stock-bar">
+
+            <div
+                style="width:{{ [product[4] or 0, 100]|min }}%;">
+            </div>
+
+        </span>
+
+        {{ product[4] or 0 }} units
+
+    </td>
+
+
+    <td>
+        ₹{{ "{:,.2f}".format(product[3] or 0) }}
+    </td>
+
+
+    <td>
+
+        {% if product[7] == 'Featured' %}
+
+        <label class="switch">
+
+            <input
+                type="checkbox"
+                checked>
+
+            <span class="slider-tg"></span>
+
+        </label>
+
+        {% else %}
+
+        <label class="switch">
+
+            <input
+                type="checkbox">
+
+            <span class="slider-tg"></span>
+
+        </label>
+
+        {% endif %}
+
+    </td>
+
+
+    <td>
+
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+
+            {% if product[8] == 'Pending' %}
+
+            <button
+                class="btn btn-gold btn-sm"
+                onclick="approveProduct({{ product[0] }})">
+                Approve
+            </button>
+
+            <button
+                class="btn btn-danger-outline btn-sm"
+                onclick="rejectProduct({{ product[0] }})">
+                Reject
+            </button>
+
+            {% else %}
+
+            <button
+                class="btn btn-outline btn-sm"
+                onclick="deleteProduct({{ product[0] }})">
+                Delete
+            </button>
+
+            {% endif %}
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+    <td colspan="7">
+
+        <div class="empty">
+
+            <div class="big">
+                No products found
+            </div>
+
+            <div>
+                There are currently no products in the database.
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+    </table></div>
+        <div class="pagination" id="productPagination"></div>
+      </div>
+    </section>
+
+    <!-- ================= ORDER MANAGEMENT ================= -->
+    <section class="section" id="sec-orders">
+
+    <div class="page-head">
+        <div>
+            <h1>Order Management</h1>
+            <p>Oversee global sales tracking and vendor fulfillment.</p>
+        </div>
+
+        <div class="head-actions">
+            <button class="btn btn-outline" onclick="filterOrders()">
+                Filter
+            </button>
+
+            <button class="btn btn-dark" onclick="exportOrders()">
+                Export CSV
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ORDER STATISTICS -->
+
+    <div class="grid cols-4">
+
+        <div class="card">
+            <div class="stat-label">Total Revenue</div>
+
+            <div class="stat-value">
+                ₹{{ "{:,.2f}".format(total_revenue or 0) }}
+            </div>
+
+            <div class="stat-trend">
+                From non-cancelled orders
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="stat-label">Total Orders</div>
+
+            <div class="stat-value">
+                {{ total_orders }}
+            </div>
+
+            <div class="stat-trend">
+                Orders in database
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="stat-label">Pending Orders</div>
+
+            <div class="stat-value">
+                {{ pending_orders }}
+            </div>
+
+            <div class="stat-trend">
+                <span class="stat-warn">
+                    Requires attention
+                </span>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="stat-label">Cancelled Orders</div>
+
+            <div class="stat-value">
+                {{ cancelled_orders }}
+            </div>
+
+            <div class="stat-trend">
+                Cancelled orders
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ORDERS TABLE -->
+
+    <div class="card" style="margin-top:18px;">
+
+        <div class="card-head">
+
+            <h3 class="section-title">
+                All Orders
+            </h3>
+
+            <span style="font-size:13px;color:var(--muted);">
+                {{ total_orders }} orders found
+            </span>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Seller ID</th>
+                        <th>Product ID</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Commission</th>
+                        <th>Seller Earning</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% if orders %}
+
+                        {% for order in orders %}
+
+                        <tr>
+
+                            <!-- Order ID -->
+                            <td>
+                                <strong>
+                                    #{{ order[0] }}
+                                </strong>
+                            </td>
+
+
+                            <!-- Customer -->
+                            <td>
+                                {{ order[1] }}
+                            </td>
+
+
+                            <!-- Seller -->
+                            <td>
+                                {{ order[2] }}
+                            </td>
+
+
+                            <!-- Product -->
+                            <td>
+                                {{ order[3] }}
+                            </td>
+
+
+                            <!-- Quantity -->
+                            <td>
+                                {{ order[4] }}
+                            </td>
+
+
+                            <!-- Total -->
+                            <td>
+                                ₹{{ "{:,.2f}".format(order[6] or 0) }}
+                            </td>
+
+
+                            <!-- Commission -->
+                            <td>
+                                ₹{{ "{:,.2f}".format(order[8] or 0) }}
+                            </td>
+
+
+                            <!-- Seller earning -->
+                            <td>
+                                ₹{{ "{:,.2f}".format(order[9] or 0) }}
+                            </td>
+
+
+                            <!-- Status -->
+
+                            <td>
+
+                                {% if order[10] == "Delivered" %}
+
+                                    <span class="pill pill-success">
+                                        Delivered
+                                    </span>
+
+                                {% elif order[10] == "Shipped" %}
+
+                                    <span class="pill pill-info">
+                                        Shipped
+                                    </span>
+
+                                {% elif order[10] == "Processing" %}
+
+                                    <span class="pill pill-info">
+                                        Processing
+                                    </span>
+
+                                {% elif order[10] == "Pending" %}
+
+                                    <span class="pill pill-warn">
+                                        Pending
+                                    </span>
+
+                                {% elif order[10] == "Cancelled" %}
+
+                                    <span class="pill pill-danger">
+                                        Cancelled
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="pill pill-info">
+                                        {{ order[10] }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Date -->
+
+                            <td>
+                                {{ order[11] }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="10">
+
+                                <div class="empty">
+
+                                    <div class="big">
+                                        No orders found
+                                    </div>
+
+                                    <div>
+                                        Orders will appear here once customers place them.
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+      <div class="page-head">
+        <div><h1>Order Management</h1><p>Oversee global sales tracking and vendor fulfillment.</p></div>
+        <div class="head-actions"><button class="btn btn-outline">Filter</button><button class="btn btn-dark">Export CSV</button></div>
+      </div>
+      <div class="grid cols-4" id="orderStats">
+
+    <div class="card">
+
+        <div class="stat-label">
+            Total Orders
+        </div>
+
+        <div class="stat-value">
+            {{ total_orders }}
+        </div>
+
+        <div class="stat-trend">
+            Orders in database
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Total Revenue
+        </div>
+
+        <div class="stat-value">
+            ₹{{ "{:,.2f}".format(total_revenue or 0) }}
+        </div>
+
+        <div class="stat-trend">
+            Excluding cancelled orders
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Pending Orders
+        </div>
+
+        <div class="stat-value">
+            {{ pending_orders }}
+        </div>
+
+        <div class="stat-trend">
+
+            {% if pending_orders > 0 %}
+
+            <span class="stat-warn">
+                Requires attention
+            </span>
+
+            {% else %}
+
+            <span class="trend-up">
+                No pending orders
+            </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="stat-label">
+            Cancelled Orders
+        </div>
+
+        <div class="stat-value">
+            {{ cancelled_orders }}
+        </div>
+
+        <div class="stat-trend">
+
+            {% if cancelled_orders > 0 %}
+
+            <span class="trend-down">
+                Cancelled
+            </span>
+
+            {% else %}
+
+            <span class="trend-up">
+                None
+            </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+      <div class="card" style="margin-top:18px;">
+        <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Customer Name</th><th>Date</th><th>Total (₹)</th><th>Status</th><th></th></tr></thead>
+        <tbody id="ordersBody">
+
+{% for order in orders %}
+
+<tr>
+
+    <td>
+        #{{ order[0] }}
+    </td>
+
+    <td>
+
+        <div class="row-name">
+
+            <div class="chip">
+                #{{ order[1] }}
+            </div>
+
+            <div>
+                Customer #{{ order[1] }}
+            </div>
+
+        </div>
+
+    </td>
+
+    <td>
+        {{ order[11] }}
+    </td>
+
+    <td>
+        ₹{{ "{:,.2f}".format(order[6] or 0) }}
+    </td>
+
+    <td>
+
+        {% if order[10] == 'Pending' %}
+
+            <span class="pill pill-warn">
+                Pending
+            </span>
+
+        {% elif order[10] == 'Processing' %}
+
+            <span class="pill pill-info">
+                Processing
+            </span>
+
+        {% elif order[10] == 'Shipped' %}
+
+            <span class="pill pill-info">
+                Shipped
+            </span>
+
+        {% elif order[10] == 'Delivered' %}
+
+            <span class="pill pill-success">
+                Delivered
+            </span>
+
+        {% elif order[10] == 'Cancelled' %}
+
+            <span class="pill pill-danger">
+                Cancelled
+            </span>
+
+        {% else %}
+
+            <span class="pill pill-info">
+                {{ order[10] }}
+            </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>
+
+        <select
+            class="field-select"
+            style="padding:6px 8px;font-size:12px;"
+            onchange="updateOrderStatus({{ order[0] }}, this.value)">
+
+            <option value="">Change</option>
+
+            <option value="Pending"
+                {% if order[10] == 'Pending' %}selected{% endif %}>
+                Pending
+            </option>
+
+            <option value="Processing"
+                {% if order[10] == 'Processing' %}selected{% endif %}>
+                Processing
+            </option>
+
+            <option value="Shipped"
+                {% if order[10] == 'Shipped' %}selected{% endif %}>
+                Shipped
+            </option>
+
+            <option value="Delivered"
+                {% if order[10] == 'Delivered' %}selected{% endif %}>
+                Delivered
+            </option>
+
+            <option value="Cancelled"
+                {% if order[10] == 'Cancelled' %}selected{% endif %}>
+                Cancelled
+            </option>
+
+        </select>
+
+    </td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+    <td colspan="6">
+
+        <div class="empty">
+
+            <div class="big">
+                No orders found
+            </div>
+
+            <div>
+                There are currently no orders in the database.
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+    </table></div>
+        <div class="pagination" id="orderPagination" style="justify-content:space-between;"></div>
+      </div>
+    </section>
+
+    <!-- ================= CUSTOMER MANAGEMENT ================= -->
+    <section class="section" id="sec-customers">
+      <div class="page-head">
+        <div><h1>Customer Management</h1><p>Review customer relations, purchase history, and active support issues.</p></div>
+        <div class="head-actions"><button class="btn btn-outline">Export Data</button><button class="btn btn-dark" onclick="toast('New customer form opened')">Add New Customer</button></div>
+      </div>
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Active Relations</h3><span style="font-size:12.5px;color:var(--muted);">Filter by: All Customers</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Orders</th><th>LTV (₹)</th></tr></thead>
+          <tbody id="customersBody">
+
+{% for customer in customers %}
+
+<tr>
+
+    <td>
+        <div class="row-name">
+
+            <div class="chip">
+                {{ customer[1][:2]|upper }}
+            </div>
+
+            <div>
+                {{ customer[1] }}
+            </div>
+
+        </div>
+    </td>
+
+    <td>
+        {{ customer[2] }}
+    </td>
+
+    <td>
+        {{ customer[0] }}
+    </td>
+
+    <td>
+        {{ customer[4] }}
+    </td>
+
+</tr>
+
+{% else %}
+
+<tr>
+    <td colspan="4">
+
+        <div class="empty">
+
+            <div class="big">
+                No customers found
+            </div>
+
+            <div>
+                There are currently no customers in the database.
+            </div>
+
+        </div>
+
+    </td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+        </table></div>
+          <div class="pagination" id="customerPagination" style="justify-content:space-between;"></div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-head"><h3 class="section-title">Active Complaints</h3><span class="pill pill-danger">High Priority</span></div>
+            <div id="ticketsList"></div>
+            <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:14px;">View All Tickets</button>
+          </div>
+          <div class="dark-card" style="margin-top:18px;">
+            <h3 class="serif" style="font-size:19px;">Customer Retention</h3>
+            <p style="font-size:12.5px;opacity:.75;margin-top:8px;">Growth of repeat buyers over last quarter.</p>
+            <div class="serif" style="font-size:38px;font-weight:700;margin-top:14px;">+24.8%</div>
+            <div style="font-size:11px;letter-spacing:.5px;opacity:.6;text-transform:uppercase;margin-top:6px;">Outperforming previous year</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COMMISSION & PAYOUTS ================= -->
+    <section class="section" id="sec-commission">
+      <div class="page-head">
+        <div><h1>Commission &amp; Payouts</h1><p>Oversee the marketplace financial ecosystem, adjust platform fee structures, and manage vendor withdrawals.</p></div>
+        <div class="head-actions"><button class="btn btn-outline">Download Report</button><button class="btn btn-gold">Export Ledger</button></div>
+      </div>
+      <div class="grid cols-3" style="align-items:stretch;">
+        <div class="card">
+          <div class="stat-label">Total Platform Revenue</div>
+          <div class="stat-value" style="font-size:34px;">₹{{ "{:,.2f}".format(total_commission or 0) }}</div>
+          <div class="stat-trend"><span class="trend-up">↗ +12.4%</span> vs last month</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Pending Payouts</div>
+          <div class="stat-value" style="font-size:34px;">
+    ₹0.00
+</div>
+          <div class="progress" style="margin-top:14px;"><div style="width:70%;"></div></div>
+          <div class="stat-trend">67 Requests Awaiting Approval</div>
+        </div>
+        <div class="dark-card">
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;">Global Settings</div>
+          <h3 class="serif" style="font-size:22px;margin-top:6px;">Commission Rate</h3>
+          <div style="font-size:11px;letter-spacing:.5px;text-transform:uppercase;opacity:.65;margin-top:16px;">Platform Percentage (%)</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+            <input id="commissionRate" value="15" style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);padding:10px 12px;color:#fff;font-size:16px;font-family:inherit;">
+            <span style="font-size:18px;">%</span>
+          </div>
+          <p style="font-size:12px;opacity:.65;margin-top:12px;font-style:italic;">Applied to all new product sales globally across the platform.</p>
+          <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:16px;" onclick="toast('Commission rate saved')">Save Changes</button>
+        </div>
+      </div>
+      <div class="grid cols-2" style="margin-top:18px;align-items:start;">
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Top Seller Wallets</h3></div>
+          <div id="walletsList">
+
+    <div class="empty" style="padding:30px 10px;">
+
+        <div class="big">
+            Wallet data unavailable
+        </div>
+
+        <div>
+            No seller wallet table is currently connected to the admin dashboard.
+        </div>
+
+    </div>
+
+</div>
+          <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:14px;">View All Seller Balances</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Pending Payout Requests</h3></div>
+          <div class="table-wrap"><table><thead><tr><th>Vendor</th><th>Request Date</th><th>Method</th><th>Amount</th><th>Action</th></tr></thead>
+          <tbody id="payoutRequestsBody">
+
+<tr>
+
+    <td colspan="5">
+
+        <div class="empty" style="padding:30px 10px;">
+
+            <div class="big">
+                No payout data available
+            </div>
+
+            <div>
+                Connect the payout table when it is available.
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
+</tbody>
+        </table></div>
+          <div class="stat-trend" style="margin-top:12px;">Showing 4 of 67 pending requests</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COUPONS & OFFERS ================= -->
+    <section class="section" id="sec-coupons">
+      <div class="page-head">
+        <div><h1>Coupons &amp; Offers</h1><p>Strategize and manage promotional campaigns across the multi-vendor platform.</p></div>
+        <div class="head-actions"><button class="btn btn-outline">⚡ Schedule Flash Sale</button><button class="btn btn-dark" onclick="toast('Coupon creator opened')">+ Create Coupon</button></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="card">
+          <div class="stat-label">Active Campaigns Efficiency</div>
+          <div class="stat-value" style="font-size:32px;">₹4,28,500 <span class="trend-up" style="font-size:14px;font-family:'Inter';">+12.4% vs Last Month</span></div>
+          <div class="grid cols-3" style="margin-top:22px;">
+            <div><div style="font-size:12.5px;color:var(--muted);">Redemptions</div><div style="font-size:18px;font-weight:600;margin-top:4px;">1,240</div></div>
+            <div><div style="font-size:12.5px;color:var(--muted);">Conversion Rate</div><div style="font-size:18px;font-weight:600;margin-top:4px;">8.2%</div></div>
+            <div><div style="font-size:12.5px;color:var(--muted);">Avg. Discount</div><div style="font-size:18px;font-weight:600;margin-top:4px;">₹342</div></div>
+          </div>
+        </div>
+        <div class="dark-card">
+          <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.7;">Upcoming Event</div>
+          <h3 class="serif" style="font-size:24px;margin-top:8px;">Midnight Luxe Flash Sale</h3>
+          <div style="font-size:12.5px;opacity:.75;margin-top:12px;">Starts in: <span id="countdown">04h 22m 15s</span></div>
+          <button class="btn btn-gold" style="margin-top:18px;" onclick="toast('Manage event opened')">Manage Event</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">Active Coupons</h3><span style="font-size:12.5px;color:var(--muted);">All Status ▾</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Coupon Code</th><th>Type</th><th>Value</th><th>Category</th><th>Validity</th><th>Status</th><th></th></tr></thead>
+        <tbody id="couponsBody">
+
+{% for coupon in coupons %}
+
+<tr>
+
+    <td>
+        <span
+            class="pill pill-info"
+            style="font-family:monospace;">
+            {{ coupon[1] }}
+        </span>
+    </td>
+
+    <td>
+        Discount
+    </td>
+
+    <td>
+        ₹{{ "{:,.2f}".format(coupon[2] or 0) }}
+    </td>
+
+    <td>
+        Sitewide
+    </td>
+
+    <td>
+        {{ coupon[3] or 'No expiry' }}
+    </td>
+
+    <td>
+
+        {% if coupon[4] %}
+
+            <span class="pill pill-success">
+                Active
+            </span>
+
+        {% else %}
+
+            <span class="pill pill-danger">
+                Inactive
+            </span>
+
+        {% endif %}
+
+    </td>
+
+    <td>
+        <button
+            class="btn btn-outline btn-sm"
+            onclick="toast('Coupon #{{ coupon[0] }} selected')">
+            View
+        </button>
+    </td>
+
+</tr>
+
+{% else %}
+
+<tr>
+
+    <td colspan="7">
+
+        <div class="empty">
+
+            <div class="big">
+                No coupons found
+            </div>
+
+            <div>
+                There are currently no coupons in the database.
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+    </table></div>
+        <div class="stat-trend" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span>
+    Showing {{ coupons|length }} coupons
+</span>
+          <div class="pagination"><div class="page-btn active">1</div><div class="page-btn">2</div><div class="page-btn">3</div></div>
+        </div>
+      </div>
+      <div class="grid cols-2" style="margin-top:18px;">
+        <div class="promo-card">
+          <span class="tag">Campaign Visuals</span>
+          <div class="cap"><div class="t">Campaign Visuals</div><div class="s">Update creative assets for the upcoming Diwali sale.</div></div>
+        </div>
+        <div class="card">
+          <div style="font-size:20px;">✨</div>
+          <h3 class="section-title" style="margin-top:10px;">Smart Recommendations</h3>
+          <p style="font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6;">Based on last week's performance, adding a "Limited Stock" timer to the <strong>LUXE15OFF</strong> campaign could increase conversions by 14%.</p>
+          <button class="btn btn-gold" style="margin-top:14px;" onclick="toast('Suggestion applied')">Apply Suggestion</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="section" id="sec-reports">
+      <div class="page-head">
+        <div><h1>Detailed Analytics</h1><p>Strategic insights for Veloura multi-vendor ecosystem.</p></div>
+        <div class="head-actions">
+          <button class="btn btn-outline">📅 Oct 01, 2023 — Oct 31, 2023 ▾</button>
+          <button class="btn btn-gold">Export to CSV</button>
+        </div>
+      </div>
+      <div class="tabs" id="reportTabs">
+        <button class="tab active" data-tab="sales">Sales</button>
+        <button class="tab" data-tab="perf">Seller Performance</button>
+        <button class="tab" data-tab="insights">Customer Insights</button>
+        <button class="tab" data-tab="velocity">Product Velocity</button>
+        <button class="tab" data-tab="commission">Commission &amp; Payouts</button>
+      </div>
+      <div class="grid cols-4">
+
+    <div class="card">
+        <div class="stat-label">Gross Revenue</div>
+        <div class="stat-value">
+            ₹{{ "{:,.2f}".format(total_revenue or 0) }}
+        </div>
+        <div class="stat-trend">
+            From completed/non-cancelled orders
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">
+            {{ total_orders }}
+        </div>
+        <div class="stat-trend">
+            Orders in database
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-label">Total Sellers</div>
+        <div class="stat-value">
+            {{ total_sellers }}
+        </div>
+        <div class="stat-trend">
+            Sellers in database
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-label">Net Commission</div>
+        <div class="stat-value">
+            ₹{{ "{:,.2f}".format(total_commission or 0) }}
+        </div>
+        <div class="stat-trend">
+            Calculated from orders
+        </div>
+    </div>
+
+</div>
+      <div class="grid cols-2" style="margin-top:18px;align-items:start;">
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Revenue Trend Analysis</h3><span style="font-size:12px;color:var(--muted);">● Current Period</span></div>
+          <div class="bar-chart" id="reportChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="section-title">Vendor Payout Distribution</h3></div>
+          <div class="wallet-row" style="border:none;">
+            <div class="donut" style="background:conic-gradient(var(--accent) 0% 75%, var(--border) 75% 100%);">75%</div>
+            <div style="flex:1;margin-left:14px;"><div class="wname">Processed</div><div class="wsub">₹28,40,000 disbursed</div></div>
+          </div>
+          <div class="wallet-row" style="border:none;">
+            <div class="donut" style="background:conic-gradient(var(--accent) 0% 25%, var(--border) 25% 100%);">25%</div>
+            <div style="flex:1;margin-left:14px;"><div class="wname">Pending</div><div class="wsub">₹9,45,000 in escrow</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-head"><h3 class="section-title">Transaction History</h3></div>
+        <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Vendor</th><th>Amount</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="transactionsBody"></tbody></table></div>
+        <div class="stat-trend" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span>Showing 5 of 1,482 transactions</span>
+          <div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" disabled>Previous</button><button class="btn btn-dark btn-sm">Next</button></div>
+        </div>
+      </div>
+      <div class="footer-note">© 2023 Veloura Fashion Group — Proprietary Internal Dashboard</div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="section" id="sec-settings">
+      <div class="page-head">
+        <div><h1>System Configuration</h1><p>Manage your global store settings, financial integrations, and communication APIs from a centralized dashboard.</p></div>
+      </div>
+      <div class="tabs" id="settingsTabs">
+        <button class="tab active" data-tab="site">Site Info</button>
+        <button class="tab" data-tab="payment">Payment Gateway</button>
+        <button class="tab" data-tab="tax">GST/Tax Settings</button>
+        <button class="tab" data-tab="api">API (SMS/WhatsApp)</button>
+      </div>
+      <div class="grid cols-2">
+        <div>
+          <div class="card">
+            <h3 class="section-title" style="margin-bottom:18px;">General Information</h3>
+            <div class="form-grid">
+              <div class="field"><label>Store Name</label><input value="Veloura Luxury Boutique"></div>
+              <div class="field"><label>Support Email</label><input value="concierge@veloura.com"></div>
+              <div class="field"><label>Base Currency (Locked)</label><input value="₹ INR (Indian Rupee)" disabled></div>
+              <div class="field"><label>Timezone</label><input value="(GMT+05:30) Mumbai, Kolkata, New Delhi"></div>
+            </div>
+            <div class="field"><label>Office Address</label><textarea rows="3">Level 4, High Street Phoenix, Lower Parel, Mumbai, Maharashtra 400013</textarea></div>
+          </div>
+          <div class="card" style="margin-top:18px;">
+            <h3 class="section-title" style="margin-bottom:18px;">Brand Identity</h3>
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+              <div class="upload-box" style="width:140px;height:110px;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Upload Logo
+              </div>
+              <div style="flex:1;min-width:200px;">
+                <div style="font-weight:600;font-size:14.5px;">Favicon &amp; Logos</div>
+                <p style="font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6;">Recommended size: 512x512px. Supports PNG, SVG, or WebP formats. Max file size: 2MB.</p>
+                <div style="display:flex;gap:10px;margin-top:12px;">
+                  <button class="btn btn-outline btn-sm">Replace</button>
+                  <button class="btn btn-sm" style="color:var(--danger);background:none;border:none;">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="dark-card">
+            <div style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;">🛡 System Health</div>
+            <p style="font-size:13px;margin-top:12px;line-height:1.6;opacity:.9;">Last global sync was successful at 14:30 PM IST. All communication channels are operational.</p>
+            <div style="margin-top:18px;font-size:12px;display:flex;justify-content:space-between;"><span>Uptime</span><strong>99.98%</strong></div>
+            <div class="progress" style="margin-top:6px;background:rgba(255,255,255,.15);"><div style="width:99%;"></div></div>
+            <div style="margin-top:14px;font-size:12px;display:flex;justify-content:space-between;"><span>API Latency</span><strong>124ms</strong></div>
+          </div>
+          <div class="card" style="margin-top:18px;">
+            <h3 class="section-title" style="margin-bottom:6px;">Quick Actions</h3>
+            <div class="qa-list">
+              <div class="qa-item" onclick="toast('System cache cleared')">Clear System Cache</div>
+              <div class="qa-item" onclick="toast('Opening change logs')">View Change Logs</div>
+              <div class="qa-item" onclick="toast('Configuration exported')">Export Configuration</div>
+            </div>
+          </div>
+          <div class="promo-card" style="margin-top:18px;min-height:150px;">
+            <span class="tag">Coming Soon</span>
+            <div class="cap"><div class="t">Advanced Analytics 2.0</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-head" style="margin-top:22px;padding-top:16px;border-top:1px solid var(--border);">
+        <span style="font-size:12.5px;color:var(--muted);">⚠ Unsaved changes will be lost if you leave this page.</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline">Discard</button>
+          <button class="btn btn-dark" onclick="toast('Configuration saved')">Save Configuration</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ===================== ICONS ===================== */
+const ICONS = {
+  dashboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+  sellers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 004 0 2 2 0 004 0 2 2 0 004 0 2 2 0 004 0"/><path d="M4 9v10h16V9"/></svg>',
+  products:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg>',
+  orders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l1.5 4h9L18 2"/><path d="M3.5 6h17l-1.4 13a2 2 0 01-2 1.8H6.9a2 2 0 01-2-1.8z"/><path d="M9 10a3 3 0 006 0"/></svg>',
+  customers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  commission:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg>',
+  coupons:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24L3.24 9.59A2 2 0 003.24 11l9.58 9.58a2 2 0 002.83 0l6.35-6.35a2 2 0 000-2.83z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>',
+  reports:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg>',
+  settings:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
+};
+const NAV_ITEMS = [
+  {id:'dashboard', label:'Dashboard'},
+  {id:'sellers', label:'Seller Management'},
+  {id:'products', label:'Product Management'},
+  {id:'orders', label:'Order Management'},
+  {id:'customers', label:'Customer Management'},
+  {id:'commission', label:'Commission &amp; Payouts'},
+  {id:'coupons', label:'Coupons &amp; Offers'},
+  {id:'reports', label:'Reports'},
+  {id:'settings', label:'Settings'},
+];
+
+function buildNav(){
+  document.getElementById('nav').innerHTML = NAV_ITEMS.map(n=>
+    `<button class="nav-item${n.id==='dashboard'?' active':''}" data-section="${n.id}" onclick="go('${n.id}')">${ICONS[n.id]}<span>${n.label}</span></button>`
+  ).join('');
+}
+
+function go(sectionId){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+sectionId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.section===sectionId));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function adminLogout() {
+    window.location.href = "/admin/logout";
+}
+
+function money(n){ return '₹' + Math.round(n).toLocaleString('en-IN'); }
+
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML = `<span class="dotok"></span>${msg}`;
+  wrap.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+function statCard(s){
+  return `<div class="card">
+    <div class="stat-label">${s.label}</div>
+    <div class="stat-value">${s.value}</div>
+    <div class="stat-trend">${s.trendHtml || s.trend || ''}</div>
+  </div>`;
+}
+
+function statusPill(status){
+  const map = {
+    Shipped:'warn', Pending:'info', Delivered:'success', Returned:'danger',
+    Approved:'success', Suspended:'danger', Active:'success', Scheduled:'info', Expired:'danger',
+    SETTLED:'warn', PROCESSING:'info', FLAGGED:'danger', TRANSFERRED:'success',
+    'Pending Review':'warn', 'Open':'info'
+  };
+  const cls = map[status] || 'info';
+  return `<span class="pill pill-${cls}">${status}</span>`;
+}
+
+function initials(name){
+  return name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+}
+
+/* ===================== DATA ===================== */
+const state = {
+
+  /*sellers:[
+    {name:'Ananya Mishra', shop:'Ethnic Grace', status:'Approved', commission:15.0, wallet:124500},
+    {name:'Rajesh Khanna', shop:'Zari Boutique', status:'Pending', commission:12.0, wallet:0},
+    {name:'Vikram Patel', shop:'Patel Silks', status:'Suspended', commission:10.0, wallet:45200},
+    {name:'Meera Nair', shop:'Silk Route', status:'Approved', commission:14.0, wallet:88950},
+    {name:'Kabir Sethi', shop:'Urban Weave', status:'Approved', commission:13.5, wallet:32100},
+  ],*/
+
+  sellerPayouts:[
+    {name:'Ethnic Grace - Monthly Settlement', ref:'#PAY-90421', date:'24 Mar 2024', amount:82400, status:'TRANSFERRED'},
+    {name:'Silk Route - Clearance', ref:'#PAY-90382', date:'22 Mar 2024', amount:34120, status:'TRANSFERRED'},
+    {name:'Urvashi Creations - Ad Refund', ref:'#PAY-90311', date:'Processing', amount:5000, status:'PROCESSING'},
+  ],
+  actionLog:[
+    {who:'Admin Sarah', action:'suspended', target:'Modern Threads', reason:'for policy violation.', time:'2 hours ago', dot:'danger'},
+    {who:'System', action:'automatically approved KYC for', target:'Zari Boutique', reason:'', time:'5 hours ago', dot:'success'},
+    {who:'Admin Sarah', action:'updated commission for', target:'Ethnic Grace', reason:'to 15%.', time:'1 day ago', dot:'info'},
+  ],
+
+  /*products:[
+    {name:'Midnight Silk Shawl', sku:'VL-7729-MS', category:'ACCESSORIES', brand:'Kashmiri Heritage', stock:85, price:12499, featured:true},
+    {name:'Kundan Jhumka Gold', sku:'VL-2210-KJ', category:'JEWELLERY', brand:'Royal Ornaments', stock:3, price:45999, featured:false},
+    {name:'Organza Silver Glow', sku:'VL-9921-OS', category:'SAREES', brand:'Surat Silks', stock:12, price:7200, featured:true},
+    {name:'Royal Burgundy Sherwani', sku:'VL-5512-RS', category:'MENSWEAR', brand:'Manyavar Heritage', stock:42, price:24999, featured:false},
+  ],*/
+
+  approvalQueue:[
+    {name:'Banarasi Silk Emerald', cat:'SAREES', by:"By Kanchipuram Weaver's Guild"},
+    {name:'Chikankari Handloom Ivory', cat:'KURTIS', by:'By Lucknowi Heritage'},
+    {name:'Temple Gold Choker', cat:'JEWELLERY', by:'By Malabar Artisans'},
+  ],
+  /*orders:[
+    {id:'#VL-9021', name:'Ananya Mishra', date:'Oct 24, 2023', total:12400, status:'Shipped'},
+    {id:'#VL-9022', name:'Rohan Kapoor', date:'Oct 24, 2023', total:4200, status:'Pending'},
+    {id:'#VL-9023', name:'Sneha Jain', date:'Oct 23, 2023', total:28500, status:'Delivered'},
+    {id:'#VL-9024', name:'Vikram Patel', date:'Oct 23, 2023', total:1200, status:'Returned'},
+    {id:'#VL-9025', name:'Ishani Sharma', date:'Oct 22, 2023', total:8900, status:'Shipped'},
+  ],*/
+
+  /*customers:[
+    {name:'Ananya Kapoor', email:'ananya.kapoor@example.com', orders:12, ltv:145200},
+    {name:'Rohan Sharma', email:'rohan.sh@example.com', orders:8, ltv:82400},
+    {name:'Vikram Malhotra', email:'vik.mal@example.com', orders:2, ltv:14000},
+    {name:'Priya Bansal', email:'pbansal@example.com', orders:24, ltv:412000},
+    {name:'John Doe', email:'j.doe@example.com', orders:5, ltv:56800},
+  ],*/ 
+  
+  tickets:[
+    {id:'#TK-9821', subject:'Delayed Shipment - Velvet Ensemble', body:'Customer reports the package was marked as delivered but…', who:'Ananya Kapoor', time:'2h ago'},
+    {id:'#TK-9818', subject:'Size Mismatch - Silk Saree', body:'The received product dimensions do not match the size chart…', who:'Rohan Sharma', time:'5h ago'},
+    {id:'#TK-9799', subject:'Refund Inquiry', body:'Payment was deducted but order shows as cancelled….', who:'Vikram Malhotra', time:'1d ago'},
+  ],
+
+  /*wallets:[
+    {name:'Aura Collective', sub:'Active Since 2022', amount:345000, status:'LIQUID'},
+    {name:'Nova Sartorial', sub:'Active Since 2023', amount:192800, status:'LIQUID'},
+    {name:'Ethereal Silk', sub:'New Partner', amount:88400, status:'HOLD'},
+  ],*/ 
+
+
+  /*coupons:[
+    {code:'VELOURA20', type:'Percentage', value:'20%', category:'Footwear', validity:'Oct 12 - Nov 30', status:'Active'},
+    {code:'FESTIVE500', type:'Fixed Amount', value:'₹500', category:'Sitewide', validity:'Dec 01 - Dec 25', status:'Scheduled'},
+    {code:'LUXE15OFF', type:'Percentage', value:'15%', category:'Bags & Jewelry', validity:'Sept 15 - Oct 15', status:'Expired'},
+    {code:'NEWUSER100', type:'Fixed Amount', value:'₹100', category:'Sitewide', validity:'Ongoing', status:'Active'},
+  ],*/ 
+
+  transactions:[
+    {id:'#VL-89320', vendor:'Maison de Luxe', amount:42000, commission:6300, status:'SETTLED', date:'24 Oct, 2023'},
+    {id:'#VL-89321', vendor:'Urban Chic Collective', amount:18500, commission:2775, status:'PROCESSING', date:'24 Oct, 2023'},
+    {id:'#VL-89322', vendor:'Silk & Stone', amount:112000, commission:16800, status:'SETTLED', date:'23 Oct, 2023'},
+    {id:'#VL-89323', vendor:'Ethereal Threads', amount:24999, commission:3750, status:'FLAGGED', date:'22 Oct, 2023'},
+    {id:'#VL-89324', vendor:'Nova Couture', amount:65000, commission:9750, status:'SETTLED', date:'22 Oct, 2023'},
+  ],
+  topSellers:[
+    {name:'Silk Heritage Studio', id:'VH-9021', loc:'Banaras, India', sales:4520000, status:'Active'},
+    {name:'Kalyan Jewelers Elite', id:'VH-3312', loc:'Mumbai, India', sales:3890000, status:'Active'},
+    {name:'Vogue Ethnic Wear', id:'VH-1189', loc:'Jaipur, India', sales:2215000, status:'Pending Review'},
+  ],
+  categories:[
+    {name:'Sarees', value:'₹1.2Cr', pct:100},
+    {name:'Kurtis', value:'₹65L', pct:54},
+    {name:'Western Wear', value:'₹42L', pct:35},
+    {name:'Jewellery', value:'₹18L', pct:15},
+  ],
+  revenueWeeks:[{lbl:'Week 1',h:38},{lbl:'Week 2',h:58},{lbl:'Week 3',h:44},{lbl:'Week 4',h:92}],
+  reportWeek:[{lbl:'Mon',h:30},{lbl:'Tue',h:45},{lbl:'Wed',h:38},{lbl:'Thu',h:60},{lbl:'Fri',h:52},{lbl:'Sat',h:75},{lbl:'Sun',h:66}],
+};
+
+/* ===================== RENDERERS ===================== */
+function renderDashboard(){
+  document.getElementById('dashStats').innerHTML = [
+    {label:'Revenue MTD', value:'₹2,45,00,000', trendHtml:'<span class="trend-up">↗ +12.4%</span> from last month'},
+    {label:'Orders', value:'1,240', trend:'Average ₹19,758 / order'},
+    {label:'Sellers', value:'85', trend:'14 new this month'},
+    {label:'Customers', value:'12,400', trend:'82% retention rate'},
+  ].map(statCard).join('');
+  document.getElementById('dashStats2').innerHTML = [
+    {label:'Products', value:'5,600', trend:'Live in catalog'},
+    {label:'Sellers Pending', value:'12', trendHtml:'<span class="stat-warn">Requires Approval</span>'},
+    {label:'Products Queued', value:'45', trendHtml:'<span class="stat-warn">Content Review</span>'},
+    {label:'System Status', value:'Optimal', trendHtml:'<span class="trend-up">All systems normal</span>'},
+  ].map(statCard).join('');
+  document.getElementById('revenueChart').innerHTML = state.revenueWeeks.map(w=>
+    `<div class="bar-col"><div class="bar" style="height:${w.h}%;"></div><div class="lbl">${w.lbl}</div></div>`
+  ).join('');
+  document.getElementById('categoryBars').innerHTML = state.categories.map(c=>
+    `<div class="catbar-row"><span class="cname">${c.name}</span><span>${c.value}</span></div>
+     <div class="catbar-track"><div style="width:${c.pct}%;"></div></div>`
+  ).join('');
+  document.getElementById('topSellersBody').innerHTML = state.topSellers.map(s=>
+    `<tr><td><div class="row-name"><div class="chip">${initials(s.name)}</div><div><div style="font-weight:600;">${s.name}</div><div class="sub">ID: ${s.id}</div></div></div></td>
+    <td>${s.loc}</td><td>${money(s.sales)}</td><td>${statusPill(s.status)}</td>
+    <td>⋯</td></tr>`
+  ).join('');
+}
+
+function renderSellers(){
+  const approved = state.sellers.filter(s=>s.status==='Approved').length;
+  const pending = state.sellers.filter(s=>s.status==='Pending').length;
+  const totalWallet = state.sellers.reduce((a,s)=>a+s.wallet,0);
+  document.getElementById('sellerStats').innerHTML = [
+    {label:'Total Sellers', value:state.sellers.length.toLocaleString(), trendHtml:'<span class="trend-up">↗ +12%</span> this month'},
+    {label:'Pending KYC', value:pending, trendHtml:'<span class="stat-warn">⚠ Requires attention</span>'},
+    {label:'Total Wallet Balance', value:money(totalWallet), trend:'Across all active vendors'},
+    {label:'Avg. Commission', value:'12.5%', trend:'Global platform rate'},
+  ].map(statCard).join('');
+  document.getElementById('sellersBody').innerHTML = state.sellers.map(s=>
+    `<tr><td><div class="row-name"><div class="chip">${initials(s.name)}</div><div><div style="font-weight:600;">${s.name}</div><div class="sub">${s.shop}</div></div></div></td>
+    <td><em>${s.shop}</em></td>
+    <td>${statusPill(s.status)}</td>
+    <td>${s.commission.toFixed(1)}%</td>
+    <td>${money(s.wallet)}</td>
+    <td>${s.status==='Pending' ? '<button class="btn btn-gold btn-sm" onclick="toast(\''+s.name+' KYC verified\')">Verify KYC</button>'
+        : s.status==='Suspended' ? '<span class="link-accent" onclick="toast(\''+s.name+' reactivated\')">Reactivate</span>'
+        : '<button class="btn btn-outline btn-sm" onclick="toast(\'Opening profile\')">View</button>'}</td></tr>`
+  ).join('');
+  document.getElementById('sellerPayoutsList').innerHTML = state.sellerPayouts.map(p=>
+    `<div class="wallet-row"><div><div class="wname">${p.name}</div><div class="wsub">Ref: ${p.ref} | ${p.date}</div></div>
+    <div><div class="wamt">${money(p.amount)}</div>${statusPill(p.status)}</div></div>`
+  ).join('');
+  document.getElementById('actionLogList').innerHTML = state.actionLog.map(a=>
+    `<div class="wallet-row" style="align-items:flex-start;">
+      <span class="pill pill-${a.dot}" style="width:8px;height:8px;padding:0;border-radius:50%;margin-top:6px;"></span>
+      <div style="flex:1;margin-left:10px;"><div style="font-size:13.5px;"><strong>${a.who}</strong> ${a.action} <em>${a.target}</em> ${a.reason}</div>
+      <div class="wsub" style="margin-top:4px;">${a.time}</div></div>
+    </div>`
+  ).join('');
+}
+
+function renderProducts(){
+  document.getElementById('approvalQueue').innerHTML = state.approvalQueue.map(p=>
+    `<div class="approval-card">
+      <div class="prod-thumb" style="width:64px;height:64px;"></div>
+      <div style="flex:1;">
+        <div class="cat">${p.cat}</div>
+        <div class="name">${p.name}</div>
+        <div class="by">${p.by}</div>
+        <div class="approval-actions">
+          <button class="btn btn-gold btn-sm" onclick="toast('${p.name} approved')">Approve</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('${p.name} rejected')">Reject</button>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+  document.getElementById('productCount').textContent = `Displaying 1-${state.products.length} of 254 products`;
+  document.getElementById('productsBody').innerHTML = state.products.map((p,i)=>
+    `<tr><td><div class="row-name"><div class="prod-thumb"></div><div><div style="font-weight:600;">${p.name}</div><div class="sub">SKU: ${p.sku}</div></div></div></td>
+    <td><span class="pill pill-info">${p.category}</span></td>
+    <td>${p.brand}</td>
+    <td class="${p.stock<10?'stock-low':''}"><span class="stock-bar"><div style="width:${Math.min(p.stock,100)}%;"></div></span>${p.stock} units</td>
+    <td>${money(p.price)}</td>
+    <td><label class="switch"><input type="checkbox" ${p.featured?'checked':''} onchange="toggleFeatured(${i})"><span class="slider-tg"></span></label></td>
+    <td>⋯</td></tr>`
+  ).join('');
+  document.getElementById('productPagination').innerHTML = ['1','2','3','…','26'].map(p=>
+    `<div class="page-btn${p==='1'?' active':''}">${p}</div>`).join('') + '<div class="page-btn">›</div>';
+}
+function toggleFeatured(i){ state.products[i].featured = !state.products[i].featured; toast(state.products[i].name + (state.products[i].featured ? ' marked featured' : ' unfeatured')); }
+
+
+function renderCustomers(){
+  document.getElementById('customersBody').innerHTML = state.customers.map(c=>
+    `<tr><td><div class="row-name"><div class="chip">${initials(c.name)}</div>${c.name}</div></td>
+    <td>${c.email}</td><td>${String(c.orders).padStart(2,'0')}</td><td>${money(c.ltv)}</td></tr>`
+  ).join('');
+  document.getElementById('customerPagination').innerHTML =
+    `<span style="font-size:13px;color:var(--muted);">Showing {{ customers|length }} customers</span>
+     <div style="display:flex;gap:6px;"><div class="page-btn">‹</div><div class="page-btn active">1</div><div class="page-btn">2</div><div class="page-btn">3</div><div class="page-btn">›</div></div>`;
+  document.getElementById('ticketsList').innerHTML = state.tickets.map(t=>
+    `<div class="ticket">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div><span style="font-weight:700;font-size:11.5px;color:var(--accent-dark);">${t.id}</span> <span style="font-size:12px;color:var(--muted);">${t.time}</span>
+        <div style="font-weight:600;font-size:14px;margin-top:4px;">${t.subject}</div></div>
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:6px;">${t.body}</div>
+      <div class="row-name" style="margin-top:10px;"><div class="chip" style="width:22px;height:22px;font-size:10px;">${initials(t.who)}</div><span style="font-size:12.5px;">${t.who}</span></div>
+    </div>`
+  ).join('');
+}
+
+/* ===================== TAB HANDLING ===================== */
+function initTabs(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.addEventListener('click', e=>{
+    const btn = e.target.closest('.tab');
+    if(!btn) return;
+    container.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    toast(btn.textContent.trim() + ' view loaded');
+  });
+}
+
+async function approveProduct(productId){
+    if(!confirm("Approve this product?")){
+        return;
+    }
+    try{
+        const response = await fetch(
+            `/admin/product/${productId}/approve`,
+            {
+                method: "POST"
+            }
+        );
+
+        const result = await response.json();
+        if(!response.ok || !result.success){
+            toast(
+                result.message || "Failed to approve product"
+            );
+            return;
+        }
+        toast(result.message);
+        setTimeout(() => {
+            window.location.reload();
+        }, 700);
+    }catch(error){
+        console.error("APPROVE PRODUCT ERROR:", error);
+        toast("Something went wrong.");
+    }
+}
+
+async function rejectProduct(productId){
+    if(!confirm("Reject this product?")){
+        return;
+    }
+    try{
+        const response = await fetch(
+            `/admin/product/${productId}/reject`,
+            {
+                method: "POST"
+            }
+        );
+        const result = await response.json();
+        if(!response.ok || !result.success){
+            toast(
+                result.message || "Failed to reject product"
+            );
+            return;
+        }
+        toast(result.message);
+        setTimeout(() => {
+            window.location.reload();
+        }, 700);
+    }catch(error){
+        console.error("REJECT PRODUCT ERROR:", error);
+        toast("Something went wrong.");
+    }
+}
+
+async function deleteProduct(productId){
+    if(!confirm("Are you sure you want to delete this product?")){
+        return;
+    }
+    try{
+        const response = await fetch(
+            `/admin/product/${productId}/delete`,
+            {
+                method: "POST"
+            }
+        );
+
+        const result = await response.json();
+        if(!response.ok || !result.success){
+            toast(
+                result.message || "Failed to delete product"
+            );
+            return;
+        }
+        toast(result.message);
+        setTimeout(() => {
+            window.location.reload();
+        }, 700);
+    }catch(error){
+        console.error("DELETE PRODUCT ERROR:", error);
+        toast("Something went wrong.");
+    }
+}
+
+async function updateOrderStatus(orderId, status){
+
+    if(!status){
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            `/admin/order/${orderId}/status`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    status: status
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if(!response.ok || !result.success){
+
+            toast(
+                result.message || "Failed to update order status"
+            );
+
+            return;
+        }
+
+        toast(result.message);
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 700);
+
+    }catch(error){
+
+        console.error(
+            "ORDER STATUS ERROR:",
+            error
+        );
+
+        toast(
+            "Something went wrong."
+        );
+    }
+}
+
+/* ===================== THEME ===================== */
+function initTheme(){
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    document.body.classList.toggle('dark');
+    toast(document.body.classList.contains('dark') ? 'Dark mode enabled' : 'Light mode enabled');
+  });
+}
+
+/* ===================== INIT ===================== */
+function renderAll(){
+  renderDashboard();
+}
+
+buildNav();
+renderAll();
+initTabs('reportTabs');
+initTabs('settingsTabs');
+initTheme();
+
+</script>
+</body>
+</html>

@@ -9,10 +9,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function(){
-  try{
-    const user = JSON.parse(localStorage.getItem('anistock_user') || 'null');
-    if(!user){ window.location.replace('login.html'); }
-  }catch(e){ window.location.replace('login.html'); }
+  // Login is already enforced server-side by Flask's /checkout route,
+  // so we don't run the old localStorage-based redirect here (it checked
+  // a browser-only key Flask never sets and was sending logged-in users
+  // to a nonexistent "login.html" path).
   try{ if(localStorage.getItem('anistock_theme') === 'dark'){ document.documentElement.classList.add('theme-pending-dark'); } }catch(e){}
 })();
 </script>
@@ -176,7 +176,7 @@ header{ display:flex; justify-content:space-between; align-items:center; padding
 </head>
 <body>
 <header>
-  <a href="shop.html" class="back-link">← VloMa</a>
+  <a href="{{ url_for('shop') }}" class="back-link">← VloMa</a>
   <div class="secure">🔒 Secure Checkout</div>
 </header>
 
@@ -264,9 +264,27 @@ header{ display:flex; justify-content:space-between; align-items:center; padding
     </div>
 </div>
 
-  <div class="summary">
+<div class="summary">
     <h3>Order Summary</h3>
-    <div></div>
+
+    <!-- CART ITEMS -->
+    <div id="cartItems"></div>
+
+    <!-- COMBO / SHIPPING PROGRESS -->
+    <div class="combo-box">
+        <div class="combo-row">
+            <span>Combo Offer</span>
+            <span id="comboLabel">Level 0</span>
+        </div>
+
+        <div class="combo-bar">
+            <div class="combo-fill" id="comboFill" style="width:0%;"></div>
+        </div>
+
+        <div class="combo-note" id="comboNote">
+            Add more items to unlock free express shipping & a complimentary gift box.
+        </div>
+    </div>
 
     <div class="totals">
       <div class="total-row"><span>Subtotal</span><span id="sumSubtotal">₹0</span></div>
@@ -317,7 +335,6 @@ function addToCart(id){
   else { cart.push({id:product.id, name:product.name, price:product.price, qty:1, img:product.img}); }
   saveCart(cart);
   renderCart();
-  renderQuickAdd();
   showToast(product.name + ' added to bag');
 }
 
@@ -361,7 +378,7 @@ function renderCart(){
   const cart = getCart();
   const wrap = document.getElementById('cartItems');
   if(cart.length===0){
-    wrap.innerHTML = `<div class="empty-cart">Your bag is empty. <a href="shop.html" style="color:var(--maroon);">Browse the shop →</a></div>`;
+    wrap.innerHTML = `<div class="empty-cart">Your bag is empty. <a href="{{ url_for('shop') }}" style="color:var(--maroon);">Browse the shop →</a></div>`;
   } else {
     wrap.innerHTML = cart.map(item=>`
       <div class="sum-item">
@@ -454,38 +471,62 @@ function validateCard(){
   return ok;
 }
 
-async function confirmPayment(){
+async function confirmPayment() {
 
-    const response=await fetch("/create-order",{
-        method:"POST"
-    });
-    const data=await response.json();
+    const cart = getCart();
 
-    var options={
-        key:data.key,
-        amount:data.amount,
-        currency:"INR",
-        order_id:data.order_id,
-        name:"AniStock",
-        description:"Order Payment",
-        handler:function(response){
-            fetch("/payment-success",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify(response)
+    if (!cart || cart.length === 0) {
+        showToast("Your cart is empty");
+        return;
+    }
+
+    const button = document.getElementById("confirmBtn");
+
+    button.disabled = true;
+    button.textContent = "Processing...";
+
+    try {
+
+        const response = await fetch("/place-order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                cart: cart
             })
-            .then(()=>{
-                window.location.href="/confirmation";
-            });
-        }
-    };
-    var rzp=new Razorpay(options);
-    rzp.open();
-}
+        });
 
+        const data = await response.json();
+
+        console.log("PLACE ORDER RESPONSE:", data);
+
+        if (data.success) {
+
+            localStorage.removeItem("anistock_cart");
+
+            window.location.href = "/confirmation";
+
+        } else {
+
+            showToast(
+                data.message || "Unable to place order"
+            );
+
+            button.disabled = false;
+            button.textContent = "Buy Now";
+        }
+
+    } catch (error) {
+
+        console.error("PLACE ORDER ERROR:", error);
+
+        showToast("Server error while placing order");
+
+        button.disabled = false;
+        button.textContent = "Buy Now";
+    }
+}
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -493,16 +534,6 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-/* seed demo cart if empty, so page isn't blank on first visit — replace img paths with your own photos */
-(function seed(){
-  const cart = getCart();
-  if(cart.length===0){
-    saveCart([
-      {id:'ck1', name:'Kundan Bloom Necklace Set', price:8500, qty:1, img:'images/jewellery-necklace-1.jpg'},
-      {id:'ck2', name:'Champagne Block Heels', price:2600, qty:1, img:'images/footwear-heels-1.jpg'}
-    ]);
-  }
-})();
 renderCart();
 renderQuickAdd();
 
@@ -511,6 +542,5 @@ renderQuickAdd();
 })();
 
 </script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
