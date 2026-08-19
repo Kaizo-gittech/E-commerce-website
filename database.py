@@ -1,12 +1,17 @@
+import os
 import mysql.connector
-import config
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def get_connection():
+
     return mysql.connector.connect(
-        host=config.MYSQL_HOST,
-        port=config.MYSQL_PORT,
-        user=config.MYSQL_USER,
-        password=config.MYSQL_PASSWORD,
-        database=config.MYSQL_DB,
+        host=os.getenv("MYSQL_HOST"),
+        port=int(os.getenv("MYSQL_PORT", 3306)),
+        user=os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MYSQL_DB"),
         ssl_ca="ca.pem"
     )
