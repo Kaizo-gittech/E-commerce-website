@@ -1,5 +1,9 @@
 import os
 import random
+
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import (
     Flask,
     render_template,
@@ -17,7 +21,6 @@ from werkzeug.security import (
 from werkzeug.utils import secure_filename
 from database import get_connection
 from mail import mail, send_seller_status_email
-import config
 
 from jinja2 import ChoiceLoader, FileSystemLoader
 
@@ -75,16 +78,14 @@ os.makedirs(SHOP_LOGO_FOLDER, exist_ok=True)
 os.makedirs(GST_FOLDER, exist_ok=True)
 os.makedirs(PAN_FOLDER, exist_ok=True)
 os.makedirs(PRODUCT_FOLDER, exist_ok=True)
+app.secret_key = os.getenv("SECRET_KEY")
 
-app.secret_key = config.SECRET_KEY
-
-app.config["MAIL_SERVER"] = config.MAIL_SERVER
-app.config["MAIL_PORT"] = config.MAIL_PORT
-app.config["MAIL_USE_TLS"] = config.MAIL_USE_TLS
-app.config["MAIL_USERNAME"] = config.MAIL_USERNAME
-app.config["MAIL_PASSWORD"] = config.MAIL_PASSWORD
-app.config["MAIL_DEFAULT_SENDER"] = config.MAIL_DEFAULT_SENDER
-
+app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER")
+app.config["MAIL_PORT"] = int(os.getenv("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"] = os.getenv("MAIL_USE_TLS", "True").lower() == "true"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
 mail.init_app(app)
 
 
@@ -645,7 +646,6 @@ def seller_register():
         category = request.form.get("category", "").strip()
 
         print(email)
-        print(password)
 
         # Basic required-field check so we fail with a friendly flash
         # instead of a raw KeyError/500 if something is missing.
@@ -1058,7 +1058,6 @@ def user_register():
 
     print("Full Name:", full_name)
     print("Email:", email)
-    print("Password:", password)
 
     conn = get_connection()
     cur = conn.cursor()
@@ -2338,7 +2337,7 @@ def create_order():
     return jsonify({
         "order_id": order["id"],
         "amount": amount,
-        "key": config.RAZORPAY_KEY_ID
+        "key": os.getenv("RAZORPAY_KEY_ID")
     })
 
 

@@ -4,3 +4,4 @@ gunicorn
 python-dotenv
 Werkzeug
 Flask-Mail
+razorpay
